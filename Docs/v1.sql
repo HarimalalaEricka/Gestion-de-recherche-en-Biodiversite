@@ -551,7 +551,9 @@ CREATE TABLE darwin_core.resource_relationship (
 );
 
 
--------------------------------
+---------------------------
+---- Specialisation 
+-----------------------------
 -- ============================================================
 -- 3e PARTIE - CLASSES DARWIN CORE SPECIALISEES
 -- PostgreSQL
