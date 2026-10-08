@@ -1,7 +1,7 @@
 CREATE TYPE AgentType AS ENUM (
-    'PERSON',
-    'GROUP',
-    'INSTITUTION'
+   'PERSON',
+   'GROUP',
+   'INSTITUTION'
 );
 
 CREATE TYPE basisOfRecord AS ENUM (
@@ -20,10 +20,10 @@ CREATE TYPE OccurenceStatus AS ENUM (
 );
 
 CREATE TYPE organismScope AS ENUM (
-    'INDIVIDUAL',
-    'GROUP',
-    'COLONY',
-    'POPULATION'
+   'INDIVIDUAL',
+   'GROUP',
+   'COLONY',
+   'POPULATION'
 );
 
 CREATE TYPE Confidentiality AS ENUM (
