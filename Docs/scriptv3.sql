@@ -61,7 +61,9 @@ CREATE TABLE Dataset(
    datasetName VARCHAR(500)  NOT NULL,
    Licence TEXT,
    rightsHolder TEXT,
-   PRIMARY KEY(datasetID)
+   rechercheID INTEGER NOT NULL,
+   PRIMARY KEY(datasetID),
+   FOREIGN KEY(rechercheID) REFERENCES recherche(rechercheID)
 );
 
 CREATE TABLE Pays(
@@ -206,10 +208,8 @@ CREATE TABLE recherche(
    date_creation TIMESTAMP NOT NULL,
    date_fin DATE,
    Note_perso TEXT,
-   datasetID INTEGER NOT NULL,
    Confidentialite Confidentiality NOT NULL,
-   PRIMARY KEY(rechercheID),
-   FOREIGN KEY(datasetID) REFERENCES Dataset(datasetID),
+   PRIMARY KEY(rechercheID)
 );
 
 CREATE TABLE Media_recherche(
