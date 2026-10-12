@@ -45,6 +45,12 @@ CREATE TYPE role AS ENUM (
    'DATA_ENTRY'
 );
 
+CREATE TYPE statut_user AS ENUM (
+   'INVITE',
+   'ACTIVE',
+   'DESACTIVE'
+);
+
 CREATE TYPE referenceType AS ENUM (
    'BOOK',
    'JOURNAL_ARTICLE',
@@ -196,6 +202,8 @@ CREATE TABLE Utilisateur(
    email VARCHAR(250)  NOT NULL,
    mot_de_passe VARCHAR(500)  NOT NULL,
    role role NOT NULL,
+   statut statut_user NOT NULL,
+   date_creation TIMESTAMP NOT NULL,
    PRIMARY KEY(UtilisateurID),
    UNIQUE(email)
 );
