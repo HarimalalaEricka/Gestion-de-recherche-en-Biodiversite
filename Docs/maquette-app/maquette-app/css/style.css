@@ -1,0 +1,26 @@
+/* Maquette de la plateforme de gestion des données de recherche en biodiversité */
+body{margin:0;background:#fff;font-family:'Patrick Hand',sans-serif;color:#222}
+.p{box-sizing:border-box;padding:32px;max-width:1280px;min-height:820px;display:flex;flex-direction:column;gap:20px}
+.box{border:2px dashed #555;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px;overflow-x:auto}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.f{display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;font-size:18px}
+input,select{font:inherit;border:2px solid #333;border-radius:6px;padding:8px 10px;height:44px;box-sizing:border-box;background:#fff;color:#222;width:100%}
+.btn{font:inherit;font-size:18px;border:2px solid #222;border-radius:8px;padding:8px 20px;min-height:44px;background:#fff;color:#222}
+.pri{background:#222;color:#fff}
+.step{border:2px solid #555;border-radius:20px;padding:6px 14px;color:#444;font-size:18px}
+.on{background:#222;color:#fff}
+h1,h2{margin:0;font-weight:400}
+h1{font-size:32px}h2{font-size:24px}
+.note{font-size:16px;color:#555}
+table{border-collapse:collapse;min-width:900px;font-size:18px}
+th{text-align:left;padding:6px 8px;border-bottom:2px solid #222}
+td{padding:6px 8px}
+a{color:inherit}
+a.btn,a.step{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;cursor:pointer}
+a.btn:hover,a.step:hover{background:#eee}
+a.btn.pri:hover,a.step.on:hover{background:#444}
+a.note{text-decoration:underline}
+.nav{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;border-bottom:2px solid #222;padding-bottom:12px}
+.nav .grp{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.logo{font-size:26px;text-decoration:none}
+

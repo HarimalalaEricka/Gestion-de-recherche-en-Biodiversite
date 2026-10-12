@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Détail d'une observation</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="p">
+<div class="nav"><div class="grp"><a class="logo" href="06-mes-recherches-liste-et-detail.html">[Logo]</a><a class="step on" href="29-explorer.html">Espace partagé</a><a class="step" href="06-mes-recherches-liste-et-detail.html">Mes recherches</a><a class="step" href="10-collaborateurs.html">Collaborateurs</a><a class="step" href="27-notifications.html">Notifications</a></div><div class="grp"><a class="step" href="23-brouillons-hors-ligne.html">Brouillons hors ligne</a><a class="step" href="05-mon-profil.html">Mon profil</a><a class="step" href="36-utilisateurs.html">Administration</a><a class="step" href="01-connexion.html">Déconnexion</a></div></div>
+<div class="note">Explorer › Observation</div><div class="row" style="justify-content:space-between;align-items:center"><h1>Observation [n] : [taxon]</h1><a class="btn" href="#" title="Action non simulée dans la maquette">Exporter</a></div>
+<div class="row" style="align-items:flex-start;flex-wrap:nowrap">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div class="box"><h2>Événement</h2><span>Date : [date]</span><span>Dataset : [dataset]</span><span>Protocole : [protocole]</span><span>Méthode : [texte]</span></div>
+<div class="box"><h2>Lieu</h2><span>[Pays] › [Province] › [Commune]</span><span>Localité : [texte]</span><span>Coordonnées : [lat], [long]</span><div class="box" style="min-height:90px;align-items:center;justify-content:center">[Mini-carte]</div></div>
+<div class="box"><h2>Organisme et observation</h2><span>Portée : [individu / groupe / colonie / population]</span><span>Statut : [détecté]</span><span>Type de donnée : [type]</span><span>Nombre : [n]</span><span>Contexte géologique : [si fossile]</span></div></div>
+<div style="flex:2;display:flex;flex-direction:column;gap:16px">
+<div class="box"><h2>Identifications</h2><table><thead><tr><th>Taxon</th><th>Date</th><th>Par</th><th>Qualificatif</th><th>Acceptée</th></tr></thead><tbody><tr><td>[taxon]</td><td>[date]</td><td>[agent]</td><td>[cf.]</td><td>Oui</td></tr><tr><td>[taxon]</td><td>[date]</td><td>[agent]</td><td></td><td>Non</td></tr></tbody></table></div>
+<div class="box"><h2>Mesures</h2><table><thead><tr><th>Type</th><th>Valeur</th><th>Unité</th><th>Méthode</th></tr></thead><tbody><tr><td>[type]</td><td>[n]</td><td>[u]</td><td>[méthode]</td></tr></tbody></table></div>
+<div class="box"><h2>Médias</h2><div class="row"><div class="box" style="width:90px;height:90px"></div><div class="box" style="width:90px;height:90px"></div></div></div>
+<div class="box"><h2>Matériel et ADN</h2><span>Échantillon : [institution] · [collection] · [n° de catalogue]</span><span>Analyse ADN : [protocole] · [séquence] · [nb de lectures]</span></div>
+<div class="row" style="flex-wrap:nowrap"><div class="box" style="flex:1"><h2>Références</h2><span>[référence]</span></div><div class="box" style="flex:1"><h2>Interactions</h2><span>[type] avec observation [n]</span></div></div>
+</div></div>
+</div>
+</body>
+</html>
