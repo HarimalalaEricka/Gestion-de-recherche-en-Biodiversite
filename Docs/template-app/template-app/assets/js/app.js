@@ -11,6 +11,7 @@
     const language = storage.lang || 'fr';
     const translations = (window.I18N || {}).en || {};
     const translate = text => language === 'en' && translations[text] || text;
+    const themeIcon = theme => theme === 'dark' ? 'bi-sun' : 'bi-moon-stars';
 
     document.documentElement.dataset.bsTheme = storage.theme || 'light';
     document.documentElement.lang = language;
@@ -190,7 +191,7 @@
                     <button class="btn btn-outline-secondary"
                             id="theme"
                             aria-label="Mode sombre / clair">
-                        <i class="bi bi-moon-stars"></i>
+                        <i class="bi ${themeIcon(storage.theme || 'light')}"></i>
                     </button>
                     <button class="btn btn-outline-secondary"
                             id="lang"
@@ -823,7 +824,7 @@
                 <button class="btn btn-sm btn-outline-secondary"
                         id="theme"
                         aria-label="Mode sombre / clair">
-                    <i class="bi bi-moon-stars"></i>
+                    <i class="bi ${themeIcon(storage.theme || 'light')}"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-secondary"
                         id="lang"
@@ -846,6 +847,9 @@
                 ? 'light'
                 : 'dark';
             document.documentElement.dataset.bsTheme = storage.theme;
+            queryAll('#theme').forEach(button => {
+                button.querySelector('i').className = `bi ${themeIcon(storage.theme)}`;
+            });
         }
     });
 
