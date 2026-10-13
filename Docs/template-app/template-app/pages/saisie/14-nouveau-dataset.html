@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="../../assets/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nouveau dataset · Nexora</title>
+    <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/bootstrap/icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <script defer src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script defer src="../../assets/js/config.js"></script>
+    <script defer src="../../assets/js/i18n.js"></script>
+    <script defer src="../../assets/js/app.js"></script>
+</head>
+
+<body data-root="../../" data-page="14" data-active="6" data-crumbs="Saisie|Nouveau dataset">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
+            <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="../accueil/00-accueil.html">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="17-saisie-contexte.html">Saisie</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="14-nouveau-dataset.html">Nouveau dataset</a></li>
+        </ol>
+        </nav>
+        <form class="needs-validation d-grid gap-4" novalidate><small class="text-body-secondary text-end"
+                data-autosave></small>
+            <h1 class="h3 mb-0">Nouveau dataset</h1>
+            <div class="row g-3">
+                <div class="col-md"><label class="form-label" for="f1">Nom du dataset<span class="text-danger">
+                            *</span></label><input class="form-control" type="text" id="f1" name="nom-du-dataset"
+                        value="Mammifères" required></div>
+                <div class="col-md"><label class="form-label" for="f2">Licence</label><select class="form-select"
+                        id="f2" name="licence">
+                        <option>CC BY 4.0</option>
+                        <option>CC BY-NC 4.0</option>
+                        <option>CC0</option>
+                    </select></div>
+                <div class="col-md"><label class="form-label" for="f3">Détenteur des droits</label><input
+                        class="form-control" type="text" id="f3" name="detenteur-des-droits" value="The Peregrine Fund">
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-secondary"
+                    href="../recherches/06-mes-recherches.html">Annuler</a><button type="submit" class="btn btn-primary"
+                    data-next="../saisie/15-fiche-d-un-dataset.html">Créer le dataset</button></div>
+        </form>
+    </main>
+</body>
+
+</html>

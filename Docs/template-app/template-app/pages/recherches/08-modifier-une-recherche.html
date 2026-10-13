@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="../../assets/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modifier une recherche · Nexora</title>
+    <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/bootstrap/icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <script defer src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script defer src="../../assets/js/config.js"></script>
+    <script defer src="../../assets/js/i18n.js"></script>
+    <script defer src="../../assets/js/app.js"></script>
+</head>
+
+<body data-root="../../" data-page="8" data-active="6" data-crumbs="Mes recherches|Modifier une recherche">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
+            <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="../accueil/00-accueil.html">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="06-mes-recherches.html">Mes recherches</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="08-modifier-une-recherche.html">Modifier une recherche</a></li>
+        </ol>
+        </nav>
+        <form class="needs-validation d-grid gap-4" novalidate><small class="text-body-secondary text-end"
+                data-autosave></small>
+            <h1 class="h3 mb-0">Modifier la recherche</h1>
+            <div class="row g-3">
+                <div class="col-md"><label class="form-label" for="f1">Sujet<span class="text-danger">
+                            *</span></label><input class="form-control" type="text" id="f1" name="sujet"
+                        value="Inventaire des lémuriens d&#x27;Andasibe" required></div>
+                <div class="col-md"><label class="form-label" for="f2">Date de début<span class="text-danger">
+                            *</span></label><input class="form-control" type="text" id="f2" name="date-de-debut"
+                        value="12/09/2026" required></div>
+                <div class="col-md"><label class="form-label" for="f3">Date de fin</label><input class="form-control"
+                        type="text" id="f3" name="date-de-fin" value="12/09/2026"></div>
+                <div class="col-md"><label class="form-label" for="f4">Visibilité</label><select class="form-select"
+                        id="f4" name="visibilite">
+                        <option>Privée</option>
+                        <option>Publiée</option>
+                    </select></div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md"><label class="form-label" for="f5">Description</label><textarea class="form-control"
+                        id="f5" name="description"
+                        rows="4">Inventaire des lémuriens du parc national d&#x27;Andasibe, saison 2026.</textarea>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-danger"
+                    href="../recherches/06-mes-recherches.html"
+                    data-confirm="Voulez-vous vraiment effectuer cette action ?">Supprimer</a><a
+                    class="btn btn-outline-danger" href="../recherches/06-mes-recherches.html"
+                    data-confirm="Voulez-vous vraiment effectuer cette action ?">Dépublier</a><button type="submit"
+                    class="btn btn-primary" data-next="../recherches/06-mes-recherches.html">Enregistrer</button></div>
+        </form>
+    </main>
+</body>
+
+</html>

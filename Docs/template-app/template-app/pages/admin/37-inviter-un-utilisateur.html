@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="../../assets/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inviter un utilisateur · Nexora</title>
+    <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/bootstrap/icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <script defer src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script defer src="../../assets/js/config.js"></script>
+    <script defer src="../../assets/js/i18n.js"></script>
+    <script defer src="../../assets/js/app.js"></script>
+</head>
+
+<body data-root="../../" data-page="37" data-active="36" data-crumbs="Administration|Inviter un utilisateur">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
+            <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="../accueil/00-accueil.html">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="36-utilisateurs.html">Administration</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="37-inviter-un-utilisateur.html">Inviter un utilisateur</a></li>
+        </ol>
+        </nav>
+        <form class="needs-validation d-grid gap-4" novalidate><small class="text-body-secondary text-end"
+                data-autosave></small>
+            <h1 class="h3 mb-0">Inviter un utilisateur</h1>
+            <div class="row g-3">
+                <div class="col-md"><label class="form-label" for="f1">Nom<span class="text-danger">
+                            *</span></label><input class="form-control" type="text" id="f1" name="nom"
+                        value="Rakoto Andry" required></div>
+                <div class="col-md"><label class="form-label" for="f2">E-mail<span class="text-danger">
+                            *</span></label><input class="form-control" type="email" id="f2" name="e-mail"
+                        value="andry.rakoto@peregrine.example" required></div>
+                <div class="col-md"><label class="form-label" for="f3">Rôle<span class="text-danger">
+                            *</span></label><select class="form-select" id="f3" name="role" required>
+                        <option>Administrateur</option>
+                        <option>Chercheur</option>
+                        <option>Agent de saisie</option>
+                        <option>Lecteur</option>
+                    </select></div>
+            </div>
+            <p class="text-body-secondary mb-0">Un lien d&#x27;activation valable 7 jours est envoyé par e-mail.</p>
+            <div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-secondary"
+                    href="../admin/36-utilisateurs.html">Annuler</a><button type="submit" class="btn btn-primary"
+                    data-next="../admin/36-utilisateurs.html">Envoyer l&#x27;invitation</button><a
+                    class="btn btn-outline-secondary" href="#" data-demo>Copier le lien</a></div>
+        </form>
+    </main>
+</body>
+
+</html>

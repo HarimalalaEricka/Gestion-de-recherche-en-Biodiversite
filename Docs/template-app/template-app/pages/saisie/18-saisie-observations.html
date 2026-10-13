@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="../../assets/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saisie : observations · Nexora</title>
+    <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/bootstrap/icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <script defer src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script defer src="../../assets/js/config.js"></script>
+    <script defer src="../../assets/js/i18n.js"></script>
+    <script defer src="../../assets/js/app.js"></script>
+</head>
+
+<body data-root="../../" data-page="18" data-active="17" data-crumbs="Saisie|Saisie : observations">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
+            <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="../accueil/00-accueil.html">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="17-saisie-contexte.html">Saisie</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="18-saisie-observations.html">Saisie : observations</a></li>
+        </ol>
+        </nav>
+        <h1 class="h3 mb-0">Nouvelle observation</h1>
+        <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link" href="../saisie/17-saisie-contexte.html">1 Contexte</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../saisie/18-saisie-observations.html">2
+                    Observations</a></li>
+            <li class="nav-item"><a class="nav-link" href="../saisie/19-saisie-identification.html">3 Identification</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="../saisie/20-saisie-complements.html">4 Compléments</a></li>
+        </ul>
+        <div class="card">
+            <div class="card-header fw-semibold">Une ligne = un organisme observé</div>
+            <div class="card-body d-grid gap-3">
+                <div class="card">
+                    <div class="card-header"><input type="search" form="nf"
+                            class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                            aria-label="Filtrer"></div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" data-table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Taxon</th>
+                                    <th scope="col">Détection</th>
+                                    <th scope="col">Type de donnée</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Portée</th>
+                                    <th scope="col">Mesures</th>
+                                    <th scope="col">Médias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Lemur catta</td>
+                                    <td><span class="badge text-bg-success">Détecté</span></td>
+                                    <td>Observation humaine</td>
+                                    <td>Rakoto Andry</td>
+                                    <td>Individu</td>
+                                    <td>12</td>
+                                    <td>12</td>
+                                </tr>
+                                <tr>
+                                    <td>Propithecus verreauxi</td>
+                                    <td><span class="badge text-bg-success">Détecté</span></td>
+                                    <td>Spécimen conservé</td>
+                                    <td>Rasoa Voahangy</td>
+                                    <td>Groupe</td>
+                                    <td>48</td>
+                                    <td>48</td>
+                                </tr>
+                                <tr>
+                                    <td>Furcifer pardalis</td>
+                                    <td><span class="badge text-bg-secondary">Non détecté</span></td>
+                                    <td>Observation machine</td>
+                                    <td>Randria Tojo</td>
+                                    <td>Colonie</td>
+                                    <td>236</td>
+                                    <td>236</td>
+                                </tr>
+                                <tr>
+                                    <td>Eulemur fulvus</td>
+                                    <td><span class="badge text-bg-success">Détecté</span></td>
+                                    <td>Observation humaine</td>
+                                    <td>Razafy Mialy</td>
+                                    <td>Individu</td>
+                                    <td>5</td>
+                                    <td>5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-secondary" href="#" data-demo>+ Ajouter
+                        une ligne</a></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header fw-semibold">Options avancées</div>
+            <div class="card-body d-grid gap-3">
+                <ul class="list-unstyled mb-0 d-grid gap-1">
+                    <li>▸ Contexte géologique (fossiles)</li>
+                    <li>▸ Interactions entre organismes</li>
+                    <li>▸ Matériel / collection</li>
+                    <li>▸ Analyse ADN</li>
+                </ul>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-secondary"
+                href="../saisie/17-saisie-contexte.html">Précédent</a><a class="btn btn-outline-secondary"
+                href="../saisie/23-brouillons-hors-ligne.html" data-toast="Brouillon enregistré">Enregistrer le
+                brouillon</a><a class="btn btn-primary" href="../saisie/19-saisie-identification.html">Suivant :
+                identification</a></div>
+    </main>
+</body>
+
+</html>

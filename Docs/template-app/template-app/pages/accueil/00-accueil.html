@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="../../assets/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Accueil · Nexora</title>
+    <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/bootstrap/icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <script defer src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script defer src="../../assets/js/config.js"></script>
+    <script defer src="../../assets/js/i18n.js"></script>
+    <script defer src="../../assets/js/app.js"></script>
+</head>
+
+<body data-root="../../" data-page="0" data-active="0" data-crumbs="">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <h1 class="h3 mb-0">Bienvenue sur Nexora</h1>
+        <p class="text-body-secondary mb-0">Voici où vous en êtes.</p>
+        <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="../recherches/07-nouvelle-recherche.html">+
+                Nouvelle recherche</a><a class="btn btn-outline-secondary"
+                href="../saisie/17-saisie-contexte.html">Nouvelle saisie</a><a class="btn btn-outline-secondary"
+                href="../saisie/16-import-excel-csv.html">Importer un fichier</a></div>
+        <div class="row row-cols-2 row-cols-lg-4 g-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="fs-3 fw-semibold">48</div>
+                        <div class="text-body-secondary">Recherches</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="fs-3 fw-semibold">236</div>
+                        <div class="text-body-secondary">Datasets</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="fs-3 fw-semibold">5</div>
+                        <div class="text-body-secondary">Observations</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <div class="fs-3 fw-semibold">12</div>
+                        <div class="text-body-secondary">Saisies à valider</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-8 d-grid gap-3 align-content-start">
+                <div class="card">
+                    <div class="card-header fw-semibold">Saisies en cours</div>
+                    <div class="card-body d-grid gap-3">
+                        <div class="card">
+                            <div class="card-header"><input type="search" form="nf"
+                                    class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                                    aria-label="Filtrer"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" data-table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Dataset</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Lignes</th>
+                                            <th scope="col">État</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Mammifères</td>
+                                            <td>12/09/2026</td>
+                                            <td>12</td>
+                                            <td><span class="badge text-bg-secondary">Brouillon</span></td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Reptiles</td>
+                                            <td>03/09/2026</td>
+                                            <td>48</td>
+                                            <td><span class="badge text-bg-warning">En attente de sync</span></td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Mes recherches récentes</div>
+                    <div class="card-body d-grid gap-3">
+                        <div class="card">
+                            <div class="card-header"><input type="search" form="nf"
+                                    class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                                    aria-label="Filtrer"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" data-table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Recherche</th>
+                                            <th scope="col">Modifiée</th>
+                                            <th scope="col">Datasets</th>
+                                            <th scope="col">Statut</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Inventaire des lémuriens d&#x27;Andasibe</td>
+                                            <td>12/09/2026</td>
+                                            <td>Mammifères</td>
+                                            <td><span class="badge text-bg-success">Publiée</span></td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Suivi des reptiles de Berenty</td>
+                                            <td>03/09/2026</td>
+                                            <td>Reptiles</td>
+                                            <td><span class="badge text-bg-secondary">Privée</span></td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Oiseaux d&#x27;Ankarafantsika</td>
+                                            <td>28/08/2026</td>
+                                            <td>Ovipares</td>
+                                            <td><span class="badge text-bg-secondary">Brouillon</span></td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 d-grid gap-3 align-content-start">
+                <div class="card">
+                    <div class="card-header fw-semibold">Synchronisation</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li><span class="text-body-secondary">Saisies enregistrées dans ce navigateur :</span> 48
+                            </li>
+                        </ul>
+                        <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary"
+                                href="../saisie/23-brouillons-hors-ligne.html">Synchroniser</a></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">À valider</div>
+                    <div class="card-body d-grid gap-3">
+                        <div class="card">
+                            <div class="card-header"><input type="search" form="nf"
+                                    class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                                    aria-label="Filtrer"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" data-table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Agent</th>
+                                            <th scope="col">Dataset</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Rakoto Andry</td>
+                                            <td>Mammifères</td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rasoa Voahangy</td>
+                                            <td>Reptiles</td>
+                                            <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                                                    href="../recherches/06-mes-recherches.html">Ouvrir</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Notifications</div>
+                    <div class="card-body d-grid gap-3">
+                        <p class="text-body-secondary mb-0">Rien de nouveau pour l&#x27;instant.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
