@@ -62,6 +62,15 @@ CREATE TYPE referenceType AS ENUM (
    'OTHER'
 );
 
+CREATE TYPE type_notification AS ENUM (
+    'invitation',
+    'validation_demandee',
+    'donnee_validee',
+    'donnee_rejetee',
+    'partage_recu',
+    'systeme'
+);
+
 CREATE TABLE Dataset(
    datasetID SERIAL,
    datasetName VARCHAR(500)  NOT NULL,
@@ -207,6 +216,19 @@ CREATE TABLE Utilisateur(
    PRIMARY KEY(UtilisateurID),
    UNIQUE(email)
 );
+
+CREATE TABLE notification (
+    notificationID              BIGSERIAL PRIMARY KEY,
+    UtilisateurID   BIGINT NOT NULL REFERENCES utilisateur(UtilisateurID) ON DELETE CASCADE,
+    type            type_notification NOT NULL,
+    titre           VARCHAR(150) NOT NULL,
+    message         TEXT,
+    lien            VARCHAR(255),          -- page à ouvrir au clic (ex. /pages/validation/detail?id=12)
+    lue             BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    read_at         TIMESTAMP
+);
+
 
 CREATE TABLE recherche(
    rechercheID SERIAL,
