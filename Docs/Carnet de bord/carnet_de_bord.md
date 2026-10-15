@@ -3,7 +3,6 @@
 
 - **Prévu aujourd'hui :**   - Envoyer cahier des charge encadreur
                             - Envoyer dossier de conception encadreur
-                            - Preparer 2 ou 3 fichier Excel de test
 - **Fait :** (ce qui marche vraiment, pas ce qui est commencé)
 - **NonTerminé :** (ce qui n'a pas été fait, et pourquoi)
 - **Problème rencontré :** (le message d'erreur, ou ce qui bloquait)
