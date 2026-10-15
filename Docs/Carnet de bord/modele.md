@@ -13,6 +13,7 @@
 
 - **Prévu aujourd'hui :** (la tâche du planning)
 - **Fait :** (ce qui marche vraiment, pas ce qui est commencé)
+- **NonTerminé :** (ce qui n'a pas été fait, et pourquoi)
 - **Problème rencontré :** (le message d'erreur, ou ce qui bloquait)
 - **Solution :** (ce qui a fonctionné, et pourquoi)
 - **Temps passé :** (par exemple 6 h, dont 1 h sur le problème)
