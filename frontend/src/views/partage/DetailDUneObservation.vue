@@ -1,0 +1,175 @@
+<script setup>
+import { usePage } from '../../composables/usePage'
+usePage()
+</script>
+
+<template>
+  <main id="content" class="p-4 d-grid gap-4 align-content-start">
+        <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
+            <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><router-link to="/accueil">Accueil</router-link></li>
+            <li class="breadcrumb-item active" aria-current="page"><router-link to="/partage/detail-d-une-observation">D&#195;&#169;tail d&#39;une observation</router-link></li>
+        </ol>
+        </nav>
+        <h1 class="h3 mb-0">Propithecus verreauxi</h1>
+        <p class="text-body-secondary mb-0">Observation n° 1042</p>
+        <div class="row g-4">
+            <div class="col-lg-4 d-grid gap-3 align-content-start">
+                <div class="card">
+                    <div class="card-header fw-semibold">Événement</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li><span class="text-body-secondary">Date :</span> 28/08/2026</li>
+                            <li><span class="text-body-secondary">Dataset :</span> Mammifères</li>
+                            <li><span class="text-body-secondary">Protocole :</span> Point d&#x27;écoute</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Lieu</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li><span class="text-body-secondary">Pays :</span> Madagascar</li>
+                            <li><span class="text-body-secondary">Province :</span> Alaotra-Mangoro</li>
+                            <li><span class="text-body-secondary">Commune :</span> Andasibe</li>
+                            <li><span class="text-body-secondary">Coordonnées :</span> -18,9 ; 48,4</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Organisme et observation</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li><span class="text-body-secondary">Portée :</span> Individu</li>
+                            <li><span class="text-body-secondary">Détection :</span> Détecté</li>
+                            <li><span class="text-body-secondary">Type de donnée :</span> Observation humaine</li>
+                            <li><span class="text-body-secondary">Nombre :</span> 2</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 d-grid gap-3 align-content-start">
+                <div class="card">
+                    <div class="card-header fw-semibold">Identifications</div>
+                    <div class="card-body d-grid gap-3">
+                        <div class="card">
+                            <div class="card-header"><input type="search" form="nf"
+                                    class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                                    aria-label="Filtrer"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" data-table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Taxon</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Identifié par</th>
+                                            <th scope="col">Qualificatif</th>
+                                            <th scope="col">Acceptée</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Lemur catta</td>
+                                            <td>12/09/2026</td>
+                                            <td>Rakoto Andry</td>
+                                            <td>cf.</td>
+                                            <td>Oui</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Propithecus verreauxi</td>
+                                            <td>03/09/2026</td>
+                                            <td>Rasoa Voahangy</td>
+                                            <td>aff.</td>
+                                            <td>Non</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Mesures</div>
+                    <div class="card-body d-grid gap-3">
+                        <div class="card">
+                            <div class="card-header"><input type="search" form="nf"
+                                    class="form-control form-control-sm table-filter" placeholder="Filtrer..."
+                                    aria-label="Filtrer"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" data-table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Valeur</th>
+                                            <th scope="col">Unité</th>
+                                            <th scope="col">Méthode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Poids</td>
+                                            <td>2,4</td>
+                                            <td>kg</td>
+                                            <td>Transect linéaire</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Longueur du corps</td>
+                                            <td>15,8</td>
+                                            <td>cm</td>
+                                            <td>Pesée</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Médias</div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="ratio ratio-1x1 bg-body-secondary rounded">
+                                    <div class="d-flex align-items-center justify-content-center text-body-secondary"><i
+                                            class="bi bi-image fs-3"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="ratio ratio-1x1 bg-body-secondary rounded">
+                                    <div class="d-flex align-items-center justify-content-center text-body-secondary"><i
+                                            class="bi bi-image fs-3"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="ratio ratio-1x1 bg-body-secondary rounded">
+                                    <div class="d-flex align-items-center justify-content-center text-body-secondary"><i
+                                            class="bi bi-image fs-3"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Matériel et ADN</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li><span class="text-body-secondary">Échantillon :</span> MNHN, collection MAM, n° 2024-118
+                            </li>
+                            <li><span class="text-body-secondary">Analyse ADN :</span> COI, 658 pb, 1 240 lectures</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header fw-semibold">Références</div>
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li>Auteur, 2019. Titre de la référence.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="#" data-demo>Exporter</a></div>
+    
+  </main>
+</template>
