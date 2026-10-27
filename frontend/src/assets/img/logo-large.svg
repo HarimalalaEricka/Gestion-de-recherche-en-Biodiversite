@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420" width="100%" height="100%">
+  <defs>
+    <style>
+      /* ==========================================================
+         VARIABLES DE COULEURS ADAPTATIVES (MODE CLAIR PAR DÉFAUT)
+         ========================================================== */
+      :root {
+        --bg-plate: #F4F7F4;
+        --border-plate: rgba(22, 59, 44, 0.12);
+        --text-title: #0C281C;
+        --text-sub: #1E4E38;
+        --text-tag: #2D6A4F;
+        --grid-line: rgba(16, 75, 50, 0.07);
+        
+        /* Dégradés Forêt / Recherche */
+        --c-leaf-dark: #0F3826;
+        --c-leaf-mid: #1B5E3F;
+        --c-forest-bright: #2D8A5E;
+        --c-mint-glow: #10B981;
+        --c-pulse: #34D399;
+        
+        --node-base: #0F3826;
+        --shadow-color: rgba(12, 40, 28, 0.12);
+      }
+
+      /* ==========================================================
+         BASCULE AUTOMATIQUE EN MODE SOMBRE
+         ========================================================== */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-plate: #08130E;
+          --border-plate: rgba(52, 211, 153, 0.18);
+          --text-title: #ECFDF5;
+          --text-sub: #A7F3D0;
+          --text-tag: #34D399;
+          --grid-line: rgba(52, 211, 153, 0.08);
+
+          --c-leaf-dark: #0A2619;
+          --c-leaf-mid: #134E33;
+          --c-forest-bright: #10B981;
+          --c-mint-glow: #34D399;
+          --c-pulse: #6EE7B7;
+
+          --node-base: #ECFDF5;
+          --shadow-color: rgba(0, 0, 0, 0.6);
+        }
+      }
+
+      .logo-font-title {
+        font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 700;
+        letter-spacing: 12px;
+      }
+      .logo-font-sub {
+        font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 500;
+        letter-spacing: 4.5px;
+      }
+      .transition-all {
+        transition: all 0.35s ease-in-out;
+      }
+    </style>
+
+    <!-- Dégradé Branche Gauche (Feuille / Base) -->
+    <linearGradient id="gradLeftPillar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--c-leaf-dark)"/>
+      <stop offset="100%" stop-color="var(--c-leaf-mid)"/>
+    </linearGradient>
+
+    <!-- Dégradé Diagonale Nexus (Données / Flux) -->
+    <linearGradient id="gradDiagonal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--c-forest-bright)"/>
+      <stop offset="60%" stop-color="var(--c-mint-glow)"/>
+      <stop offset="100%" stop-color="var(--c-pulse)"/>
+    </linearGradient>
+
+    <!-- Dégradé Branche Droite (Croissance / Données) -->
+    <linearGradient id="gradRightPillar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--c-leaf-mid)"/>
+      <stop offset="100%" stop-color="var(--c-forest-bright)"/>
+    </linearGradient>
+
+    <!-- Lueur subtile pour les nœuds -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Arrière-plan dynamique (rect autonome) -->
+
+  <!-- Grille de recherche subtile en arrière-plan -->
+  <g stroke="var(--grid-line)" stroke-width="1" class="transition-all">
+    <line x1="120" y1="50" x2="120" y2="370" stroke-dasharray="4 8"/>
+    <line x1="480" y1="50" x2="480" y2="370" stroke-dasharray="4 8"/>
+    <line x1="50" y1="170" x2="550" y2="170" stroke-dasharray="4 8"/>
+  </g>
+
+  <!-- ========================================================
+       SYMBOLE : LE NEXUS "N" (BIO-STRUCTURE & DONNÉES)
+       ======================================================== -->
+  <g transform="translate(300, 160)" class="transition-all">
+    
+    <!-- Hexagone / Structure Cristalline / Nervure externe -->
+    <polygon 
+      points="0,-82 71,-41 71,41 0,82 -71,41 -71,-41" 
+      fill="none" 
+      stroke="var(--c-forest-bright)" 
+      stroke-width="1.5" 
+      stroke-opacity="0.35" 
+      stroke-dasharray="6 4"
+    />
+
+    <!-- Nervures de données (lignes fines d'interconnexion) -->
+    <line x1="-36" y1="-55" x2="0" y2="-82" stroke="var(--c-mint-glow)" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="36" y1="55" x2="0" y2="82" stroke="var(--c-mint-glow)" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="-36" y1="55" x2="-71" y2="41" stroke="var(--c-mint-glow)" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="36" y1="-55" x2="71" y2="-41" stroke="var(--c-mint-glow)" stroke-width="1.2" stroke-opacity="0.4"/>
+
+    <!-- PILIER GAUCHE DU "N" (Feuille / Pylône ancré) -->
+    <path 
+      d="M -48,55 L -24,55 C -24,55 -24,-20 -24,-55 L -48,-35 Z" 
+      fill="url(#gradLeftPillar)"
+    />
+
+    <!-- PILIER DROIT DU "N" (Nervure / Émergence) -->
+    <path 
+      d="M 24,-55 L 48,-55 C 48,-55 48,20 48,55 L 24,35 Z" 
+      fill="url(#gradRightPillar)"
+    />
+
+    <!-- DIAGONALE CENTRALE DU "N" (Flux de données synaptique) -->
+    <path 
+      d="M -36,-50 L -14,-55 L 36,50 L 14,55 Z" 
+      fill="url(#gradDiagonal)"
+      filter="url(#softGlow)"
+    />
+
+    <!-- NŒUDS DE DONNÉES / CELLULES SCIENTIFIQUES -->
+    <!-- Point haut gauche -->
+    <circle cx="-36" cy="-50" r="5.5" fill="var(--c-pulse)" />
+    <circle cx="-36" cy="-50" r="2.5" fill="var(--bg-plate)" />
+
+    <!-- Point bas gauche -->
+    <circle cx="-36" cy="55" r="4.5" fill="var(--c-leaf-mid)" />
+
+    <!-- Nœud central (Centre d'agrégation de recherche) -->
+    <circle cx="0" cy="0" r="6" fill="var(--c-pulse)" filter="url(#softGlow)"/>
+    <circle cx="0" cy="0" r="2.5" fill="var(--node-base)"/>
+
+    <!-- Point haut droit -->
+    <circle cx="36" cy="-55" r="4.5" fill="var(--c-forest-bright)" />
+
+    <!-- Point bas droit -->
+    <circle cx="36" cy="50" r="5.5" fill="var(--c-pulse)" />
+    <circle cx="36" cy="50" r="2.5" fill="var(--bg-plate)" />
+
+    <!-- Capteurs satellites / Points d'échantillonnage de recherche -->
+    <circle cx="0" cy="-82" r="3" fill="var(--c-mint-glow)" opacity="0.8"/>
+    <circle cx="71" cy="-41" r="3" fill="var(--c-forest-bright)" opacity="0.8"/>
+    <circle cx="71" cy="41" r="3" fill="var(--c-mint-glow)" opacity="0.8"/>
+    <circle cx="0" cy="82" r="3" fill="var(--c-forest-bright)" opacity="0.8"/>
+    <circle cx="-71" cy="41" r="3" fill="var(--c-mint-glow)" opacity="0.8"/>
+    <circle cx="-71" cy="-41" r="3" fill="var(--c-forest-bright)" opacity="0.8"/>
+  </g>
+
+  <!-- ========================================================
+       TEXTE & IDENTITÉ INSTITUTIONNELLE TPF
+       ======================================================== -->
+  <g text-anchor="middle" class="transition-all">
+    <!-- Nom Principal -->
+    <text 
+      x="306" 
+      y="298" 
+      class="logo-font-title" 
+      font-size="34" 
+      fill="var(--text-title)"
+    >NEXORA</text>
+
+    <!-- Séparateur technologique discret -->
+    <line x1="220" y1="318" x2="380" y2="318" stroke="var(--c-mint-glow)" stroke-width="1.5" stroke-opacity="0.5"/>
+
+    <!-- Sous-titre fonctionnel -->
+    <text 
+      x="302" 
+      y="340" 
+      class="logo-font-sub" 
+      font-size="10.5" 
+      fill="var(--text-sub)"
+    >RESEARCH DATA SYSTEM</text>
+
+    <!-- Badge / Partenaire TPF -->
+    <text 
+      x="302" 
+      y="364" 
+      font-family="'Inter', sans-serif" 
+      font-weight="600" 
+      font-size="9" 
+      letter-spacing="3px" 
+      fill="var(--text-tag)"
+      opacity="0.85"
+    >• TPF LABS &amp; ANALYTICS •</text>
+  </g>
+</svg>

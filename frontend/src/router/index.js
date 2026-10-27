@@ -1,23 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import routes from './routes'
+import { translate } from '../lib/i18n'
+import app from '../config/app'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-  ],
+  routes,
+  scrollBehavior: () => ({ top: 0 }),
+})
+
+// Reproduit les attributs que le template posait sur <body> : custom.css s'en sert
+// (ex. body[data-page="1"] .auth-page) et le titre de l'onglet est traduit.
+router.afterEach((to) => {
+  const { page, active, layout, title } = to.meta
+  document.body.dataset.page = String(page ?? '')
+  document.body.dataset.active = active == null ? '' : String(active)
+  if (layout === 'blank') document.body.dataset.layout = 'blank'
+  else delete document.body.dataset.layout
+  if (title) document.title = `${translate(title)} · ${app.name}`
 })
 
 export default router
