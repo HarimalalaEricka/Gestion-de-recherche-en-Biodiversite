@@ -7,7 +7,7 @@ usePage()
   <main id="content" class="auth-page">
         <div class="auth-card auth-simple-card">
             <div class="auth-simple-brand"><img src="../../assets/img/logo.svg" alt="Logo Nexora"><span>Nexora</span></div>
-            <div class="auth-tech-strip"><span><i class="bi bi-diagram-3"></i> Profil scientifique</span><span>ÉTAPE 01 / 03</span></div>
+            <div class="auth-tech-strip"><span><i class="bi bi-diagram-3"></i> Profil scientifique</span><span>ÉTAPE 01 / 01</span></div>
             <form class="needs-validation auth-simple-form d-grid gap-4" novalidate><small class="text-body-secondary text-end" data-autosave></small>
                     <div class="auth-form-heading"><span class="auth-icon"><i class="bi bi-person-check"></i></span><span class="auth-kicker">Première connexion</span></div>
                     <div><h1>Activer mon compte</h1><p>Complétez vos informations pour commencer à utiliser Nexora.</p></div>

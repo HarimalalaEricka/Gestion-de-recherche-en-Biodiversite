@@ -7,7 +7,8 @@ import mg.nexora.biodiversity.model.Utilisateur;
 import mg.nexora.biodiversity.repository.UtilisateurRepository;
 import mg.nexora.biodiversity.security.JwtService;
 import mg.nexora.biodiversity.model.enums.StatutUser;
-import mg.nexora.biodiversity.service.PasswordResetService;
+import mg.nexora.biodiversity.model.enums.TypeToken;
+import mg.nexora.biodiversity.service.TokenService;
 import mg.nexora.biodiversity.dto.ResetPasswordRequest;
 import mg.nexora.biodiversity.dto.ForgotPasswordRequest;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +25,13 @@ public class AuthController {
     private final UtilisateurRepository repo;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
-    private final PasswordResetService passwordResetService;
+    private final TokenService tokenService;
 
-    public AuthController(UtilisateurRepository repo, PasswordEncoder encoder, JwtService jwtService, PasswordResetService passwordResetService) {
+    public AuthController(UtilisateurRepository repo, PasswordEncoder encoder, JwtService jwtService, TokenService tokenService) {
         this.repo = repo;
         this.encoder = encoder;
         this.jwtService = jwtService;
-        this.passwordResetService = passwordResetService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
@@ -62,7 +63,7 @@ public class AuthController {
 
     @PostMapping("/mot-de-passe-oublie")
     public ResponseEntity<?> motDePasseOublie(@Valid @RequestBody ForgotPasswordRequest req) {
-        passwordResetService.demander(req.email());
+        tokenService.demander(req.email(), TypeToken.RESET_PASSWORD);
         // Même réponse dans tous les cas
         return ResponseEntity.ok(Map.of("message",
                 "Si cette adresse existe, un e-mail de réinitialisation vient d'être envoyé."));
@@ -70,8 +71,7 @@ public class AuthController {
 
     @PostMapping("/reinitialisation")
     public ResponseEntity<?> reinitialiser(@Valid @RequestBody ResetPasswordRequest req) {
-        boolean ok = passwordResetService.reinitialiser(req.token(), req.motDePasse());
-        if (!ok) {
+        if (!tokenService.valider(req.token(), req.motDePasse(), TypeToken.RESET_PASSWORD)) {
             return ResponseEntity.badRequest().body(Map.of("erreur", "Lien invalide ou expiré"));
         }
         return ResponseEntity.ok(Map.of("message", "Mot de passe modifié"));

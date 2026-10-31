@@ -2,10 +2,11 @@ package mg.nexora.biodiversity.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import mg.nexora.biodiversity.model.enums.TypeToken;
 
 @Entity
-@Table(name = "password_reset_token")
-public class PasswordResetToken {
+@Table(name = "token")
+public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,10 @@ public class PasswordResetToken {
 
     private boolean utilise = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_token", nullable = false)
+    private TypeToken typeToken;
+
     public Long getId() { return id; }
     public String getTokenHash() { return tokenHash; }
     public void setTokenHash(String tokenHash) { this.tokenHash = tokenHash; }
@@ -32,4 +37,6 @@ public class PasswordResetToken {
     public void setExpireLe(LocalDateTime expireLe) { this.expireLe = expireLe; }
     public boolean isUtilise() { return utilise; }
     public void setUtilise(boolean utilise) { this.utilise = utilise; }
+    public TypeToken getTypeToken() { return typeToken; }
+    public void setTypeToken(TypeToken typeToken) { this.typeToken = typeToken; }
 }

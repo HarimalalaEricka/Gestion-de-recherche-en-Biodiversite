@@ -24,10 +24,10 @@ usePage()
                         value="andry.rakoto@peregrine.example" required></div>
                 <div class="col-md"><label class="form-label" for="f3">Rôle<span class="text-danger">
                             *</span></label><select class="form-select" id="f3" name="role" required>
-                        <option>Administrateur</option>
-                        <option>Chercheur</option>
-                        <option>Agent de saisie</option>
-                        <option>Lecteur</option>
+                        <option value="ADMIN">Administrateur</option>
+                        <option value="RESEARCHER">Chercheur</option>
+                        <option value="DATA_ENTRY">Agent de saisie</option>
+                        <option value="VIEWER">Lecteur</option>
                     </select></div>
             </div>
             <p class="text-body-secondary mb-0">Un lien d&#x27;activation valable 7 jours est envoyé par e-mail.</p>
