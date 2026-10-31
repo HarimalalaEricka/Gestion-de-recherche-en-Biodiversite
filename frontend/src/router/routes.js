@@ -2,22 +2,27 @@
 // meta.page   : numéro de page d'origine (utilisé par custom.css : body[data-page="1"]…)
 // meta.active : numéro de l'entrée du menu à surligner
 // meta.layout : 'app' (sidebar + barre du haut) ou 'blank' (pages d'authentification, erreurs)
+// meta.public : true = page accessible sans être connecté (toutes les autres sont protégées)
 export default [
   { path: '/', redirect: '/auth/connexion' },
   { path: "/sommaire", component: () => import('../views/Sommaire.vue'),
     meta: { page: "index", active: null, layout: 'blank', title: "Maquette interactive" } },
   { path: "/accueil", component: () => import('../views/accueil/Accueil.vue'),
     meta: { page: 0, active: 0, layout: 'app', title: "Accueil" } },
+
+  // ---------- Authentification (publiques) ----------
   { path: "/auth/connexion", component: () => import('../views/auth/Connexion.vue'),
-    meta: { page: 1, active: null, layout: 'blank', title: "Connexion" } },
+    meta: { page: 1, active: null, layout: 'blank', title: "Connexion", public: true } },
   { path: "/auth/activation-du-compte", component: () => import('../views/auth/ActivationDuCompte.vue'),
-    meta: { page: 2, active: null, layout: 'blank', title: "Activation du compte" } },
+    meta: { page: 2, active: null, layout: 'blank', title: "Activation du compte", public: true } },
   { path: "/auth/mot-de-passe-oublie", component: () => import('../views/auth/MotDePasseOublie.vue'),
-    meta: { page: 3, active: null, layout: 'blank', title: "Mot de passe oublié" } },
+    meta: { page: 3, active: null, layout: 'blank', title: "Mot de passe oublié", public: true } },
   { path: "/auth/reinitialisation", component: () => import('../views/auth/Reinitialisation.vue'),
-    meta: { page: 4, active: null, layout: 'blank', title: "Réinitialisation" } },
+    meta: { page: 4, active: null, layout: 'blank', title: "Réinitialisation", public: true } },
   { path: "/auth/mon-profil", component: () => import('../views/auth/MonProfil.vue'),
     meta: { page: 5, active: null, layout: 'app', title: "Mon profil" } },
+
+  // ---------- Recherches ----------
   { path: "/recherches/mes-recherches", component: () => import('../views/recherches/MesRecherches.vue'),
     meta: { page: 6, active: 6, layout: 'app', title: "Mes recherches" } },
   { path: "/recherches/nouvelle-recherche", component: () => import('../views/recherches/NouvelleRecherche.vue'),
@@ -34,6 +39,8 @@ export default [
     meta: { page: 12, active: 6, layout: 'app', title: "Thèse" } },
   { path: "/recherches/notes-personnelles", component: () => import('../views/recherches/NotesPersonnelles.vue'),
     meta: { page: 13, active: 6, layout: 'app', title: "Notes personnelles" } },
+
+  // ---------- Saisie ----------
   { path: "/saisie/nouveau-dataset", component: () => import('../views/saisie/NouveauDataset.vue'),
     meta: { page: 14, active: 6, layout: 'app', title: "Nouveau dataset" } },
   { path: "/saisie/fiche-d-un-dataset", component: () => import('../views/saisie/FicheDUnDataset.vue'),
@@ -56,6 +63,8 @@ export default [
     meta: { page: 23, active: 17, layout: 'app', title: "Brouillons hors ligne" } },
   { path: "/saisie/detail-d-un-evenement", component: () => import('../views/saisie/DetailDUnEvenement.vue'),
     meta: { page: 24, active: 17, layout: 'app', title: "Détail d'un événement" } },
+
+  // ---------- Validation ----------
   { path: "/validation/saisies-a-valider", component: () => import('../views/validation/SaisiesAValider.vue'),
     meta: { page: 25, active: 25, layout: 'app', title: "Saisies à valider" } },
   { path: "/validation/detail-d-une-saisie-a-valider", component: () => import('../views/validation/DetailDUneSaisieAValider.vue'),
@@ -64,6 +73,8 @@ export default [
     meta: { page: 27, active: null, layout: 'app', title: "Notifications" } },
   { path: "/validation/tableau-de-bord", component: () => import('../views/validation/TableauDeBord.vue'),
     meta: { page: 28, active: 0, layout: 'app', title: "Tableau de bord" } },
+
+  // ---------- Partage ----------
   { path: "/partage/explorer", component: () => import('../views/partage/Explorer.vue'),
     meta: { page: 29, active: 29, layout: 'app', title: "Explorer" } },
   { path: "/partage/liste-des-taxons", component: () => import('../views/partage/ListeDesTaxons.vue'),
@@ -78,6 +89,8 @@ export default [
     meta: { page: 34, active: 29, layout: 'app', title: "Recherche publiée" } },
   { path: "/partage/tableau-de-bord-partage", component: () => import('../views/partage/TableauDeBordPartage.vue'),
     meta: { page: 35, active: 29, layout: 'app', title: "Tableau de bord partagé" } },
+
+  // ---------- Administration ----------
   { path: "/admin/utilisateurs", component: () => import('../views/admin/Utilisateurs.vue'),
     meta: { page: 36, active: 36, layout: 'app', title: "Utilisateurs" } },
   { path: "/admin/inviter-un-utilisateur", component: () => import('../views/admin/InviterUnUtilisateur.vue'),
@@ -90,14 +103,20 @@ export default [
     meta: { page: 40, active: 40, layout: 'app', title: "Agents" } },
   { path: "/admin/journal-des-evenements", component: () => import('../views/admin/JournalDesEvenements.vue'),
     meta: { page: 41, active: 41, layout: 'app', title: "Journal des événements" } },
+
+  // ---------- Erreurs (publiques) ----------
   { path: "/erreurs/acces-refuse", component: () => import('../views/erreurs/AccesRefuse.vue'),
-    meta: { page: 42, active: null, layout: 'blank', title: "Accès refusé" } },
+    meta: { page: 42, active: null, layout: 'blank', title: "Accès refusé", public: true } },
   { path: "/erreurs/page-introuvable", component: () => import('../views/erreurs/PageIntrouvable.vue'),
-    meta: { page: 43, active: null, layout: 'blank', title: "Page introuvable" } },
+    meta: { page: 43, active: null, layout: 'blank', title: "Page introuvable", public: true } },
+
+  // ---------- Informations ----------
   { path: "/info/aide", component: () => import('../views/info/Aide.vue'),
     meta: { page: 44, active: 44, layout: 'app', title: "Aide" } },
   { path: "/info/mentions-legales-et-donnees", component: () => import('../views/info/MentionsLegalesEtDonnees.vue'),
     meta: { page: 45, active: 45, layout: 'app', title: "Mentions légales et données" } },
+
+  // ---------- Tableaux personnalisés ----------
   { path: "/tableaux/tableaux-personnalises", component: () => import('../views/tableaux/TableauxPersonnalises.vue'),
     meta: { page: 46, active: 46, layout: 'app', title: "Tableaux personnalisés" } },
   { path: "/tableaux/creer-un-tableau", component: () => import('../views/tableaux/CreerUnTableau.vue'),
@@ -110,6 +129,8 @@ export default [
     meta: { page: 50, active: 46, layout: 'app', title: "Import dans un tableau" } },
   { path: "/tableaux/catalogue-des-attributs", component: () => import('../views/tableaux/CatalogueDesAttributs.vue'),
     meta: { page: 51, active: 51, layout: 'app', title: "Catalogue des attributs" } },
+
+  // ---------- Adresses inconnues (publique, doit rester en dernier) ----------
   { path: "/:pathMatch(.*)*", component: () => import('../views/erreurs/PageIntrouvable.vue'),
-    meta: { page: 43, active: null, layout: 'blank', title: "Page introuvable" } },
+    meta: { page: 43, active: null, layout: 'blank', title: "Page introuvable", public: true } },
 ]
