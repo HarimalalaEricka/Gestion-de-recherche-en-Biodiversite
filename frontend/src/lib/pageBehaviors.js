@@ -319,7 +319,7 @@ export function initPage(root, { page, route, router }) {
       }
 
       const nextPage = event.submitter && event.submitter.dataset.next
-      showToast('Enregistré (démonstration)')
+      // showToast('Enregistré (démonstration)')
       storage.removeItem(draftKey)
 
       if (nextPage) setTimeout(() => go(nextPage), 700)
