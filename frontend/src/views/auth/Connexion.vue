@@ -7,8 +7,8 @@ usePage();
 const router = useRouter();
 const route = useRoute();
 
-const email = ref("admin@nexora.mg");
-const password = ref("Admin123!");
+const email = ref("harimalalaerickarandria@gmail.com");
+const password = ref("admin9607");
 const error = ref("");
 const loading = ref(false);
 
