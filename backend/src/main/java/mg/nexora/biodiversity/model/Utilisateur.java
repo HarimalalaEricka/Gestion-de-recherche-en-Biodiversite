@@ -32,7 +32,7 @@ public class Utilisateur {
 
     private String email;
 
-    @Column(name = "mot_de_passe", nullable = false)
+    @Column(name = "mot_de_passe")
 
     private String motDePasse;
 

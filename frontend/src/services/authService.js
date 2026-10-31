@@ -38,3 +38,12 @@ export async function resetPassword(token, motDePasse) {
   })
   return data
 }
+
+export async function activateAccount(token, motDePasse) {
+  const { data } = await request('auth/activation', {
+    method: 'POST',
+    body: { token, motDePasse },
+    auth: false
+  })
+  return data
+}

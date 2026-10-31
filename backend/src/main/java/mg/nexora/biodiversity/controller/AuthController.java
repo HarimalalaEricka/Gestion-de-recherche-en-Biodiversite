@@ -76,4 +76,12 @@ public class AuthController {
         }
         return ResponseEntity.ok(Map.of("message", "Mot de passe modifié"));
     }
+
+    @PostMapping("/activation")
+    public ResponseEntity<?> activer(@Valid @RequestBody ResetPasswordRequest req) {
+        if (!tokenService.valider(req.token(), req.motDePasse(), TypeToken.INVITATION)) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Lien invalide ou expiré"));
+        }
+        return ResponseEntity.ok(Map.of("message", "Compte activé"));
+    }
 }
