@@ -33,4 +33,17 @@ public class UtilisateurService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+
+    public Optional<Utilisateur> partialUpdate(Integer id, Utilisateur entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getNom() != null) existing.setNom(entity.getNom());
+                    if (entity.getPrenom() != null) existing.setPrenom(entity.getPrenom());
+                    if (entity.getEmail() != null) existing.setEmail(entity.getEmail());
+                    if (entity.getTelephone() != null) existing.setTelephone(entity.getTelephone());
+                    if (entity.getRole() != null) existing.setRole(entity.getRole());
+                    if (entity.getStatut() != null) existing.setStatut(entity.getStatut());
+                    return repository.save(existing);
+                });
+    }
 }

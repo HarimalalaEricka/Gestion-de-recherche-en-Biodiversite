@@ -8,7 +8,7 @@ const router = useRouter();
 const route = useRoute();
 
 const email = ref("harimalalaerickarandria@gmail.com");
-const password = ref("admin9607831");
+const password = ref("831admin9607");
 const error = ref("");
 const loading = ref(false);
 

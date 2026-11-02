@@ -11,6 +11,7 @@ import mg.nexora.biodiversity.model.enums.TypeToken;
 import mg.nexora.biodiversity.service.TokenService;
 import mg.nexora.biodiversity.dto.ResetPasswordRequest;
 import mg.nexora.biodiversity.dto.ForgotPasswordRequest;
+import mg.nexora.biodiversity.dto.ChangerMotDePasseRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,9 +57,14 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("erreur", "Utilisateur introuvable"));
         }
         return ResponseEntity.ok(Map.of(
+                "utilisateurID", u.getUtilisateurID(),
                 "email", u.getEmail(),
                 "nom", u.getNom() == null ? "" : u.getNom(),
-                "role", u.getRole().name()));
+                "prenom", u.getPrenom() == null ? "" : u.getPrenom(),
+                "telephone", u.getTelephone() == null ? "" : u.getTelephone(),
+                "role", u.getRole().name(),
+                "statut", u.getStatut().name(),
+                "dateCreation", u.getDateCreation() == null ? "" : u.getDateCreation().toString()));
     }
 
     @PostMapping("/mot-de-passe-oublie")
@@ -83,5 +89,27 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("erreur", "Lien invalide ou expiré"));
         }
         return ResponseEntity.ok(Map.of("message", "Compte activé"));
+    }
+    @PutMapping("/me/mot-de-passe")
+    public ResponseEntity<?> changerMotDePasse(Authentication auth,
+                                            @RequestBody ChangerMotDePasseRequest req) {
+        Utilisateur u = repo.findByEmail(auth.getName()).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(401).body(Map.of("erreur", "Utilisateur introuvable"));
+        }
+
+        if (!encoder.matches(req.ancienMotDePasse(), u.getMotDePasse())) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Ancien mot de passe incorrect"));
+        }
+        if (req.nouveauMotDePasse() == null || req.nouveauMotDePasse().length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Le nouveau mot de passe doit contenir au moins 8 caractères"));
+        }
+        if (!req.nouveauMotDePasse().equals(req.confirmation())) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "La confirmation ne correspond pas"));
+        }
+
+        u.setMotDePasse(encoder.encode(req.nouveauMotDePasse()));
+        repo.save(u);
+        return ResponseEntity.ok(Map.of("message", "Mot de passe modifié"));
     }
 }
