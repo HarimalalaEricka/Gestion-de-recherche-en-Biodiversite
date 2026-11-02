@@ -52,4 +52,11 @@ public class UtilisateurController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Utilisateur> partialUpdate(@PathVariable Integer id, @RequestBody Utilisateur entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
