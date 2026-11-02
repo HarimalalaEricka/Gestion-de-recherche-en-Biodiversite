@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Offcanvas } from "bootstrap";
 import app from "../../config/app";
@@ -13,10 +13,40 @@ import {
   pendingDrafts,
   toggleSimulation,
 } from "../../composables/useConnection";
-import { removeToken } from "../../services/api";
+import { removeToken, request } from "../../services/api";
 
 const router = useRouter();
 const search = ref("");
+
+const nomUser = ref('')
+const prenomUser = ref('')
+const roleUser = ref('')
+
+const initiales = computed(() => {
+  const p = (prenomUser.value || '').trim()
+  const n = (nomUser.value || '').trim()
+  return ((p[0] ?? '') + (n[0] ?? '')).toUpperCase() || '?'
+})
+
+const roleLabels = {
+  ADMIN: 'Administrateur',
+  RESEARCHER: 'Chercheur',
+  VIEWER: 'Lecteur',
+  DATA_ENTRY: 'Agent de saisie',
+  STUDENT: 'Étudiant',
+}
+const roleLabel = computed(() => roleLabels[roleUser.value] ?? roleUser.value)
+
+async function loadProfile() {
+  try {
+    const { data } = await request('auth/me')
+    nomUser.value = data.nom
+    prenomUser.value = data.prenom
+    roleUser.value = data.role
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 // Grand écran : replie la sidebar. Mobile : ouvre/ferme le menu (offcanvas).
 function toggleSidebar() {
@@ -40,6 +70,8 @@ function logout() {
   removeToken();
   router.push(pagePath(1));
 }
+onMounted(loadProfile)
+
 </script>
 
 <template>
@@ -125,19 +157,19 @@ function logout() {
 
       <div class="dropdown profile-menu">
         <button class="profile-trigger" data-bs-toggle="dropdown">
-          <span class="avatar">{{ app.user.ini }}</span>
+          <span class="avatar">{{ initiales }}</span>
           <span class="profile-summary d-none d-md-flex">
-            <strong>{{ app.user.name }}</strong>
-            <small>{{ t(app.user.role) }}</small>
+            <strong>{{ prenomUser }} {{ nomUser }}</strong>
+            <small>{{ t(roleLabel) }}</small>
           </span>
           <i class="bi bi-chevron-down profile-chevron"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end shadow profile-dropdown">
           <li class="profile-dropdown-heading">
-            <span class="avatar">{{ app.user.ini }}</span>
+            <span class="avatar">{{ initiales }}</span>
             <span>
-              <strong>{{ app.user.name }}</strong>
-              <small>{{ t(app.user.role) }}</small>
+              <strong>{{ prenomUser }} {{ nomUser }}</strong>
+              <small>{{ t(roleLabel) }}</small>
             </span>
           </li>
           <li><hr class="dropdown-divider" /></li>
