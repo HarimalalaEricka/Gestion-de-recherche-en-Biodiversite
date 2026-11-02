@@ -33,4 +33,16 @@ public class LocationService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Location> partialUpdate(Integer id, Location entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getMunicipality() != null) existing.setMunicipality(entity.getMunicipality());
+                    if (entity.getLocality() != null) existing.setLocality(entity.getLocality());
+                    if (entity.getDecimalLatitude() != null) existing.setDecimalLatitude(entity.getDecimalLatitude());
+                    if (entity.getDecimalLongitude() != null) existing.setDecimalLongitude(entity.getDecimalLongitude());
+                    if (entity.getGeodeticDatum() != null) existing.setGeodeticDatum(entity.getGeodeticDatum());
+                    if (entity.getProvinceID() != null) existing.setProvinceID(entity.getProvinceID());
+                    return repository.save(existing);
+                });
+    }
 }

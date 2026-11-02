@@ -33,4 +33,11 @@ public class MeasurementTypeService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MeasurementType> partialUpdate(Integer id, MeasurementType entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getMeasurementType() != null) existing.setMeasurementType(entity.getMeasurementType());
+                    return repository.save(existing);
+                });
+    }
 }

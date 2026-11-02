@@ -33,4 +33,13 @@ public class MolecularProtocolService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MolecularProtocol> partialUpdate(Integer id, MolecularProtocol entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getAssayType() != null) existing.setAssayType(entity.getAssayType());
+                    if (entity.getMolecularProtocolRemarks() != null) existing.setMolecularProtocolRemarks(entity.getMolecularProtocolRemarks());
+                    if (entity.getProtocolID() != null) existing.setProtocolID(entity.getProtocolID());
+                    return repository.save(existing);
+                });
+    }
 }

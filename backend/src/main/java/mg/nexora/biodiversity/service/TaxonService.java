@@ -33,4 +33,19 @@ public class TaxonService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Taxon> partialUpdate(Integer id, Taxon entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getScientificName() != null) existing.setScientificName(entity.getScientificName());
+                    if (entity.getKingdom() != null) existing.setKingdom(entity.getKingdom());
+                    if (entity.getPhylum() != null) existing.setPhylum(entity.getPhylum());
+                    if (entity.getTaxonomicClass() != null) existing.setTaxonomicClass(entity.getTaxonomicClass());
+                    if (entity.getOrder() != null) existing.setOrder(entity.getOrder());
+                    if (entity.getFamily() != null) existing.setFamily(entity.getFamily());
+                    if (entity.getGenus() != null) existing.setGenus(entity.getGenus());
+                    if (entity.getSpecificEpithet() != null) existing.setSpecificEpithet(entity.getSpecificEpithet());
+                    if (entity.getTaxonRankID() != null) existing.setTaxonRankID(entity.getTaxonRankID());
+                    return repository.save(existing);
+                });
+    }
 }

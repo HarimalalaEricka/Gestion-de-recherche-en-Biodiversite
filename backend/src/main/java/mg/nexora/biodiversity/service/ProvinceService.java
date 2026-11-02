@@ -33,4 +33,12 @@ public class ProvinceService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Province> partialUpdate(Integer id, Province entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getProvince() != null) existing.setProvince(entity.getProvince());
+                    if (entity.getPaysID() != null) existing.setPaysID(entity.getPaysID());
+                    return repository.save(existing);
+                });
+    }
 }

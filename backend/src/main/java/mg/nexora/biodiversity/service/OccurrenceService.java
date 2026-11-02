@@ -33,4 +33,16 @@ public class OccurrenceService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Occurrence> partialUpdate(Integer id, Occurrence entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getIndividualCount() != null) existing.setIndividualCount(entity.getIndividualCount());
+                    if (entity.getGeologicalContextID() != null) existing.setGeologicalContextID(entity.getGeologicalContextID());
+                    if (entity.getOrganismID() != null) existing.setOrganismID(entity.getOrganismID());
+                    if (entity.getOccurrenceStatus() != null) existing.setOccurrenceStatus(entity.getOccurrenceStatus());
+                    if (entity.getBasisOfRecord() != null) existing.setBasisOfRecord(entity.getBasisOfRecord());
+                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
+                    return repository.save(existing);
+                });
+    }
 }

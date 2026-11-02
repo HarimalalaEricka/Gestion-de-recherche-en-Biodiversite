@@ -33,4 +33,18 @@ public class GeologicalContextService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<GeologicalContext> partialUpdate(Integer id, GeologicalContext entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getGroup() != null) existing.setGroup(entity.getGroup());
+                    if (entity.getFormation() != null) existing.setFormation(entity.getFormation());
+                    if (entity.getMember() != null) existing.setMember(entity.getMember());
+                    if (entity.getBed() != null) existing.setBed(entity.getBed());
+                    if (entity.getEarliestPeriodOrLowestSystem() != null) existing.setEarliestPeriodOrLowestSystem(entity.getEarliestPeriodOrLowestSystem());
+                    if (entity.getLatestPeriodOrHighestSystem() != null) existing.setLatestPeriodOrHighestSystem(entity.getLatestPeriodOrHighestSystem());
+                    if (entity.getEarliestAgeOrLowestStage() != null) existing.setEarliestAgeOrLowestStage(entity.getEarliestAgeOrLowestStage());
+                    if (entity.getLatestAgeOrHighestStage() != null) existing.setLatestAgeOrHighestStage(entity.getLatestAgeOrHighestStage());
+                    return repository.save(existing);
+                });
+    }
 }

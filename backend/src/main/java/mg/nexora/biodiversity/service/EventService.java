@@ -33,4 +33,15 @@ public class EventService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Event> partialUpdate(Integer id, Event entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getEventDate() != null) existing.setEventDate(entity.getEventDate());
+                    if (entity.getSamplingProtocol() != null) existing.setSamplingProtocol(entity.getSamplingProtocol());
+                    if (entity.getProtocolID() != null) existing.setProtocolID(entity.getProtocolID());
+                    if (entity.getLocationID() != null) existing.setLocationID(entity.getLocationID());
+                    if (entity.getDatasetID() != null) existing.setDatasetID(entity.getDatasetID());
+                    return repository.save(existing);
+                });
+    }
 }

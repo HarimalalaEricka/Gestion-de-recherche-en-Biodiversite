@@ -33,4 +33,19 @@ public class MeasurementOrFactService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MeasurementOrFact> partialUpdate(Integer id, MeasurementOrFact entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getMeasurementValue() != null) existing.setMeasurementValue(entity.getMeasurementValue());
+                    if (entity.getMeasurementAccuracy() != null) existing.setMeasurementAccuracy(entity.getMeasurementAccuracy());
+                    if (entity.getMeasurementMethod() != null) existing.setMeasurementMethod(entity.getMeasurementMethod());
+                    if (entity.getMeasurementDeterminedDate() != null) existing.setMeasurementDeterminedDate(entity.getMeasurementDeterminedDate());
+                    if (entity.getMeasurementRemarks() != null) existing.setMeasurementRemarks(entity.getMeasurementRemarks());
+                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
+                    if (entity.getMeasurementOrFactID1() != null) existing.setMeasurementOrFactID1(entity.getMeasurementOrFactID1());
+                    if (entity.getMeasurementUnitID() != null) existing.setMeasurementUnitID(entity.getMeasurementUnitID());
+                    if (entity.getMeasurementTypeID() != null) existing.setMeasurementTypeID(entity.getMeasurementTypeID());
+                    return repository.save(existing);
+                });
+    }
 }

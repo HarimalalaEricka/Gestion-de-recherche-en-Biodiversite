@@ -33,4 +33,11 @@ public class TaxonRankService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<TaxonRank> partialUpdate(Integer id, TaxonRank entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getTaxonRank() != null) existing.setTaxonRank(entity.getTaxonRank());
+                    return repository.save(existing);
+                });
+    }
 }

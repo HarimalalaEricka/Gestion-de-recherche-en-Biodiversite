@@ -33,4 +33,11 @@ public class MaterialEntityCategoryService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MaterialEntityCategory> partialUpdate(Integer id, MaterialEntityCategory entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getCategory() != null) existing.setCategory(entity.getCategory());
+                    return repository.save(existing);
+                });
+    }
 }

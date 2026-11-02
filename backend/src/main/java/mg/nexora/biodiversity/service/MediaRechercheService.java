@@ -33,4 +33,16 @@ public class MediaRechercheService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MediaRecherche> partialUpdate(Integer id, MediaRecherche entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getAccessURI() != null) existing.setAccessURI(entity.getAccessURI());
+                    if (entity.getCaption() != null) existing.setCaption(entity.getCaption());
+                    if (entity.getComments() != null) existing.setComments(entity.getComments());
+                    if (entity.getUtilisateurID() != null) existing.setUtilisateurID(entity.getUtilisateurID());
+                    if (entity.getRechercheID() != null) existing.setRechercheID(entity.getRechercheID());
+                    if (entity.getTypeMedia() != null) existing.setTypeMedia(entity.getTypeMedia());
+                    return repository.save(existing);
+                });
+    }
 }

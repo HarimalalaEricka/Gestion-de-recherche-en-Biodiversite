@@ -33,4 +33,15 @@ public class OrganismInteractionService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<OrganismInteraction> partialUpdate(Integer id, OrganismInteraction entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getOrganismInteractionDescription() != null) existing.setOrganismInteractionDescription(entity.getOrganismInteractionDescription());
+                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
+                    if (entity.getOccurrenceID1() != null) existing.setOccurrenceID1(entity.getOccurrenceID1());
+                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
+                    if (entity.getOrganismInteractionTypeID() != null) existing.setOrganismInteractionTypeID(entity.getOrganismInteractionTypeID());
+                    return repository.save(existing);
+                });
+    }
 }

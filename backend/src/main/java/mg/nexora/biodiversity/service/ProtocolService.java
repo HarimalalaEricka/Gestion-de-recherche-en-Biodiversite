@@ -33,4 +33,15 @@ public class ProtocolService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Protocol> partialUpdate(Integer id, Protocol entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getProtocolName() != null) existing.setProtocolName(entity.getProtocolName());
+                    if (entity.getProtocolDescription() != null) existing.setProtocolDescription(entity.getProtocolDescription());
+                    if (entity.getProtocolReferences() != null) existing.setProtocolReferences(entity.getProtocolReferences());
+                    if (entity.getProtocolRemarks() != null) existing.setProtocolRemarks(entity.getProtocolRemarks());
+                    if (entity.getProtocolTypeID() != null) existing.setProtocolTypeID(entity.getProtocolTypeID());
+                    return repository.save(existing);
+                });
+    }
 }

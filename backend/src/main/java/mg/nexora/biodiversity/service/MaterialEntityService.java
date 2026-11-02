@@ -33,4 +33,18 @@ public class MaterialEntityService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MaterialEntity> partialUpdate(Integer id, MaterialEntity entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getInstitutionCode() != null) existing.setInstitutionCode(entity.getInstitutionCode());
+                    if (entity.getCollectionCode() != null) existing.setCollectionCode(entity.getCollectionCode());
+                    if (entity.getCatalogNumber() != null) existing.setCatalogNumber(entity.getCatalogNumber());
+                    if (entity.getPreparations() != null) existing.setPreparations(entity.getPreparations());
+                    if (entity.getDisposition() != null) existing.setDisposition(entity.getDisposition());
+                    if (entity.getMaterialEntityRemarks() != null) existing.setMaterialEntityRemarks(entity.getMaterialEntityRemarks());
+                    if (entity.getMaterialEntityCategoryID() != null) existing.setMaterialEntityCategoryID(entity.getMaterialEntityCategoryID());
+                    if (entity.getMaterialEntityTypeID() != null) existing.setMaterialEntityTypeID(entity.getMaterialEntityTypeID());
+                    return repository.save(existing);
+                });
+    }
 }

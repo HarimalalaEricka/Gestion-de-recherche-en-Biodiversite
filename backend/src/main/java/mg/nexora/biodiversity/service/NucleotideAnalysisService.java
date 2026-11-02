@@ -33,4 +33,17 @@ public class NucleotideAnalysisService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<NucleotideAnalysis> partialUpdate(Integer id, NucleotideAnalysis entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getReadCount() != null) existing.setReadCount(entity.getReadCount());
+                    if (entity.getTotalReadCount() != null) existing.setTotalReadCount(entity.getTotalReadCount());
+                    if (entity.getIdentificationID() != null) existing.setIdentificationID(entity.getIdentificationID());
+                    if (entity.getNucleotideSequenceID() != null) existing.setNucleotideSequenceID(entity.getNucleotideSequenceID());
+                    if (entity.getMolecularProtocolID() != null) existing.setMolecularProtocolID(entity.getMolecularProtocolID());
+                    if (entity.getMaterialEntityID() != null) existing.setMaterialEntityID(entity.getMaterialEntityID());
+                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
+                    return repository.save(existing);
+                });
+    }
 }

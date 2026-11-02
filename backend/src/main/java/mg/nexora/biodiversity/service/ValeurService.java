@@ -33,4 +33,16 @@ public class ValeurService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Valeur> partialUpdate(Integer id, Valeur entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getValeurTexte() != null) existing.setValeurTexte(entity.getValeurTexte());
+                    if (entity.getValeurNumeric() != null) existing.setValeurNumeric(entity.getValeurNumeric());
+                    if (entity.getValeurBoolean() != null) existing.setValeurBoolean(entity.getValeurBoolean());
+                    if (entity.getValeurDate() != null) existing.setValeurDate(entity.getValeurDate());
+                    if (entity.getLigneID() != null) existing.setLigneID(entity.getLigneID());
+                    if (entity.getAttributID() != null) existing.setAttributID(entity.getAttributID());
+                    return repository.save(existing);
+                });
+    }
 }

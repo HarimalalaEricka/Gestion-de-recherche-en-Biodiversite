@@ -33,4 +33,17 @@ public class RechercheService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Recherche> partialUpdate(Integer id, Recherche entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getSujet() != null) existing.setSujet(entity.getSujet());
+                    if (entity.getDescription() != null) existing.setDescription(entity.getDescription());
+                    if (entity.getDateDebut() != null) existing.setDateDebut(entity.getDateDebut());
+                    if (entity.getDateCreation() != null) existing.setDateCreation(entity.getDateCreation());
+                    if (entity.getDateFin() != null) existing.setDateFin(entity.getDateFin());
+                    if (entity.getNotePerso() != null) existing.setNotePerso(entity.getNotePerso());
+                    if (entity.getConfidentialite() != null) existing.setConfidentialite(entity.getConfidentialite());
+                    return repository.save(existing);
+                });
+    }
 }

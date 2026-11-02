@@ -33,4 +33,14 @@ public class DatasetService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Dataset> partialUpdate(Integer id, Dataset entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getDatasetName() != null) existing.setDatasetName(entity.getDatasetName());
+                    if (entity.getLicence() != null) existing.setLicence(entity.getLicence());
+                    if (entity.getRightsHolder() != null) existing.setRightsHolder(entity.getRightsHolder());
+                    if (entity.getRechercheID() != null) existing.setRechercheID(entity.getRechercheID());
+                    return repository.save(existing);
+                });
+    }
 }

@@ -33,4 +33,13 @@ public class TableauPersonnaliseService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<TableauPersonnalise> partialUpdate(Integer id, TableauPersonnalise entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getNom() != null) existing.setNom(entity.getNom());
+                    if (entity.getDatasetID() != null) existing.setDatasetID(entity.getDatasetID());
+                    if (entity.getAgentID() != null) existing.setAgentID(entity.getAgentID());
+                    return repository.save(existing);
+                });
+    }
 }
