@@ -64,27 +64,32 @@ export default {
       "i": "database"
     },
     {
-      "l": "Administration"
+      "l": "Administration",
+      "role": "ADMIN"
     },
     {
       "p": 36,
       "t": "Utilisateurs",
-      "i": "people"
+      "i": "people",
+      "role": "ADMIN"
     },
     {
       "p": 39,
       "t": "Référentiels",
-      "i": "list-ul"
+      "i": "list-ul",
+      "role": "ADMIN"
     },
     {
       "p": 40,
       "t": "Agents",
-      "i": "person-badge"
+      "i": "person-badge",
+      "role": "ADMIN"
     },
     {
       "p": 41,
       "t": "Journal des événements",
-      "i": "journal-text"
+      "i": "journal-text",
+      "role": "ADMIN"
     },
     {
       "l": "Aide"
