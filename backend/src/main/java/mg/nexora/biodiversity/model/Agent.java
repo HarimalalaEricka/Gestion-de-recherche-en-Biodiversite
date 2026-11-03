@@ -16,35 +16,22 @@ public class Agent {
 
     private Integer agentID;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "agenttype", nullable = false)
+    @Column(name = "utilisateurid")
+    private Integer utilisateurId;
 
-    private AgentType agentType;
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "utilisateurid")
-    private Utilisateur utilisateur;
-
-    @Column(name = "agentroleorder")
-
-    private Integer agentRoleOrder;
+    @Column(name = "orderrole")
+    private Integer orderRole;
 
     public Integer getAgentID() { return agentID; }
 
     public void setAgentID(Integer agentID) { this.agentID = agentID; }
 
-    public AgentType getAgentType() { return agentType; }
+    public Integer getUtilisateurId() { return utilisateurId; }
 
-    public void setAgentType(AgentType agentType) { this.agentType = agentType; }
+    public void setUtilisateurId(Integer utilisateurId) { this.utilisateurId = utilisateurId; }
 
-    public Utilisateur getUtilisateur() { return utilisateur; }
+    public Integer getOrderRole() { return orderRole; }
 
-    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
-
-    public Integer getAgentRoleOrder() { return agentRoleOrder; }
-
-
-    public void setAgentRoleOrder(Integer agentRoleOrder) { this.agentRoleOrder = agentRoleOrder; }
+    public void setOrderRole(Integer orderRole) { this.orderRole = orderRole; }
 
 }

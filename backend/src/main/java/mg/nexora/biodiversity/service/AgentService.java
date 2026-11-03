@@ -36,8 +36,8 @@ public class AgentService {
     public Optional<Agent> partialUpdate(Integer id, Agent entity) {
         return repository.findById(id)
                 .map(existing -> {
-                    if (entity.getAgentRemarks() != null) existing.setAgentRemarks(entity.getAgentRemarks());
-                    if (entity.getAgentType() != null) existing.setAgentType(entity.getAgentType());
+                    if (entity.getUtilisateurId() != null) existing.setUtilisateurId(entity.getUtilisateurId());
+                    if (entity.getOrderRole() != null) existing.setOrderRole(entity.getOrderRole());
                     return repository.save(existing);
                 });
     }

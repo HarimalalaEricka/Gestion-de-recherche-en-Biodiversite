@@ -18,16 +18,14 @@ public class RechercheService {
     private final RechercheRepository repository;
     private final UtilisateurRepository utilisateurRepository;
     private final AgentRepository agentRepository;
-    private final AgentUserRepository agentUserRepository;
     private final AgentRechercheRepository agentRechercheRepository;
 
 
 
-    public RechercheService(RechercheRepository repository, UtilisateurRepository utilisateurRepository, AgentRepository agentRepository, AgentUserRepository agentUserRepository, AgentRechercheRepository agentRechercheRepository) {
+    public RechercheService(RechercheRepository repository, UtilisateurRepository utilisateurRepository, AgentRepository agentRepository, AgentRechercheRepository agentRechercheRepository) {
         this.repository = repository;
         this.utilisateurRepository = utilisateurRepository;
         this.agentRepository = agentRepository;
-        this.agentUserRepository = agentUserRepository;
         this.agentRechercheRepository = agentRechercheRepository;
     }
 
@@ -77,20 +75,15 @@ public class RechercheService {
         r = repository.save(r);
 
         // Réutilise l'agent de l'utilisateur s'il existe déjà, sinon le crée
-        Agent agent = agentUserRepository.findByUtilisateurAndAgentRoleOrder(user, 1)
-            .map(AgentUser::getAgent)
+        Agent agent = agentRepository.findByUtilisateurIdAndOrderRole(user.getUtilisateurID(), 1)
             .orElseGet(() -> {
                 Agent a = new Agent();
-                a.setAgentType(AgentType.PERSON);
+                a.setUtilisateurId(user.getUtilisateurID());
+                a.setOrderRole(1);
                 a = agentRepository.save(a);
-
-                AgentUser au = new AgentUser();
-                au.setAgent(a);
-                au.setUtilisateur(user);
-                au.setAgentRoleOrder(1);
-                agentUserRepository.save(au);
                 return a;
             });
+
 
         AgentRecherche ar = new AgentRecherche();
         ar.setAgent(agent);
