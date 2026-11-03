@@ -1,11 +1,20 @@
 <script setup>
-import { useRoute } from 'vue-router'
-import app from '../../config/app'
-import { pagePath } from '../../router/pages'
-import { translate as t } from '../../lib/i18n'
-import logo from '../../assets/img/logo.svg'
+import { useRoute } from "vue-router";
+import app from "../../config/app";
+import { pagePath } from "../../router/pages";
+import { translate as t } from "../../lib/i18n";
+import logo from "../../assets/img/logo.svg";
+import { computed } from "vue";
 
-const route = useRoute()
+const route = useRoute();
+
+const brut = JSON.parse(localStorage.getItem("userConnected") || "{}");
+const userConnecter = brut.data ?? brut; // le rôle est dans brut.data
+console.log("userConnecter", userConnecter);
+console.log("role", userConnecter.role); // doit afficher "ADMIN"
+const menuVisible = computed(() =>
+  app.menu.filter((item) => !item.role || item.role === userConnecter.role)
+);
 </script>
 
 <template>
@@ -20,7 +29,7 @@ const route = useRoute()
       </div>
     </div>
     <nav class="side-nav">
-      <template v-for="(item, index) in app.menu" :key="index">
+      <template v-for="(item, index) in menuVisible" :key="index">
         <div v-if="item.l" class="side-label">{{ t(item.l) }}</div>
         <router-link
           v-else

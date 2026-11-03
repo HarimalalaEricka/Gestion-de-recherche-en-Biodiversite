@@ -3,6 +3,7 @@ import { usePage } from "../../composables/usePage";
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { login } from "../../services/authService";
+import { request } from "../../services/api";
 usePage();
 const router = useRouter();
 const route = useRoute();
@@ -17,11 +18,14 @@ async function loginUser() {
   loading.value = true;
   try {
     await login(email.value, password.value);
+    const user = await request("auth/me");
+    localStorage.setItem("userConnected", JSON.stringify(user));
     router.push(route.query.redirect || "/accueil");
   } catch (e) {
     error.value = e.message.includes("401")
       ? "E-mail ou mot de passe incorrect"
       : "Impossible de se connecter au serveur";
+    console.log("Erreur lors de la connexion :", e);
   } finally {
     loading.value = false;
   }

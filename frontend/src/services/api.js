@@ -91,6 +91,10 @@ export async function getItems(item, filters = {}, params = {}) {
     delete query.perPage
   }
 
+  Object.keys(query).forEach(k => {
+    if (query[k] === '' || query[k] === undefined || query[k] === null) delete query[k]
+  })
+
   const { data, response } = await request(item, { query })
 
   // Lecture flexible de la liste
@@ -99,14 +103,16 @@ export async function getItems(item, filters = {}, params = {}) {
   else if (Array.isArray(data?.content)) items = data.content   // Page Spring
   else if (Array.isArray(data?.data)) items = data.data
   else if (Array.isArray(data?.results)) items = data.results
+  else if (Array.isArray(data?.items)) items = data.items
 
   // Total : Page Spring, sinon header X-Total-Count, sinon taille de la liste
+  const headerTotal = parseInt(response?.headers?.get('X-Total-Count'), 10)
   const total =
     data?.totalElements ??
-    parseInt(response.headers.get('X-Total-Count')) ??
-    items.length
+    (Number.isNaN(headerTotal) ? items.length : headerTotal)
 
-  return { items, total: Number.isNaN(total) ? items.length : total }
+
+  return { items, total }
 }
 
 export async function getItemById(itemType, itemId) {
