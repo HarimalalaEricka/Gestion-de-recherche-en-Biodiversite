@@ -7,11 +7,22 @@ import { isAuthenticated } from '../services/api'
 const LOGIN_PATH = '/auth/connexion'   // à adapter au chemin réel de Connexion.vue
 const HOME_PATH = '/accueil'
 
+const ADMIN_PAGES = [36, 37, 38, 39, 40, 41]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior: () => ({ top: 0 }),
 })
+
+function getUser() {
+  try {
+    const brut = JSON.parse(localStorage.getItem('userConnected') || '{}')
+    return brut.data ?? brut   
+  } catch {
+    return {}
+  }
+}
 
 // Protection des pages : tout est privé sauf les routes marquées meta.public
 router.beforeEach((to) => {
@@ -23,6 +34,15 @@ router.beforeEach((to) => {
   }
 
   if (to.path === LOGIN_PATH && connecte) {
+    return { path: HOME_PATH }
+  }
+
+  // Protection par rôle
+  const roleRequis =
+    to.matched.map(r => r.meta.role).find(Boolean) ||
+    (ADMIN_PAGES.includes(to.meta.active) ? 'ADMIN' : null)
+
+  if (roleRequis && getUser().role !== roleRequis) {
     return { path: HOME_PATH }
   }
 })

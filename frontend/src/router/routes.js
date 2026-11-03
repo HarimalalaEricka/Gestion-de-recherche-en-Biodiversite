@@ -92,17 +92,17 @@ export default [
 
   // ---------- Administration ----------
   { path: "/admin/utilisateurs", component: () => import('../views/admin/Utilisateurs.vue'),
-    meta: { page: 36, active: 36, layout: 'app', title: "Utilisateurs" } },
+    meta: { page: 36, active: 36, layout: 'app', title: "Utilisateurs", role: "ADMIN" } },
   { path: "/admin/inviter-un-utilisateur", component: () => import('../views/admin/InviterUnUtilisateur.vue'),
-    meta: { page: 37, active: 36, layout: 'app', title: "Inviter un utilisateur" } },
+    meta: { page: 37, active: 36, layout: 'app', title: "Inviter un utilisateur", role: "ADMIN" } },
   { path: "/admin/fiche-d-un-utilisateur", component: () => import('../views/admin/FicheDUnUtilisateur.vue'),
-    meta: { page: 38, active: 36, layout: 'app', title: "Fiche d'un utilisateur" } },
+    meta: { page: 38, active: 36, layout: 'app', title: "Fiche d'un utilisateur", role: "ADMIN" } },
   { path: "/admin/referentiels", component: () => import('../views/admin/Referentiels.vue'),
-    meta: { page: 39, active: 39, layout: 'app', title: "Référentiels" } },
+    meta: { page: 39, active: 39, layout: 'app', title: "Référentiels", role: "ADMIN" } },
   { path: "/admin/agents", component: () => import('../views/admin/Agents.vue'),
-    meta: { page: 40, active: 40, layout: 'app', title: "Agents" } },
+    meta: { page: 40, active: 40, layout: 'app', title: "Agents", role: "ADMIN" } },
   { path: "/admin/journal-des-evenements", component: () => import('../views/admin/JournalDesEvenements.vue'),
-    meta: { page: 41, active: 41, layout: 'app', title: "Journal des événements" } },
+    meta: { page: 41, active: 41, layout: 'app', title: "Journal des événements", role: "ADMIN" } },
 
   // ---------- Erreurs (publiques) ----------
   { path: "/erreurs/acces-refuse", component: () => import('../views/erreurs/AccesRefuse.vue'),
