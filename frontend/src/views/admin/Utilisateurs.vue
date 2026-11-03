@@ -156,7 +156,6 @@ onMounted(fetchUtilisateurs);
                 <th scope="col">Rôle</th>
                 <th scope="col">Statut</th>
                 <th scope="col">Créé le</th>
-                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
@@ -209,13 +208,6 @@ onMounted(fetchUtilisateurs);
                 </td>
 
                 <td>{{ formatDate(u.dateCreation) }}</td>
-                <td class="text-end">
-                  <router-link
-                    class="btn btn-sm btn-outline-primary"
-                    :to="`/admin/fiche-d-un-utilisateur/${u.utilisateurID}`"
-                    >Ouvrir</router-link
-                  >
-                </td>
               </tr>
             </tbody>
           </table>
