@@ -14,24 +14,24 @@ public class AgentUser {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
-    private Agent agentID;
+    private Agent agent;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateurid")
-    private Utilisateur utilisateurID;
+    private Utilisateur utilisateur;
 
     @Column(name = "agentroleorder")
 
     private Integer agentRoleOrder;
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
-    public Utilisateur getUtilisateurID() { return utilisateurID; }
+    public Utilisateur getUtilisateur() { return utilisateur; }
 
-    public void setUtilisateurID(Utilisateur utilisateurID) { this.utilisateurID = utilisateurID; }
+    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 
     public Integer getAgentRoleOrder() { return agentRoleOrder; }
 

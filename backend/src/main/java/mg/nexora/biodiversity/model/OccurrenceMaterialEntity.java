@@ -14,19 +14,19 @@ public class OccurrenceMaterialEntity {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid")
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materialentityid")
-    private MaterialEntity materialEntityID;
+    private MaterialEntity materialEntity;
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
-    public MaterialEntity getMaterialEntityID() { return materialEntityID; }
+    public MaterialEntity getMaterialEntity() { return materialEntity; }
 
-    public void setMaterialEntityID(MaterialEntity materialEntityID) { this.materialEntityID = materialEntityID; }
+    public void setMaterialEntity(MaterialEntity materialEntity) { this.materialEntity = materialEntity; }
 
 }

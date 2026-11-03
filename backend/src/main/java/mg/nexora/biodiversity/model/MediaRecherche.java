@@ -30,11 +30,11 @@ public class MediaRecherche {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateurid", nullable = false)
-    private Utilisateur utilisateurID;
+    private Utilisateur utilisateur;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid", nullable = false)
-    private Recherche rechercheID;
+    private Recherche recherche;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_media", nullable = false)
@@ -57,13 +57,13 @@ public class MediaRecherche {
 
     public void setComments(String comments) { this.comments = comments; }
 
-    public Utilisateur getUtilisateurID() { return utilisateurID; }
+    public Utilisateur getUtilisateur() { return utilisateur; }
 
-    public void setUtilisateurID(Utilisateur utilisateurID) { this.utilisateurID = utilisateurID; }
+    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 
-    public Recherche getRechercheID() { return rechercheID; }
+    public Recherche getRecherche() { return recherche; }
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
 
     public TypeMedia getTypeMedia() { return typeMedia; }
 

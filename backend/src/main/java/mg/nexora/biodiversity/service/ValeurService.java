@@ -40,8 +40,8 @@ public class ValeurService {
                     if (entity.getValeurNumeric() != null) existing.setValeurNumeric(entity.getValeurNumeric());
                     if (entity.getValeurBoolean() != null) existing.setValeurBoolean(entity.getValeurBoolean());
                     if (entity.getValeurDate() != null) existing.setValeurDate(entity.getValeurDate());
-                    if (entity.getLigneID() != null) existing.setLigneID(entity.getLigneID());
-                    if (entity.getAttributID() != null) existing.setAttributID(entity.getAttributID());
+                    if (entity.getLigne() != null) existing.setLigne(entity.getLigne());
+                    if (entity.getAttribut() != null) existing.setAttribut(entity.getAttribut());
                     return repository.save(existing);
                 });
     }

@@ -14,19 +14,19 @@ public class IdentificationReference {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "identificationid")
-    private Identification identificationID;
+    private Identification identification;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referenceid")
-    private BibliographicResource referenceID;
+    private BibliographicResource reference;
 
-    public Identification getIdentificationID() { return identificationID; }
+    public Identification getIdentification() { return identification; }
 
-    public void setIdentificationID(Identification identificationID) { this.identificationID = identificationID; }
+    public void setIdentification(Identification identification) { this.identification = identification; }
 
-    public BibliographicResource getReferenceID() { return referenceID; }
+    public BibliographicResource getReference() { return reference; }
 
-    public void setReferenceID(BibliographicResource referenceID) { this.referenceID = referenceID; }
+    public void setReference(BibliographicResource reference) { this.reference = reference; }
 
 }

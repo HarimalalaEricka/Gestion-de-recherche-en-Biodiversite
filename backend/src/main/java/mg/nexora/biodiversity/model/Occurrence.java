@@ -22,11 +22,11 @@ public class Occurrence {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "geological_contextid")
-    private GeologicalContext geologicalContextID;
+    private GeologicalContext geologicalContext;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organismid", nullable = false)
-    private Organism organismID;
+    private Organism organism;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "occurrencestatus", nullable = false)
@@ -40,7 +40,7 @@ public class Occurrence {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventid", nullable = false)
-    private Event eventID;
+    private Event event;
 
     public Integer getOccurrenceID() { return occurrenceID; }
 
@@ -50,13 +50,13 @@ public class Occurrence {
 
     public void setIndividualCount(Integer individualCount) { this.individualCount = individualCount; }
 
-    public GeologicalContext getGeologicalContextID() { return geologicalContextID; }
+    public GeologicalContext getGeologicalContext() { return geologicalContext; }
 
-    public void setGeologicalContextID(GeologicalContext geologicalContextID) { this.geologicalContextID = geologicalContextID; }
+    public void setGeologicalContext(GeologicalContext geologicalContext) { this.geologicalContext = geologicalContext; }
 
-    public Organism getOrganismID() { return organismID; }
+    public Organism getOrganism() { return organism; }
 
-    public void setOrganismID(Organism organismID) { this.organismID = organismID; }
+    public void setOrganism(Organism organism) { this.organism = organism; }
 
     public OccurenceStatus getOccurrenceStatus() { return occurrenceStatus; }
 
@@ -66,8 +66,8 @@ public class Occurrence {
 
     public void setBasisOfRecord(BasisOfRecord basisOfRecord) { this.basisOfRecord = basisOfRecord; }
 
-    public Event getEventID() { return eventID; }
+    public Event getEvent() { return event; }
 
-    public void setEventID(Event eventID) { this.eventID = eventID; }
+    public void setEvent(Event event) { this.event = event; }
 
 }

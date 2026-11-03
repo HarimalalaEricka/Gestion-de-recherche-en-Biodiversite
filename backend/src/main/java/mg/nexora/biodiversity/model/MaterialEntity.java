@@ -42,11 +42,11 @@ public class MaterialEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materialentitycategoryid", nullable = false)
-    private MaterialEntityCategory materialEntityCategoryID;
+    private MaterialEntityCategory materialEntityCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materialentitytypeid", nullable = false)
-    private MaterialEntityType materialEntityTypeID;
+    private MaterialEntityType materialEntityType;
 
     public Integer getMaterialEntityID() { return materialEntityID; }
 
@@ -76,12 +76,12 @@ public class MaterialEntity {
 
     public void setMaterialEntityRemarks(String materialEntityRemarks) { this.materialEntityRemarks = materialEntityRemarks; }
 
-    public MaterialEntityCategory getMaterialEntityCategoryID() { return materialEntityCategoryID; }
+    public MaterialEntityCategory getMaterialEntityCategory() { return materialEntityCategory; }
 
-    public void setMaterialEntityCategoryID(MaterialEntityCategory materialEntityCategoryID) { this.materialEntityCategoryID = materialEntityCategoryID; }
+    public void setMaterialEntityCategory(MaterialEntityCategory materialEntityCategory) { this.materialEntityCategory = materialEntityCategory; }
 
-    public MaterialEntityType getMaterialEntityTypeID() { return materialEntityTypeID; }
+    public MaterialEntityType getMaterialEntityType() { return materialEntityType; }
 
-    public void setMaterialEntityTypeID(MaterialEntityType materialEntityTypeID) { this.materialEntityTypeID = materialEntityTypeID; }
+    public void setMaterialEntityType(MaterialEntityType materialEntityType) { this.materialEntityType = materialEntityType; }
 
 }

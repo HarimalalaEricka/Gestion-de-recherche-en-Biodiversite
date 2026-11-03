@@ -44,7 +44,7 @@ public class TaxonService {
                     if (entity.getFamily() != null) existing.setFamily(entity.getFamily());
                     if (entity.getGenus() != null) existing.setGenus(entity.getGenus());
                     if (entity.getSpecificEpithet() != null) existing.setSpecificEpithet(entity.getSpecificEpithet());
-                    if (entity.getTaxonRankID() != null) existing.setTaxonRankID(entity.getTaxonRankID());
+                    if (entity.getTaxonRank() != null) existing.setTaxonRank(entity.getTaxonRank());
                     return repository.save(existing);
                 });
     }

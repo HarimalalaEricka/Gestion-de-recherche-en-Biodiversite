@@ -14,19 +14,19 @@ public class OccurrenceAgent {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
-    private Agent agentID;
+    private Agent agent;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid")
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
 }

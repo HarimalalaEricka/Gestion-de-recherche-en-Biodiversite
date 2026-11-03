@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.Recherche;
 import mg.nexora.biodiversity.service.RechercheService;
+import mg.nexora.biodiversity.dto.CreerRechercheRequest;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/recherches")
@@ -58,5 +60,10 @@ public class RechercheController {
         }
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/creer")
+    public Recherche creer(@RequestBody CreerRechercheRequest req, Authentication auth) {
+        return service.creerAvecAgent(req, auth.getName());
     }
 }

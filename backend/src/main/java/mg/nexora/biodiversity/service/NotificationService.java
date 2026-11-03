@@ -43,7 +43,7 @@ public class NotificationService {
                     if (entity.getReadAt() != null) existing.setReadAt(entity.getReadAt());
                     if (entity.getMessage() != null) existing.setMessage(entity.getMessage());
                     if (entity.getLien() != null) existing.setLien(entity.getLien());
-                    if (entity.getUtilisateurID() != null) existing.setUtilisateurID(entity.getUtilisateurID());
+                    if (entity.getUtilisateur() != null) existing.setUtilisateur(entity.getUtilisateur());
                     return repository.save(existing);
                 });
     }

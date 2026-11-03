@@ -39,8 +39,8 @@ public class MediaRechercheService {
                     if (entity.getAccessURI() != null) existing.setAccessURI(entity.getAccessURI());
                     if (entity.getCaption() != null) existing.setCaption(entity.getCaption());
                     if (entity.getComments() != null) existing.setComments(entity.getComments());
-                    if (entity.getUtilisateurID() != null) existing.setUtilisateurID(entity.getUtilisateurID());
-                    if (entity.getRechercheID() != null) existing.setRechercheID(entity.getRechercheID());
+                    if (entity.getUtilisateur() != null) existing.setUtilisateur(entity.getUtilisateur());
+                    if (entity.getRecherche() != null) existing.setRecherche(entity.getRecherche());
                     if (entity.getTypeMedia() != null) existing.setTypeMedia(entity.getTypeMedia());
                     return repository.save(existing);
                 });

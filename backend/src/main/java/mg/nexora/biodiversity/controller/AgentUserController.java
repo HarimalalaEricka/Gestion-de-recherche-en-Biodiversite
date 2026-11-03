@@ -25,8 +25,8 @@ public class AgentUserController {
     @GetMapping("/{agentIDId}/{utilisateurIDId}")
     public ResponseEntity<AgentUser> findById(@PathVariable Integer agentIDId, @PathVariable Integer utilisateurIDId) {
         AgentUserKey id = new AgentUserKey();
-        id.setAgentID(agentIDId);
-        id.setUtilisateurID(utilisateurIDId);
+        id.setAgent(agentIDId);
+        id.setUtilisateur(utilisateurIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class AgentUserController {
     @DeleteMapping("/{agentIDId}/{utilisateurIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer agentIDId, @PathVariable Integer utilisateurIDId) {
         AgentUserKey id = new AgentUserKey();
-        id.setAgentID(agentIDId);
-        id.setUtilisateurID(utilisateurIDId);
+        id.setAgent(agentIDId);
+        id.setUtilisateur(utilisateurIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

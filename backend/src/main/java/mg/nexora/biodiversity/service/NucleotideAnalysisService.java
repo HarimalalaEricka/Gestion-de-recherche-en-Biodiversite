@@ -38,11 +38,11 @@ public class NucleotideAnalysisService {
                 .map(existing -> {
                     if (entity.getReadCount() != null) existing.setReadCount(entity.getReadCount());
                     if (entity.getTotalReadCount() != null) existing.setTotalReadCount(entity.getTotalReadCount());
-                    if (entity.getIdentificationID() != null) existing.setIdentificationID(entity.getIdentificationID());
-                    if (entity.getNucleotideSequenceID() != null) existing.setNucleotideSequenceID(entity.getNucleotideSequenceID());
-                    if (entity.getMolecularProtocolID() != null) existing.setMolecularProtocolID(entity.getMolecularProtocolID());
-                    if (entity.getMaterialEntityID() != null) existing.setMaterialEntityID(entity.getMaterialEntityID());
-                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
+                    if (entity.getIdentification() != null) existing.setIdentification(entity.getIdentification());
+                    if (entity.getNucleotideSequence() != null) existing.setNucleotideSequence(entity.getNucleotideSequence());
+                    if (entity.getMolecularProtocol() != null) existing.setMolecularProtocol(entity.getMolecularProtocol());
+                    if (entity.getMaterialEntity() != null) existing.setMaterialEntity(entity.getMaterialEntity());
+                    if (entity.getEvent() != null) existing.setEvent(entity.getEvent());
                     return repository.save(existing);
                 });
     }

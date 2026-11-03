@@ -14,19 +14,19 @@ public class AgentRecherche {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
-    private Agent agentID;
+    private Agent agent;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid")
-    private Recherche rechercheID;
+    private Recherche recherche;
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
-    public Recherche getRechercheID() { return rechercheID; }
+    public Recherche getRecherche() { return recherche; }
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
 
 }

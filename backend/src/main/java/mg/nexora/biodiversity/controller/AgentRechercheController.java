@@ -25,8 +25,8 @@ public class AgentRechercheController {
     @GetMapping("/{agentIDId}/{rechercheIDId}")
     public ResponseEntity<AgentRecherche> findById(@PathVariable Integer agentIDId, @PathVariable Integer rechercheIDId) {
         AgentRechercheKey id = new AgentRechercheKey();
-        id.setAgentID(agentIDId);
-        id.setRechercheID(rechercheIDId);
+        id.setAgent(agentIDId);
+        id.setRecherche(rechercheIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class AgentRechercheController {
     @DeleteMapping("/{agentIDId}/{rechercheIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer agentIDId, @PathVariable Integer rechercheIDId) {
         AgentRechercheKey id = new AgentRechercheKey();
-        id.setAgentID(agentIDId);
-        id.setRechercheID(rechercheIDId);
+        id.setAgent(agentIDId);
+        id.setRecherche(rechercheIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

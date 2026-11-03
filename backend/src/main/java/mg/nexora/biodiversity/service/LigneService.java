@@ -38,7 +38,7 @@ public class LigneService {
                 .map(existing -> {
                     if (entity.getDateCreation() != null) existing.setDateCreation(entity.getDateCreation());
                     if (entity.getTableauPersonnaliseID() != null) existing.setTableauPersonnaliseID(entity.getTableauPersonnaliseID());
-                    if (entity.getAgentID() != null) existing.setAgentID(entity.getAgentID());
+                    if (entity.getAgent() != null) existing.setAgent(entity.getAgent());
                     return repository.save(existing);
                 });
     }

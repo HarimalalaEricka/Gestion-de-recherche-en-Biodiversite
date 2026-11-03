@@ -30,15 +30,15 @@ public class Identification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "taxonid", nullable = false)
-    private Taxon taxonID;
+    private Taxon taxon;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid", nullable = false)
-    private Agent agentID;
+    private Agent agent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid")
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
     public Integer getIdentificationID() { return identificationID; }
 
@@ -56,16 +56,16 @@ public class Identification {
 
     public void setIsAcceptedIdentification(Boolean isAcceptedIdentification) { this.isAcceptedIdentification = isAcceptedIdentification; }
 
-    public Taxon getTaxonID() { return taxonID; }
+    public Taxon getTaxon() { return taxon; }
 
-    public void setTaxonID(Taxon taxonID) { this.taxonID = taxonID; }
+    public void setTaxon(Taxon taxon) { this.taxon = taxon; }
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
 }
