@@ -1,6 +1,54 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref, computed, watch, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getItems } from "../../services/api";
 usePage()
+
+const router = useRouter()
+
+const recherches = ref([]);
+const total = ref(0);
+const loading = ref(false);
+
+const page = ref(1);
+const perPage = ref(10);
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+
+const confidentialityLabels = {
+    PRIVATE: "Privée",
+    PUBLIC: "Publique",
+    DRAFT: "Brouillon",
+}
+const confidentialityOptions = Object.entries(confidentialityLabels).map(([value, label]) => ({
+    value,
+    label,
+}));
+
+const formatDate = (d) => (d ? new Date(d).toLocaleDateString("fr-FR") : "-");
+
+async function fetchRecherches() {
+    loading.value = true;
+    try {
+        const { items, total: t } = await getItems(
+            "recherches",
+            {},
+            { page: page.value, perPage: perPage.value, sort: "dateCreation,desc" }
+        );
+        recherches.value = items;
+        total.value = t;
+    } catch (e) {
+        console.error("Erreur lors de la récupération des recherches :", e);
+    } finally {
+        loading.value = false;
+    }
+}
+
+// Changement de page ou de taille : on recharge
+watch([page, perPage], fetchRecherches);
+
+onMounted(fetchRecherches)
+
 </script>
 
 <template>
@@ -24,35 +72,40 @@ usePage()
                     <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Brouillons</router-link>
                     </li>
                 </ul>
-                <div class="list-group"><router-link
+                <div class="list-group">
+                    <div v-if="loading" class="list-group-item text-center text-body-secondary">
+                        Chargement...
+                    </div>
+
+                    <div v-else-if="recherches.length === 0"
+                        class="list-group-item text-center text-body-secondary">
+                        Aucune recherche trouvée
+                    </div>
+
+                    <router-link
+                        v-else
+                        v-for="r in recherches"
+                        :key="r.rechercheID"
                         class="list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-2"
-                        to="/recherches/mes-recherches">
+                        :to="`/recherches/mes-recherches/${r.rechercheID}`"
+                    >
                         <div>
-                            <div class="fw-semibold">Suivi des reptiles de Berenty</div><small
-                                class="text-body-secondary">28/08/2026 · 5 datasets</small>
-                        </div><span class="badge text-bg-success">Publiée</span>
-                    </router-link><router-link
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-2"
-                        to="/recherches/mes-recherches">
-                        <div>
-                            <div class="fw-semibold">Inventaire des lémuriens d&#x27;Andasibe</div><small
-                                class="text-body-secondary">03/09/2026 · 236 datasets</small>
-                        </div><span class="badge text-bg-secondary">Privée</span>
-                    </router-link><router-link
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-2"
-                        to="/recherches/mes-recherches">
-                        <div>
-                            <div class="fw-semibold">Amphibiens de Ranomafana</div><small
-                                class="text-body-secondary">12/09/2026 · 48 datasets</small>
-                        </div><span class="badge text-bg-secondary">Brouillon</span>
-                    </router-link><router-link
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-2"
-                        to="/recherches/mes-recherches">
-                        <div>
-                            <div class="fw-semibold">Oiseaux d&#x27;Ankarafantsika</div><small
-                                class="text-body-secondary">15/08/2026 · 12 datasets</small>
-                        </div><span class="badge text-bg-secondary">Brouillon</span>
-                    </router-link></div>
+                            <div class="fw-semibold">{{ r.sujet }}</div>
+                            <small class="text-body-secondary">
+                                {{ formatDate(r.dateCreation) }}
+                            </small>
+                        </div>
+
+                        <span class="badge"
+                            :class="{
+                                'text-bg-success': r.confidentialite === 'PUBLIC',
+                                'text-bg-secondary': r.confidentialite === 'PRIVATE',
+                                'text-bg-warning': r.confidentialite === 'DRAFT'
+                            }">
+                            {{ confidentialityLabels[r.confidentialite] || r.confidentialite }}
+                        </span>
+                    </router-link>
+                </div>
             </div>
             <div class="col-lg-8 d-grid gap-3 align-content-start">
                 <h1 class="h3 mb-0">Suivi des reptiles de Berenty</h1>
