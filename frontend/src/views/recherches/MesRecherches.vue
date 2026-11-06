@@ -90,15 +90,13 @@ async function fetchRecherches() {
   }
 }
 
-// Retire le focus du bouton "Confirmer" du modal avant sa fermeture,
-// pour éviter l'avertissement aria-hidden
+
 function releaseFocus() {
   const el = document.activeElement;
   if (el && el !== document.body) el.blur();
 }
 
-// Change la visibilité de la recherche sélectionnée
-// (la confirmation est gérée par data-confirm dans le template)
+
 async function changerVisibilite(nouvelleValeur) {
   releaseFocus();
   if (!selected.value) return;
@@ -121,7 +119,6 @@ async function changerVisibilite(nouvelleValeur) {
 const publier = () => changerVisibilite("PUBLIC");
 const depublier = () => changerVisibilite("PRIVATE");
 
-// Supprime la recherche sélectionnée (confirmation gérée par data-confirm)
 async function supprimer() {
   releaseFocus();
   if (!selected.value) return;
@@ -364,7 +361,7 @@ onMounted(fetchRecherches);
           <div class="d-flex flex-wrap gap-2">
             <router-link
               class="btn btn-primary"
-              :to="`/saisie/fiche-d-un-dataset?recherche=${selected.rechercheID}`"
+              :to="`/recherches/medias-de-la-recherche/${selected.rechercheID}`"
               >Ouvrir la recherche</router-link
             >
             <router-link

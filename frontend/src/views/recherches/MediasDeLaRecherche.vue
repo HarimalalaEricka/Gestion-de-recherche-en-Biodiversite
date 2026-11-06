@@ -1,6 +1,43 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref, watch, computed, onMounted } from "vue";
+import { getItems } from "../../services/api";
+
 usePage()
+
+const props = defineProps({ idRecherche: { type: String, required: true } })
+
+const loading = ref(false);
+const error = ref("");
+const medias = ref([]);
+const total = ref(0);
+
+const page = ref(1);
+const perPage = ref(10);
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+
+async function fetchMedias() {
+    loading.value = true;
+    error.value = "";
+    try {
+        const { items, total: t } = await getItems(
+            `medias-recherche/mes-medias/${props.idRecherche}`,
+            {},
+            { page: page.value, perPage: perPage.value, sort: "mediaRechercheID,desc" }
+        );
+        medias.value = items;
+        total.value = t;
+    } catch (e) {
+        console.error("Erreur lors du chargement des médias :", e);
+        error.value = "Impossible de charger les médias.";
+    } finally {
+        loading.value = false;
+    }
+}
+
+watch([page, perPage], fetchMedias);
+
+onMounted(fetchMedias);
 </script>
 
 <template>
@@ -14,7 +51,7 @@ usePage()
         </nav>
         <h1 class="h3 mb-0">Suivi des reptiles de Berenty</h1>
         <ul class="nav nav-tabs">
-            <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Données</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Recherches</router-link></li>
             <li class="nav-item"><router-link class="nav-link active"
                     to="/recherches/medias-de-la-recherche">Médias</router-link></li>
             <li class="nav-item"><router-link class="nav-link" to="/recherches/collaborateurs">Collaborateurs</router-link></li>
@@ -47,38 +84,52 @@ usePage()
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><i class="bi bi-image fs-4 text-body-secondary"></i></td>
-                            <td>Poids</td>
-                            <td>Lémur en alimentation</td>
-                            <td>—</td>
-                            <td>Rakoto Andry</td>
-                            <td>12/09/2026</td>
+                        <tr v-for="media in medias" :key="media.mediaRechercheID">
+                            <th><img :src="media.accessURI" :alt="media.caption" class="img-fluid" style="max-height: 100px;" width="50" height="50"></th>
+                            <td>{{ media.typeMedia }}</td>
+                            <td>{{ media.caption }}</td>
+                            <td>{{ media.comments }}</td>
+                            <td>{{ media.utilisateur.nom }} {{ media.utilisateur.prenom }}</td>
+                            <td>{{ media.dateCreation }}</td>
                             <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                    to="/recherches/mes-recherches">Ouvrir</router-link></td>
-                        </tr>
-                        <tr>
-                            <td><i class="bi bi-image fs-4 text-body-secondary"></i></td>
-                            <td>Longueur du corps</td>
-                            <td>Photo de caméra piège</td>
-                            <td>—</td>
-                            <td>Rasoa Voahangy</td>
-                            <td>03/09/2026</td>
-                            <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                    to="/recherches/mes-recherches">Ouvrir</router-link></td>
-                        </tr>
-                        <tr>
-                            <td><i class="bi bi-image fs-4 text-body-secondary"></i></td>
-                            <td>Envergure</td>
-                            <td>Lémur en alimentation</td>
-                            <td>—</td>
-                            <td>Randria Tojo</td>
-                            <td>28/08/2026</td>
-                            <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                    to="/recherches/mes-recherches">Ouvrir</router-link></td>
+                                    :to="`/recherches/mes-recherches/${media.mediaRechercheID}`">Ouvrir</router-link></td>
                         </tr>
                     </tbody>
                 </table>
+                <!-- Pagination -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <small class="text-body-secondary">{{ total }} media(s)</small>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <select
+                        class="form-select form-select-sm w-auto"
+                        v-model.number="perPage"
+                        aria-label="Par page"
+                        >
+                        <option :value="5">5</option>
+                        <option :value="10">10</option>
+                        <option :value="20">20</option>
+                        </select>
+
+                        <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        :disabled="page <= 1"
+                        @click="page--"
+                        >
+                        Précédent
+                        </button>
+                        <span class="small">Page {{ page }} / {{ totalPages }}</span>
+                        <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        :disabled="page >= totalPages"
+                        @click="page++"
+                        >
+                        Suivant
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     

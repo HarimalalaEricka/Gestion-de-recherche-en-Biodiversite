@@ -41,6 +41,9 @@ public class MediaRecherche {
 
     private TypeMedia typeMedia;
 
+    @Column(name = "date_creation", nullable = false, updatable = false)
+    private LocalDateTime dateCreation = LocalDateTime.now();
+
     public Integer getMediaRechercheID() { return mediaRechercheID; }
 
     public void setMediaRechercheID(Integer mediaRechercheID) { this.mediaRechercheID = mediaRechercheID; }
