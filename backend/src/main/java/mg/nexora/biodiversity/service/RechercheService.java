@@ -1,6 +1,7 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ import mg.nexora.biodiversity.repository.*;
 import mg.nexora.biodiversity.dto.CreerRechercheRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
@@ -30,8 +34,8 @@ public class RechercheService {
     }
 
     @Transactional(readOnly = true)
-    public List<Recherche> findAll() {
-        return repository.findAll();
+    public Page<Recherche> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Recherche>from(params), pageable);
     }
 
     @Transactional(readOnly = true)

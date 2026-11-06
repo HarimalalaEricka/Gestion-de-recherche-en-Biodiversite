@@ -25,6 +25,8 @@ export default [
   // ---------- Recherches ----------
   { path: "/recherches/mes-recherches", component: () => import('../views/recherches/MesRecherches.vue'),
     meta: { page: 6, active: 6, layout: 'app', title: "Mes recherches" } },
+  { path: "/recherches/mes-recherches/:id", component: () => import('../views/recherches/MesRecherches.vue'),
+    meta: { page: 6, active: 6, layout: 'app', title: "Mes recherches" } },
   { path: "/recherches/nouvelle-recherche", component: () => import('../views/recherches/NouvelleRecherche.vue'),
     meta: { page: 7, active: 6, layout: 'app', title: "Nouvelle recherche" } },
   { path: "/recherches/modifier-une-recherche", component: () => import('../views/recherches/ModifierUneRecherche.vue'),

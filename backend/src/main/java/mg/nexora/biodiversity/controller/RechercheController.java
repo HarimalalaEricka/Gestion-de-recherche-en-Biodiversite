@@ -1,6 +1,8 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,9 @@ import mg.nexora.biodiversity.model.Recherche;
 import mg.nexora.biodiversity.service.RechercheService;
 import mg.nexora.biodiversity.dto.CreerRechercheRequest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/recherches")
@@ -19,8 +24,8 @@ public class RechercheController {
     }
 
     @GetMapping
-    public List<Recherche> findAll() {
-        return service.findAll();
+    public Page<Recherche> findAll(@RequestParam Map<String, String> params, @Param("page") Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
