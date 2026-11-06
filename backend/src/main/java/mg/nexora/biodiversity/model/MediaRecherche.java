@@ -72,4 +72,8 @@ public class MediaRecherche {
 
     public void setTypeMedia(TypeMedia typeMedia) { this.typeMedia = typeMedia; }
 
+    public LocalDateTime getDateCreation() { return dateCreation; }
+
+    public void setDateCreation( LocalDateTime date ) { this.dateCreation = date; }
+
 }
