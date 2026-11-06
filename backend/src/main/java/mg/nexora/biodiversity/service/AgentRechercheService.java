@@ -1,12 +1,16 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mg.nexora.biodiversity.model.AgentRecherche;
 import mg.nexora.biodiversity.repository.AgentRechercheRepository;
 import mg.nexora.biodiversity.model.keys.*;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
@@ -18,8 +22,8 @@ public class AgentRechercheService {
     }
 
     @Transactional(readOnly = true)
-    public List<AgentRecherche> findAll() {
-        return repository.findAll();
+    public Page<AgentRecherche> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)

@@ -96,4 +96,12 @@ public class RechercheService {
 
         return r;
     }
+    @Transactional(readOnly = true)
+    public Page<Recherche> findByUtilisateur(Integer utilisateurId,
+                                            Confidentiality confidentialite,
+                                            Pageable pageable) {
+        return confidentialite == null
+                ? repository.findByUtilisateurId(utilisateurId, pageable)
+                : repository.findByUtilisateurIdAndConfidentialite(utilisateurId, confidentialite, pageable);
+    }
 }

@@ -59,7 +59,7 @@ async function fetchRecherches() {
   loading.value = true;
   try {
     const filters = filtre.value === "ALL" ? {} : { confidentialite: filtre.value };
-    const { items, total: t } = await getItems("recherches", filters, {
+    const { items, total: t } = await getItems("recherches/mes-recherches", filters, {
       page: page.value,
       perPage: perPage.value,
       sort: "dateCreation,desc",

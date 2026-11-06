@@ -1,9 +1,12 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import mg.nexora.biodiversity.model.AgentRecherche;
 import mg.nexora.biodiversity.model.keys.AgentRechercheKey;
 import mg.nexora.biodiversity.service.AgentRechercheService;
@@ -18,8 +21,8 @@ public class AgentRechercheController {
     }
 
     @GetMapping
-    public List<AgentRecherche> findAll() {
-        return service.findAll();
+    public Page<AgentRecherche> findAll(Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping("/{agentIDId}/{rechercheIDId}")

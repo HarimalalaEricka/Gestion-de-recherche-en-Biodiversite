@@ -10,6 +10,7 @@ import mg.nexora.biodiversity.repository.UtilisateurRepository;
 import mg.nexora.biodiversity.util.FilterSpec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -49,5 +50,12 @@ public class UtilisateurService {
                     if (entity.getStatut() != null) existing.setStatut(entity.getStatut());
                     return repository.save(existing);
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public Integer findIdByEmail(String email) {
+        return repository.findByEmail(email)
+                .map(Utilisateur::getUtilisateurID)      // ADAPTER : getter de l'ID
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur introuvable"));
     }
 }
