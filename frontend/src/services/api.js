@@ -157,6 +157,7 @@ export async function uploadMedia(rechercheId, file, caption, comments) {
   formData.append('rechercheID', rechercheId)
   formData.append('caption', caption || '')
   formData.append('comments', comments || '')
+  formData.append('type', 'MEDIA')  
 
   const { data } = await request('medias-recherche/upload', {
     method: 'POST',

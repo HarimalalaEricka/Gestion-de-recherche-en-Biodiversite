@@ -43,6 +43,11 @@ public class MediaRecherche {
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
+    
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_media_recherche", nullable = false)
+    private TypeMediaRecherche typeMediaRecherche;
 
     public Integer getMediaRechercheID() { return mediaRechercheID; }
 
@@ -75,5 +80,9 @@ public class MediaRecherche {
     public LocalDateTime getDateCreation() { return dateCreation; }
 
     public void setDateCreation( LocalDateTime date ) { this.dateCreation = date; }
+
+    public TypeMediaRecherche getTypeMediaRecherche() { return typeMediaRecherche; }
+
+    public void setTypeMediaRecherche(TypeMediaRecherche typeMediaRecherche) { this.typeMediaRecherche = typeMediaRecherche; }
 
 }

@@ -229,7 +229,7 @@ async function uploadAll() {
     if (item.status === "done") continue;
     item.status = "uploading";
     try {
-      await uploadMedia(props.idRecherche, item.file, item.caption, item.comments);
+      await uploadMedia(props.idRecherche, item.file, item.caption, item.comments, 'MEDIA');
       item.status = "done";
     } catch (e) {
       console.error("Erreur d'envoi :", e);

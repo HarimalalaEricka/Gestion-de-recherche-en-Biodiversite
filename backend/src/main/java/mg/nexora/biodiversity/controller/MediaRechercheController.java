@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import mg.nexora.biodiversity.model.MediaRecherche;
-import mg.nexora.biodiversity.model.enums.TypeMedia;
+import mg.nexora.biodiversity.model.enums.*;
 import mg.nexora.biodiversity.service.MediaRechercheService;
 import mg.nexora.biodiversity.service.UtilisateurService;
 
@@ -70,10 +70,11 @@ public class MediaRechercheController {
             @RequestParam("rechercheID") Integer rechercheID,
             @RequestParam(required = false) String caption,
             @RequestParam(required = false) String comments,
+            @RequestParam(required = true) TypeMediaRecherche type,
             Authentication authentication) {
 
         Integer utilisateurId = utilisateurService.findIdByEmail(authentication.getName());
-        MediaRecherche saved = service.upload(file, rechercheID, caption, comments, utilisateurId);
+        MediaRecherche saved = service.upload(file, rechercheID, caption, comments, utilisateurId, type);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

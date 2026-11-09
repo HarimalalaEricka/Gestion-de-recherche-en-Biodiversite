@@ -16,7 +16,7 @@ import jakarta.persistence.criteria.JoinType;
 import mg.nexora.biodiversity.model.MediaRecherche;
 import mg.nexora.biodiversity.model.Recherche;
 import mg.nexora.biodiversity.model.Utilisateur;
-import mg.nexora.biodiversity.model.enums.TypeMedia;
+import mg.nexora.biodiversity.model.enums.*;
 import mg.nexora.biodiversity.repository.AgentRechercheRepository;
 import mg.nexora.biodiversity.repository.MediaRechercheRepository;
 import mg.nexora.biodiversity.repository.RechercheRepository;
@@ -143,7 +143,7 @@ public class MediaRechercheService {
     }
 
     public MediaRecherche upload(MultipartFile file, Integer rechercheId,
-                                 String caption, String comments, Integer utilisateurId) {
+                                 String caption, String comments, Integer utilisateurId, TypeMediaRecherche type) {
 
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fichier vide");
@@ -174,6 +174,7 @@ public class MediaRechercheService {
             m.setTypeMedia(typeMedia);
             m.setRecherche(recherche);
             m.setUtilisateur(utilisateur);
+            m.setTypeMediaRecherche(type);
             return repository.save(m);
         } catch (RuntimeException e) {
             storageService.delete(objectName);   // évite un fichier orphelin si la base échoue
