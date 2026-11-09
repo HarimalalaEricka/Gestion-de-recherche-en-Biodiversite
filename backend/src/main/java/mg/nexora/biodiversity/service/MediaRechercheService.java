@@ -108,14 +108,12 @@ public class MediaRechercheService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MediaRecherche> findAllMesMedias(Integer utilisateurId,
-                                                Integer rechercheId,
+    public Page<MediaRecherche> findAllMesMedias(Integer rechercheId,
                                                 TypeMedia typeMedia,
                                                 String q,
                                                 Pageable pageable) {
 
-        Specification<MediaRecherche> spec = (root, query, cb) ->
-                cb.equal(root.get("utilisateur").get("utilisateurID"), utilisateurId);
+        Specification<MediaRecherche> spec = (root, query, cb) -> cb.conjunction();
 
         if (rechercheId != null) {
             spec = spec.and((root, query, cb) ->
@@ -127,8 +125,11 @@ public class MediaRechercheService {
         }
         if (q != null && !q.isBlank()) {
             String pattern = "%" + q.trim().toLowerCase() + "%";
+
             spec = spec.and((root, query, cb) -> {
-                Join<MediaRecherche, Utilisateur> auteur = root.join("utilisateur", JoinType.LEFT);
+                Join<MediaRecherche, Utilisateur> auteur =
+                        root.join("utilisateur", JoinType.LEFT);
+
                 return cb.or(
                         cb.like(cb.lower(root.get("caption")), pattern),
                         cb.like(cb.lower(root.get("comments")), pattern),
