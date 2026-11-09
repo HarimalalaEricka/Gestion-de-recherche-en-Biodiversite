@@ -1,6 +1,8 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 usePage()
+
+const props = defineProps({ idRecherche: { type: String, required: true } })
 </script>
 
 <template>
@@ -14,13 +16,18 @@ usePage()
         </nav>
         <h1 class="h3 mb-0">Suivi des reptiles de Berenty</h1>
         <ul class="nav nav-tabs">
-            <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Données</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/recherches/medias-de-la-recherche">Médias</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/recherches/collaborateurs">Collaborateurs</router-link></li>
-            <li class="nav-item"><router-link class="nav-link"
-                    to="/recherches/metadonnees-de-la-recherche">Métadonnées</router-link></li>
-            <li class="nav-item"><router-link class="nav-link active" to="/recherches/these">Thèse</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/recherches/notes-personnelles">Notes</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Recherches</router-link></li>
+            <li class="nav-item">
+                <router-link class="nav-link" :to="`/recherches/medias-de-la-recherche/${idRecherche}`">Médias</router-link>
+            </li>
+            <li class="nav-item"><router-link class="nav-link" :to="`/recherches/collaborateurs/${idRecherche}`">Collaborateurs</router-link></li>
+            <li class="nav-item">
+                <router-link class="nav-link" :to="`/recherches/metadonnees-de-la-recherche/${idRecherche}`">Métadonnées</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link active" :to="`/recherches/these/${idRecherche}`">Thèse</router-link>
+            </li>
+            <li class="nav-item"><router-link class="nav-link" :to="`/recherches/notes-personnelles/${idRecherche}`">Notes</router-link></li>
         </ul>
         <ul class="list-unstyled mb-0 d-grid gap-1">
             <li><span class="text-body-secondary">État :</span> En cours</li>

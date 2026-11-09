@@ -19,9 +19,6 @@ public class Agent {
     @Column(name = "utilisateurid")
     private Integer utilisateurId;
 
-    @Column(name = "orderrole")
-    private Integer orderRole;
-
     public Integer getAgentID() { return agentID; }
 
     public void setAgentID(Integer agentID) { this.agentID = agentID; }
@@ -30,8 +27,6 @@ public class Agent {
 
     public void setUtilisateurId(Integer utilisateurId) { this.utilisateurId = utilisateurId; }
 
-    public Integer getOrderRole() { return orderRole; }
 
-    public void setOrderRole(Integer orderRole) { this.orderRole = orderRole; }
 
 }

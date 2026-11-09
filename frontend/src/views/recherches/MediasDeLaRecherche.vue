@@ -280,14 +280,14 @@ onUnmounted(() => {
       <li class="nav-item">
         <router-link class="nav-link active" :to="`/recherches/medias-de-la-recherche/${idRecherche}`">Médias</router-link>
       </li>
-      <li class="nav-item"><router-link class="nav-link" to="/recherches/collaborateurs">Collaborateurs</router-link></li>
+      <li class="nav-item"><router-link class="nav-link" :to="`/recherches/collaborateurs/${idRecherche}`">Collaborateurs</router-link></li>
       <li class="nav-item">
-        <router-link class="nav-link" to="/recherches/metadonnees-de-la-recherche">Métadonnées</router-link>
+        <router-link class="nav-link" :to="`/recherches/metadonnees-de-la-recherche/${idRecherche}`">Métadonnées</router-link>
       </li>
       <li class="nav-item">
         <router-link class="nav-link" :to="`/recherches/these/${idRecherche}`">Thèse</router-link>
       </li>
-      <li class="nav-item"><router-link class="nav-link" to="/recherches/notes-personnelles">Notes</router-link></li>
+      <li class="nav-item"><router-link class="nav-link" :to="`/recherches/notes-personnelles/${idRecherche}`">Notes</router-link></li>
     </ul>
 
     <!-- Zone de dépôt (classe "upload-zone" et non "dropzone" : le script du template ne s'y branche pas) -->

@@ -1,95 +1,220 @@
+
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { insertItem } from '../../services/api'
+
 usePage()
+
+const router = useRouter()
+
+const props = defineProps({ idRecherche: { type: String, required: true } })
+console.log('idRecherche:', props.idRecherche)
+
+const error = ref('')
+const message = ref('')
+const loading = ref(false)
+
+const email = ref('')
+const role = ref('CHERCHEUR')
+
+const roles = [
+    { label: 'Chercheur Principal', value: 'CHERCHEUR_PRINCIPAL' },
+    { label: 'Chercheur', value: 'CO_CHERCHEUR' },
+    { label: 'Agent de saisie', value: 'DATA_ENTRY' }
+]
+
+async function inviter() {
+    error.value = ''
+    message.value = ''
+
+    if (!email.value.trim() || !role.value) {
+        error.value = 'Veuillez renseigner tous les champs.'
+        return
+    }
+
+    loading.value = true
+
+    try {
+        const data = await insertItem(
+            `agent-recherches/recherches/${props.idRecherche}/collaborateurs`,
+            {
+                email: email.value.trim(),
+                role: role.value
+            }
+        )
+
+        message.value = data.message || 'Invitation envoyée.'
+
+        email.value = ''
+
+        setTimeout(() => {
+            router.push(`/recherches/collaborateurs/${props.idRecherche}`)
+        }, 1500)
+
+    } catch (e) {
+        console.error('Erreur invitation :', e)
+
+        if (e.message?.includes('409')) {
+            error.value = 'Cette adresse est déjà utilisée.'
+        } else if (e.message?.includes('403')) {
+            error.value = 'Accès réservé aux administrateurs.'
+        } else if (e.message?.includes('400')) {
+            error.value = 'Données invalides : vérifiez l’adresse e-mail et le rôle.'
+        } else if (e.message?.includes('404')) {
+            error.value = 'Recherche ou utilisateur introuvable.'
+        } else {
+            error.value = 'Impossible d’envoyer l’invitation.'
+        }
+    } finally {
+        loading.value = false
+    }
+}
 </script>
 
 <template>
-  <main id="content" class="p-4 d-grid gap-4 align-content-start">
+    <main id="content" class="p-4 d-grid gap-4 align-content-start">
+
         <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
             <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><router-link to="/accueil">Accueil</router-link></li>
-            <li class="breadcrumb-item"><router-link to="/recherches/mes-recherches">Mes recherches</router-link></li>
-            <li class="breadcrumb-item active" aria-current="page"><router-link to="/recherches/collaborateurs">Collaborateurs</router-link></li>
-        </ol>
-        </nav>
-        <form class="needs-validation d-grid gap-4" novalidate><small class="text-body-secondary text-end"
-                data-autosave></small>
-            <h1 class="h3 mb-0">Suivi des reptiles de Berenty</h1>
-            <ul class="nav nav-tabs">
-                <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Données</router-link></li>
-                <li class="nav-item"><router-link class="nav-link" to="/recherches/medias-de-la-recherche">Médias</router-link>
+                <li class="breadcrumb-item">
+                    <router-link to="/accueil">Accueil</router-link>
                 </li>
-                <li class="nav-item"><router-link class="nav-link active"
-                        to="/recherches/collaborateurs">Collaborateurs</router-link></li>
-                <li class="nav-item"><router-link class="nav-link"
-                        to="/recherches/metadonnees-de-la-recherche">Métadonnées</router-link></li>
-                <li class="nav-item"><router-link class="nav-link" to="/recherches/these">Thèse</router-link></li>
-                <li class="nav-item"><router-link class="nav-link" to="/recherches/notes-personnelles">Notes</router-link></li>
+                <li class="breadcrumb-item">
+                    <router-link to="/recherches/mes-recherches">
+                        Mes recherches
+                    </router-link>
+                </li>
+                <li class="breadcrumb-item active">
+                    Collaborateurs
+                </li>
+            </ol>
+        </nav>
+
+        <form @submit.prevent="inviter" class="needs-validation d-grid gap-4">
+
+            <h1 class="h3 mb-0">Suivi des reptiles de Berenty</h1>
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Recherches</router-link></li>
+                <li class="nav-item">
+                    <router-link class="nav-link" :to="`/recherches/medias-de-la-recherche/${idRecherche}`">Médias</router-link>
+                </li>
+                <li class="nav-item"><router-link class="nav-link active" :to="`/recherches/collaborateurs/${idRecherche}`">Collaborateurs</router-link></li>
+                <li class="nav-item">
+                    <router-link class="nav-link" :to="`/recherches/metadonnees-de-la-recherche/${idRecherche}`">Métadonnées</router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" :to="`/recherches/these/${idRecherche}`">Thèse</router-link>
+                </li>
+                <li class="nav-item"><router-link class="nav-link" :to="`/recherches/notes-personnelles/${idRecherche}`">Notes</router-link></li>
             </ul>
+
+            <!-- Invitation -->
             <div class="card">
-                <div class="card-header fw-semibold">Inviter</div>
+                <div class="card-header fw-semibold">
+                    Inviter un collaborateur
+                </div>
+
                 <div class="card-body d-grid gap-3">
-                    <div class="row g-3">
-                        <div class="col-md"><label class="form-label" for="f1">Nom ou e-mail</label><input
-                                class="form-control" type="email" id="f1" name="nom-ou-e-mail"
-                                value="andry.rakoto@peregrine.example"></div>
-                        <div class="col-md"><label class="form-label" for="f2">Rôle sur la recherche</label><select
-                                class="form-select" id="f2" name="role-sur-la-recherche">
-                                <option>Administrateur</option>
-                                <option>Chercheur</option>
-                                <option>Agent de saisie</option>
-                                <option>Lecteur</option>
-                            </select></div>
+
+                    <div v-if="error" class="alert alert-danger mb-0">
+                        {{ error }}
                     </div>
-                    <div class="d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary"
-                            data-next="/recherches/collaborateurs">Inviter</button></div>
+
+                    <div v-if="message" class="alert alert-success mb-0">
+                        {{ message }}
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md">
+                            <label class="form-label" for="email">
+                                Adresse e-mail
+                            </label>
+
+                            <input
+                                v-model="email"
+                                class="form-control"
+                                type="email"
+                                id="email"
+                                placeholder="exemple@email.com"
+                                required
+                            >
+                        </div>
+
+                        <div class="col-md">
+                            <label class="form-label" for="role">
+                                Rôle sur la recherche
+                            </label>
+
+                            <select
+                                v-model="role"
+                                class="form-select"
+                                id="role"
+                                required
+                            >
+                                <option
+                                    v-for="r in roles"
+                                    :key="r.value"
+                                    :value="r.value"
+                                >
+                                    {{ r.label }}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            :disabled="loading"
+                        >
+                            <span
+                                v-if="loading"
+                                class="spinner-border spinner-border-sm me-2"
+                            ></span>
+
+                            {{ loading ? 'Envoi...' : 'Inviter' }}
+                        </button>
+                    </div>
+
                 </div>
             </div>
+
+            <!-- Liste des collaborateurs -->
             <div class="card">
-                <div class="card-header"><input type="search" form="nf"
-                        class="form-control form-control-sm table-filter" placeholder="Filtrer..." aria-label="Filtrer">
+                <div class="card-header">
+                    Collaborateurs de la recherche
                 </div>
+
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" data-table>
+                    <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th scope="col">Personne</th>
-                                <th scope="col">Rôle</th>
-                                <th scope="col">Statut du compte</th>
-                                <th scope="col">Ajouté le</th>
-                                <th scope="col"></th>
+                                <th>Personne</th>
+                                <th>Rôle</th>
+                                <th>Statut du compte</th>
+                                <th>Ajouté le</th>
+                                <th></th>
                             </tr>
                         </thead>
+
                         <tbody>
+                            <!-- À remplacer par les données provenant du backend -->
                             <tr>
-                                <td>Rakoto Andry</td>
-                                <td>Chercheur principal</td>
-                                <td><span class="badge text-bg-success">Actif</span></td>
-                                <td>12/09/2026</td>
-                                <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                        to="/recherches/mes-recherches">Ouvrir</router-link></td>
-                            </tr>
-                            <tr>
-                                <td>Rasoa Voahangy</td>
-                                <td>Agent de saisie</td>
-                                <td><span class="badge text-bg-success">Actif</span></td>
-                                <td>03/09/2026</td>
-                                <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                        to="/recherches/mes-recherches">Ouvrir</router-link></td>
-                            </tr>
-                            <tr>
-                                <td>Randria Tojo</td>
-                                <td>Lecteur</td>
-                                <td><span class="badge text-bg-info">Invité</span></td>
-                                <td>28/08/2026</td>
-                                <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
-                                        to="/recherches/mes-recherches">Ouvrir</router-link></td>
+                                <td colspan="5" class="text-center text-body-secondary">
+                                    Liste des collaborateurs à charger depuis le backend.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </form>
-    
-  </main>
+    </main>
 </template>

@@ -37,7 +37,7 @@ public class AgentService {
         return repository.findById(id)
                 .map(existing -> {
                     if (entity.getUtilisateurId() != null) existing.setUtilisateurId(entity.getUtilisateurId());
-                    if (entity.getOrderRole() != null) existing.setOrderRole(entity.getOrderRole());
+                    // if (entity.getOrderRole() != null) existing.setOrderRole(entity.getOrderRole());
                     return repository.save(existing);
                 });
     }

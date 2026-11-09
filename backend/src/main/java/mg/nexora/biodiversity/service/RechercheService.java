@@ -79,11 +79,11 @@ public class RechercheService {
         r = repository.save(r);
 
         // Réutilise l'agent de l'utilisateur s'il existe déjà, sinon le crée
-        Agent agent = agentRepository.findByUtilisateurIdAndOrderRole(user.getUtilisateurID(), 1)
+        Agent agent = agentRepository.findByUtilisateurId(user.getUtilisateurID())
             .orElseGet(() -> {
                 Agent a = new Agent();
                 a.setUtilisateurId(user.getUtilisateurID());
-                a.setOrderRole(1);
+                // a.setOrderRole(1);
                 a = agentRepository.save(a);
                 return a;
             });

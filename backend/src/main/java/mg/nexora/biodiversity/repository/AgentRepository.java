@@ -5,5 +5,5 @@ import mg.nexora.biodiversity.model.Agent;
 import java.util.Optional;
 
 public interface AgentRepository extends JpaRepository<Agent, Integer> {
-    Optional<Agent> findByUtilisateurIdAndOrderRole(Integer utilisateurId, Integer orderRole);
+    Optional<Agent> findByUtilisateurId(Integer utilisateurId);
 }
