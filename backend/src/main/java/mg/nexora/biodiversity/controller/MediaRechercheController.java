@@ -47,9 +47,10 @@ public class MediaRechercheController {
             @RequestParam(required = false) Integer rechercheID,
             @RequestParam(required = false) TypeMedia typeMedia,
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) TypeMediaRecherche typeMediaRecherche,
             Pageable pageable) {
 
-        return service.findAllMesMedias( rechercheID, typeMedia, q, pageable);
+        return service.findAllMesMedias( rechercheID, typeMedia, q, typeMediaRecherche, pageable);
     }
 
     // Mes médias d'une recherche (même logique, l'ID est dans le chemin)
@@ -59,9 +60,10 @@ public class MediaRechercheController {
             @RequestParam(required = false) TypeMedia typeMedia,
             @RequestParam(required = false) String q,
             Authentication authentication,
+            @RequestParam(required = false) TypeMediaRecherche typeMediaRecherche,
             Pageable pageable) {
 
-        return service.findAllMesMedias( rechercheID, typeMedia, q, pageable);
+        return service.findAllMesMedias( rechercheID, typeMedia, q, typeMediaRecherche, pageable);
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -146,7 +146,8 @@ async function fetchMedias() {
       "medias-recherche/mes-medias",
       {
         rechercheID: props.idRecherche,
-        typeMedia: typeFiltre.value,     // "" est ignoré par getItems
+        typeMedia: typeFiltre.value,     
+        typeMediaRecherche: "MEDIA",
         q: terme.value.trim(),
       },
       { page: page.value, perPage: perPage.value, sort: "dateCreation,desc" }

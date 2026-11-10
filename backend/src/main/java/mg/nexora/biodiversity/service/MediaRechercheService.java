@@ -111,6 +111,7 @@ public class MediaRechercheService {
     public Page<MediaRecherche> findAllMesMedias(Integer rechercheId,
                                                 TypeMedia typeMedia,
                                                 String q,
+                                                TypeMediaRecherche typeRecherche,
                                                 Pageable pageable) {
 
         Specification<MediaRecherche> spec = (root, query, cb) -> cb.conjunction();
@@ -122,6 +123,10 @@ public class MediaRechercheService {
         if (typeMedia != null) {
             spec = spec.and((root, query, cb) ->
                     cb.equal(root.get("typeMedia"), typeMedia));
+        }
+        if( typeRecherche != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("typeMediaRecherche"), typeRecherche));
         }
         if (q != null && !q.isBlank()) {
             String pattern = "%" + q.trim().toLowerCase() + "%";

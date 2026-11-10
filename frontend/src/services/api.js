@@ -151,13 +151,13 @@ export async function deleteItem(itemType, itemId) {
   return data
 }
 
-export async function uploadMedia(rechercheId, file, caption, comments) {
+export async function uploadMedia(rechercheId, file, caption, comments, type) {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('rechercheID', rechercheId)
   formData.append('caption', caption || '')
   formData.append('comments', comments || '')
-  formData.append('type', 'MEDIA')  
+  formData.append('type', type)  
 
   const { data } = await request('medias-recherche/upload', {
     method: 'POST',
