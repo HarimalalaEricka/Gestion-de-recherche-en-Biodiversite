@@ -2,6 +2,11 @@ package mg.nexora.biodiversity.service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import mg.nexora.biodiversity.util.*;
 import mg.nexora.biodiversity.model.*;
 import mg.nexora.biodiversity.model.enums.*;
 import mg.nexora.biodiversity.model.keys.AgentRechercheKey;
@@ -42,8 +48,35 @@ public class AgentRechercheService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AgentRecherche> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<AgentRecherche> findAll(Map<String, String> params, Pageable pageable) {
+        Map<String, String> filtres = new HashMap<>(params);
+        String q = filtres.remove("q"); // traité séparément
+
+        Specification<AgentRecherche> spec = FilterSpec.<AgentRecherche>from(filtres);
+
+        if (q != null && !q.isBlank()) {
+            spec = spec.and(rechercheTexte(q.trim().toLowerCase()));
+        }
+
+        return repository.findAll(spec, pageable);
+    }
+
+    private Specification<AgentRecherche> rechercheTexte(String q) {
+        return (root, query, cb) -> {
+            String motif = "%" + q + "%";
+
+            Subquery<Integer> sub = query.subquery(Integer.class);
+            Root<Utilisateur> u = sub.from(Utilisateur.class);
+            sub.select(u.get("utilisateurID")).where(   // nom du champ id dans Utilisateur
+                cb.or(
+                    cb.like(cb.lower(u.get("nom")), motif),
+                    cb.like(cb.lower(u.get("prenom")), motif),
+                    cb.like(cb.lower(u.get("email")), motif)
+                )
+            );
+
+            return root.get("agent").get("utilisateurId").in(sub);
+        };
     }
 
     @Transactional(readOnly = true)

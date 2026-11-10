@@ -28,8 +28,8 @@ public class AgentRechercheController {
     }
 
     @GetMapping
-    public Page<AgentRecherche> findAll(Pageable pageable) {
-        return service.findAll(pageable);
+    public Page<AgentRecherche> findAll( @RequestParam Map<String, String> params,Pageable pageable) {
+        return service.findAll(params,pageable);
     }
 
     @GetMapping("/{agentIDId}/{rechercheIDId}")

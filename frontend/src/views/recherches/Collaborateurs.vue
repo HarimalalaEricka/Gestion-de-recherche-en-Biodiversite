@@ -1,6 +1,6 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { insertItem, getItems, getItemById } from '../../services/api'
 
 usePage()
@@ -28,6 +28,60 @@ const roleLabels = Object.fromEntries(roles.map(r => [r.value, r.label]))
 
 const formatDate = (d) => (d ? new Date(d).toLocaleDateString('fr-FR') : '-')
 
+// ---------- Pagination ----------
+
+const total = ref(0)
+const page = ref(1)
+const perPage = ref(10)
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)))
+
+// ---------- Filtres (appliqués côté serveur) ----------
+
+const terme = ref('')          // texte : nom, prénom, e-mail
+const roleFiltre = ref('')     // '' = tous les rôles
+const statutFiltre = ref('')   // '' = tous les statuts
+
+const roleOptions = [{ value: '', label: 'Tous les rôles' }, ...roles.map(r => ({ value: r.value, label: r.label }))]
+
+// À adapter aux valeurs réelles de l'enum de statut côté backend
+const statutOptions = [
+    { value: '', label: 'Tous les statuts' },
+    { value: 'ACCEPTEE', label: 'Acceptée' },
+    { value: 'EN_ATTENTE', label: 'En attente' },
+    { value: 'REFUSEE', label: 'Refusée' }
+]
+const statutLabels = Object.fromEntries(statutOptions.filter(s => s.value).map(s => [s.value, s.label]))
+
+const filtresActifs = computed(
+    () => terme.value.trim() !== '' || roleFiltre.value !== '' || statutFiltre.value !== ''
+)
+
+let searchTimer = null
+
+function applyFilters() {
+    if (page.value !== 1) page.value = 1 // le watch sur la page recharge
+    else fetchCollaborateurs()
+}
+
+// Recherche texte : on attend 300 ms après la dernière frappe
+watch(terme, () => {
+    clearTimeout(searchTimer)
+    searchTimer = setTimeout(applyFilters, 300)
+})
+
+watch([roleFiltre, statutFiltre], applyFilters)
+
+function resetFilters() {
+    clearTimeout(searchTimer)
+    terme.value = ''
+    roleFiltre.value = ''
+    statutFiltre.value = ''
+}
+
+watch([page, perPage], fetchCollaborateurs)
+
+// ---------- Invitation ----------
+
 async function inviter() {
     error.value = ''
     message.value = ''
@@ -51,8 +105,9 @@ async function inviter() {
         message.value = data.message || 'Invitation envoyée.'
         email.value = ''
 
-        // Rafraîchit la liste sans changer de page
-        await fetchCollaborateurs()
+        // Rafraîchit la liste sans changer de page de l'application
+        if (page.value !== 1) page.value = 1 // le watch recharge
+        else await fetchCollaborateurs()
 
     } catch (e) {
         console.error('Erreur invitation :', e)
@@ -73,6 +128,8 @@ async function inviter() {
     }
 }
 
+// ---------- Chargement des données ----------
+
 async function getutilisateurById(id) {
     try {
         return await getItemById('utilisateurs', id)
@@ -82,30 +139,44 @@ async function getutilisateurById(id) {
     }
 }
 
+let requestId = 0 // seule la dernière requête met à jour l'écran
+
 async function fetchCollaborateurs() {
+    const id = ++requestId
     loadingList.value = true
     try {
-        const { items } = await getItems(
+        const { items, total: t } = await getItems(
             'agent-recherches',
-            { rechercheID: props.idRecherche }
+            {
+                rechercheID: props.idRecherche,
+                roleCollaboration: roleFiltre.value,  // "" est ignoré par getItems
+                statut: statutFiltre.value,           // "" est ignoré par getItems
+                q: terme.value.trim(),
+            },
+            { page: page.value, perPage: perPage.value }
         )
-        collaborators.value = items
+        if (id !== requestId) return
 
-        // Ids uniques, sans valeur vide
+        // On ne charge que les utilisateurs de la page courante, et pas ceux déjà connus
         const ids = [...new Set(
             items.map(c => c.agent?.utilisateurId).filter(Boolean)
-        )]
+        )].filter(uid => !utilisateurs.value[uid])
 
-        // Un appel par utilisateur, en parallèle
-        const resultats = await Promise.all(ids.map(id => getutilisateurById(id)))
+        const resultats = await Promise.all(ids.map(uid => getutilisateurById(uid)))
+        if (id !== requestId) return
 
-        const map = {}
-        ids.forEach((id, i) => { map[id] = resultats[i] })
+        const map = { ...utilisateurs.value }
+        ids.forEach((uid, i) => { map[uid] = resultats[i] })
+
+        // Mise à jour d'un seul coup pour éviter un affichage à moitié vide
         utilisateurs.value = map
+        collaborators.value = items
+        total.value = t
     } catch (e) {
+        if (id !== requestId) return
         console.error('Erreur chargement des collaborateurs :', e)
     } finally {
-        loadingList.value = false
+        if (id === requestId) loadingList.value = false
     }
 }
 
@@ -120,6 +191,10 @@ async function fetchRecherche() {
 onMounted(() => {
     fetchCollaborateurs()
     fetchRecherche()
+})
+
+onUnmounted(() => {
+    clearTimeout(searchTimer)
 })
 </script>
 
@@ -235,8 +310,45 @@ onMounted(() => {
 
         <!-- Liste des collaborateurs -->
         <div class="card">
-            <div class="card-header">
-                Collaborateurs de la recherche
+            <!-- Filtres -->
+            <div class="card-header d-flex flex-wrap align-items-center gap-2">
+                <span class="fw-semibold me-2">Collaborateurs de la recherche</span>
+
+                <div class="input-group input-group-sm filter-search">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input
+                        v-model="terme"
+                        type="search"
+                        class="form-control"
+                        placeholder="Nom, prénom, e-mail..."
+                        aria-label="Rechercher"
+                    >
+                </div>
+
+                <select
+                    v-model="roleFiltre"
+                    class="form-select form-select-sm w-auto"
+                    aria-label="Filtrer par rôle"
+                >
+                    <option v-for="o in roleOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
+                </select>
+
+                <select
+                    v-model="statutFiltre"
+                    class="form-select form-select-sm w-auto"
+                    aria-label="Filtrer par statut"
+                >
+                    <option v-for="o in statutOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
+                </select>
+
+                <button
+                    v-if="filtresActifs"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    @click="resetFilters"
+                >
+                    <i class="bi bi-x-circle me-1"></i>Réinitialiser
+                </button>
             </div>
 
             <div class="table-responsive">
@@ -244,6 +356,7 @@ onMounted(() => {
                     <thead>
                         <tr>
                             <th>Personne</th>
+                            <th>Email</th>
                             <th>Rôle</th>
                             <th>Statut</th>
                             <th>Ajouté le</th>
@@ -256,24 +369,71 @@ onMounted(() => {
                             <td colspan="5" class="text-center text-body-secondary">Chargement...</td>
                         </tr>
                         <tr v-else-if="collaborators.length === 0">
-                            <td colspan="5" class="text-center text-body-secondary">Aucun collaborateur trouvé.</td>
-                        </tr>
-                        <tr v-for="collaborateur in collaborators" :key="collaborateur.agent?.agentID">
-                            <td>
-                                {{ utilisateurs[collaborateur.agent?.utilisateurId]?.nom }}
-                                {{ utilisateurs[collaborateur.agent?.utilisateurId]?.prenom }}
-                            </td>
-                            <td>{{ roleLabels[collaborateur.roleCollaboration] || collaborateur.roleCollaboration }}</td>
-                            <td>{{ collaborateur.statut }}</td>
-                            <td>{{ formatDate(collaborateur.accepteLe || collaborateur.inviteLe) }}</td>
-                            <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            <td colspan="5" class="text-center text-body-secondary">
+                                {{ filtresActifs ? "Aucun collaborateur ne correspond à ces filtres" : "Aucun collaborateur trouvé." }}
                             </td>
                         </tr>
+                        <template v-else>
+                            <tr v-for="collaborateur in collaborators" :key="collaborateur.agent?.agentID">
+                                <td>
+                                    {{ utilisateurs[collaborateur.agent?.utilisateurId]?.nom }}
+                                    {{ utilisateurs[collaborateur.agent?.utilisateurId]?.prenom }}
+                                </td>
+                                <td>{{ utilisateurs[collaborateur.agent?.utilisateurId]?.email }}</td>
+                                <td>{{ roleLabels[collaborateur.roleCollaboration] || collaborateur.roleCollaboration }}</td>
+                                <td>{{ statutLabels[collaborateur.statut] || collaborateur.statut }}</td>
+                                <td>{{ formatDate(collaborateur.accepteLe || collaborateur.inviteLe) }}</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <small class="text-body-secondary">{{ total }} collaborateur(s)</small>
+
+                <div class="d-flex align-items-center gap-2">
+                    <select
+                        class="form-select form-select-sm w-auto"
+                        v-model.number="perPage"
+                        aria-label="Par page"
+                    >
+                        <option :value="5">5</option>
+                        <option :value="10">10</option>
+                        <option :value="20">20</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        :disabled="page <= 1"
+                        @click="page--"
+                    >
+                        Précédent
+                    </button>
+                    <span class="small">Page {{ page }} / {{ totalPages }}</span>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        :disabled="page >= totalPages"
+                        @click="page++"
+                    >
+                        Suivant
+                    </button>
+                </div>
             </div>
         </div>
 
     </main>
 </template>
+
+<style scoped>
+.filter-search {
+    flex: 1 1 240px;
+    max-width: 340px;
+}
+</style>
