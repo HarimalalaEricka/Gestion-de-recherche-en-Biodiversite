@@ -37,10 +37,10 @@ public class OrganismInteractionService {
         return repository.findById(id)
                 .map(existing -> {
                     if (entity.getOrganismInteractionDescription() != null) existing.setOrganismInteractionDescription(entity.getOrganismInteractionDescription());
-                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
+                    if (entity.getOccurrence() != null) existing.setOccurrence(entity.getOccurrence());
                     if (entity.getOccurrenceID1() != null) existing.setOccurrenceID1(entity.getOccurrenceID1());
-                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
-                    if (entity.getOrganismInteractionTypeID() != null) existing.setOrganismInteractionTypeID(entity.getOrganismInteractionTypeID());
+                    if (entity.getEvent() != null) existing.setEvent(entity.getEvent());
+                    if (entity.getOrganismInteractionType() != null) existing.setOrganismInteractionType(entity.getOrganismInteractionType());
                     return repository.save(existing);
                 });
     }

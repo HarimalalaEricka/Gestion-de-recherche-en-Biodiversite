@@ -39,9 +39,9 @@ public class IdentificationService {
                     if (entity.getDateIdentified() != null) existing.setDateIdentified(entity.getDateIdentified());
                     if (entity.getIdentificationQualifier() != null) existing.setIdentificationQualifier(entity.getIdentificationQualifier());
                     if (entity.getIsAcceptedIdentification() != null) existing.setIsAcceptedIdentification(entity.getIsAcceptedIdentification());
-                    if (entity.getTaxonID() != null) existing.setTaxonID(entity.getTaxonID());
-                    if (entity.getAgentID() != null) existing.setAgentID(entity.getAgentID());
-                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
+                    if (entity.getTaxon() != null) existing.setTaxon(entity.getTaxon());
+                    if (entity.getAgent() != null) existing.setAgent(entity.getAgent());
+                    if (entity.getOccurrence() != null) existing.setOccurrence(entity.getOccurrence());
                     return repository.save(existing);
                 });
     }

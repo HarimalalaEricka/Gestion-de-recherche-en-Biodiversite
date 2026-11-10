@@ -38,9 +38,9 @@ public class EventService {
                 .map(existing -> {
                     if (entity.getEventDate() != null) existing.setEventDate(entity.getEventDate());
                     if (entity.getSamplingProtocol() != null) existing.setSamplingProtocol(entity.getSamplingProtocol());
-                    if (entity.getProtocolID() != null) existing.setProtocolID(entity.getProtocolID());
-                    if (entity.getLocationID() != null) existing.setLocationID(entity.getLocationID());
-                    if (entity.getDatasetID() != null) existing.setDatasetID(entity.getDatasetID());
+                    if (entity.getProtocol() != null) existing.setProtocol(entity.getProtocol());
+                    if (entity.getLocation() != null) existing.setLocation(entity.getLocation());
+                    if (entity.getDataset() != null) existing.setDataset(entity.getDataset());
                     return repository.save(existing);
                 });
     }

@@ -41,7 +41,7 @@ public class MediaService {
                     if (entity.getCaption() != null) existing.setCaption(entity.getCaption());
                     if (entity.getCaptureDevice() != null) existing.setCaptureDevice(entity.getCaptureDevice());
                     if (entity.getComments() != null) existing.setComments(entity.getComments());
-                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
+                    if (entity.getOccurrence() != null) existing.setOccurrence(entity.getOccurrence());
                     return repository.save(existing);
                 });
     }

@@ -45,8 +45,13 @@ export async function request(path, { method = 'GET', body, query, auth = true }
     })
   }
 
+  // Un FormData (envoi de fichier) ne doit être ni sérialisé en JSON,
+  // ni envoyé avec un Content-Type : le navigateur pose lui-même
+  // multipart/form-data avec le bon "boundary"
+  const isFormData = body instanceof FormData
+
   const headers = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json'
   if (auth) {
     const token = getToken()
     if (token) headers.Authorization = `Bearer ${token}`
@@ -55,7 +60,7 @@ export async function request(path, { method = 'GET', body, query, auth = true }
   const response = await fetch(url, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined
+    body: body === undefined ? undefined : (isFormData ? body : JSON.stringify(body))
   })
 
   // Token expiré ou invalide : on déconnecte et on renvoie au login
@@ -143,5 +148,20 @@ export async function patchItem(itemUrl, data, idItem) {
 
 export async function deleteItem(itemType, itemId) {
   const { data } = await request(joinApiPath(itemType, itemId), { method: 'DELETE' })
+  return data
+}
+
+export async function uploadMedia(rechercheId, file, caption, comments, type) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('rechercheID', rechercheId)
+  formData.append('caption', caption || '')
+  formData.append('comments', comments || '')
+  formData.append('type', type)  
+
+  const { data } = await request('medias-recherche/upload', {
+    method: 'POST',
+    body: formData
+  })
   return data
 }

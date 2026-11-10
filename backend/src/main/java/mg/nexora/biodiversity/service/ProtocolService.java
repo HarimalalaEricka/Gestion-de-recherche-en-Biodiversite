@@ -40,7 +40,7 @@ public class ProtocolService {
                     if (entity.getProtocolDescription() != null) existing.setProtocolDescription(entity.getProtocolDescription());
                     if (entity.getProtocolReferences() != null) existing.setProtocolReferences(entity.getProtocolReferences());
                     if (entity.getProtocolRemarks() != null) existing.setProtocolRemarks(entity.getProtocolRemarks());
-                    if (entity.getProtocolTypeID() != null) existing.setProtocolTypeID(entity.getProtocolTypeID());
+                    if (entity.getProtocolType() != null) existing.setProtocolType(entity.getProtocolType());
                     return repository.save(existing);
                 });
     }

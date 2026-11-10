@@ -37,7 +37,7 @@ public class ProvinceService {
         return repository.findById(id)
                 .map(existing -> {
                     if (entity.getProvince() != null) existing.setProvince(entity.getProvince());
-                    if (entity.getPaysID() != null) existing.setPaysID(entity.getPaysID());
+                    if (entity.getPays() != null) existing.setPays(entity.getPays());
                     return repository.save(existing);
                 });
     }

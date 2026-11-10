@@ -30,7 +30,7 @@ public class Dataset {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid", nullable = false)
-    private Recherche rechercheID;
+    private Recherche recherche;
 
     public Integer getDatasetID() { return datasetID; }
 
@@ -48,8 +48,8 @@ public class Dataset {
 
     public void setRightsHolder(String rightsHolder) { this.rightsHolder = rightsHolder; }
 
-    public Recherche getRechercheID() { return rechercheID; }
+    public Recherche getRecherche() { return recherche; }
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
 
 }

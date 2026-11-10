@@ -3,12 +3,6 @@ DROP DATABASE bio_test;
 CREATE DATABASE bio_test;
 \c bio_test
 
-CREATE TYPE AgentType AS ENUM (
-   'PERSON',
-   'GROUP',
-   'INSTITUTION'
-);
-
 CREATE TYPE basisOfRecord AS ENUM (
    'FOSSIL_SPECIMEN',
    'HUMAN_OBSERVATION',
@@ -179,8 +173,8 @@ CREATE TABLE materialEntityCategory(
 
 CREATE TABLE Agent(
    agentID SERIAL,
-   agentRemarks TEXT,
-   agentType AgentType NOT NULL,
+   UtilisateurID INTEGER,
+   orderRole INTEGER,
    PRIMARY KEY(agentID)
 );
 

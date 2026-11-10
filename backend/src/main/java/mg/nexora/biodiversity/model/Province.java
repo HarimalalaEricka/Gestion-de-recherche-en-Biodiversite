@@ -22,7 +22,7 @@ public class Province {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paysid", nullable = false)
-    private Pays paysID;
+    private Pays pays;
 
     public Integer getProvinceID() { return provinceID; }
 
@@ -32,8 +32,8 @@ public class Province {
 
     public void setProvince(String province) { this.province = province; }
 
-    public Pays getPaysID() { return paysID; }
+    public Pays getPays() { return pays; }
 
-    public void setPaysID(Pays paysID) { this.paysID = paysID; }
+    public void setPays(Pays pays) { this.pays = pays; }
 
 }

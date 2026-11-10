@@ -6,11 +6,12 @@ import mg.nexora.biodiversity.model.enums.StatutUser;
 import mg.nexora.biodiversity.model.enums.TypeToken;
 import mg.nexora.biodiversity.repository.TokenRepository;
 import mg.nexora.biodiversity.repository.UtilisateurRepository;
-import mg.nexora.biodiversity.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -51,6 +52,7 @@ public class TokenService {
     /**
      * Crée un jeton du type demandé et envoie le lien par e-mail.
      * Ne dit jamais si l'adresse existe : en cas d'échec, il ne se passe rien.
+     * (Réservé à RESET_PASSWORD et INVITATION ; la collaboration passe par creerToken.)
      */
     @Transactional
     public void demander(String email, TypeToken type) {
@@ -105,12 +107,77 @@ public class TokenService {
         return true;
     }
 
+    // ---------- Collaboration (NOUVEAU) ----------
+
+    /**
+     * Crée un jeton SANS supprimer les autres du même type : un utilisateur peut avoir
+     * plusieurs invitations en attente (une par recherche). Retourne le jeton brut pour le lien.
+     */
+    @Transactional
+    public String creerToken(Utilisateur u, TypeToken type) {
+        byte[] bytes = new byte[32];
+        random.nextBytes(bytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+
+        Token t = new Token();
+        t.setTokenHash(hash(token));
+        t.setUtilisateur(u);
+        t.setTypeToken(type);
+        t.setExpireLe(expiration(type));
+        tokenRepo.save(t);
+        return token;
+    }
+
+    /**
+     * Vérifie le token et l'identité du destinataire,
+     * puis consomme le token.
+     */
+    @Transactional
+    public Utilisateur consommer(
+            String token,
+            TypeToken type,
+            String emailAuthentifie) {
+
+        Token t = tokenRepo.findByTokenHashAndTypeTokenAndUtiliseFalse(
+                hash(token), type
+        ).orElseThrow(() ->
+                new ResponseStatusException(
+                        HttpStatus.GONE,
+                        "Lien invalide ou expiré"
+                )
+        );
+
+        if (t.getExpireLe().isBefore(LocalDateTime.now())
+                || t.getUtilisateur().getStatut() != statutRequis(type)) {
+            throw new ResponseStatusException(
+                    HttpStatus.GONE,
+                    "Lien invalide ou expiré"
+            );
+        }
+
+        Utilisateur u = t.getUtilisateur();
+
+        // Vérifier que le compte connecté est bien le destinataire
+        if (!u.getEmail().equalsIgnoreCase(emailAuthentifie)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Cette invitation ne vous est pas destinée."
+            );
+        }
+
+        t.setUtilise(true);
+        tokenRepo.save(t);
+
+        return u;
+    }
+
     // ---------- Ce qui change selon le type ----------
 
     private StatutUser statutRequis(TypeToken type) {
         return switch (type) {
             case RESET_PASSWORD -> StatutUser.ACTIVE;
             case INVITATION -> StatutUser.INVITE;
+            case COLLABORATOR_DEMANDE -> StatutUser.ACTIVE;
         };
     }
 
@@ -118,6 +185,7 @@ public class TokenService {
         return switch (type) {
             case RESET_PASSWORD -> LocalDateTime.now().plusMinutes(resetMinutes);
             case INVITATION -> LocalDateTime.now().plusDays(invitationJours);
+            case COLLABORATOR_DEMANDE -> LocalDateTime.now().plusDays(invitationJours);
         };
     }
 
@@ -125,6 +193,7 @@ public class TokenService {
         return switch (type) {
             case RESET_PASSWORD -> "/auth/reinitialisation";
             case INVITATION -> "/auth/activation-du-compte";
+            case COLLABORATOR_DEMANDE -> "/collaboration";
         };
     }
 

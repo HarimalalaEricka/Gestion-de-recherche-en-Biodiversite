@@ -39,7 +39,7 @@ public class DatasetService {
                     if (entity.getDatasetName() != null) existing.setDatasetName(entity.getDatasetName());
                     if (entity.getLicence() != null) existing.setLicence(entity.getLicence());
                     if (entity.getRightsHolder() != null) existing.setRightsHolder(entity.getRightsHolder());
-                    if (entity.getRechercheID() != null) existing.setRechercheID(entity.getRechercheID());
+                    if (entity.getRecherche() != null) existing.setRecherche(entity.getRecherche());
                     return repository.save(existing);
                 });
     }

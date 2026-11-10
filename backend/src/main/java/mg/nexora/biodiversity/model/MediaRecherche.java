@@ -30,16 +30,24 @@ public class MediaRecherche {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateurid", nullable = false)
-    private Utilisateur utilisateurID;
+    private Utilisateur utilisateur;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid", nullable = false)
-    private Recherche rechercheID;
+    private Recherche recherche;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_media", nullable = false)
 
     private TypeMedia typeMedia;
+
+    @Column(name = "date_creation", nullable = false, updatable = false)
+    private LocalDateTime dateCreation = LocalDateTime.now();
+    
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_media_recherche", nullable = false)
+    private TypeMediaRecherche typeMediaRecherche;
 
     public Integer getMediaRechercheID() { return mediaRechercheID; }
 
@@ -57,16 +65,24 @@ public class MediaRecherche {
 
     public void setComments(String comments) { this.comments = comments; }
 
-    public Utilisateur getUtilisateurID() { return utilisateurID; }
+    public Utilisateur getUtilisateur() { return utilisateur; }
 
-    public void setUtilisateurID(Utilisateur utilisateurID) { this.utilisateurID = utilisateurID; }
+    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 
-    public Recherche getRechercheID() { return rechercheID; }
+    public Recherche getRecherche() { return recherche; }
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
 
     public TypeMedia getTypeMedia() { return typeMedia; }
 
     public void setTypeMedia(TypeMedia typeMedia) { this.typeMedia = typeMedia; }
+
+    public LocalDateTime getDateCreation() { return dateCreation; }
+
+    public void setDateCreation( LocalDateTime date ) { this.dateCreation = date; }
+
+    public TypeMediaRecherche getTypeMediaRecherche() { return typeMediaRecherche; }
+
+    public void setTypeMediaRecherche(TypeMediaRecherche typeMediaRecherche) { this.typeMediaRecherche = typeMediaRecherche; }
 
 }

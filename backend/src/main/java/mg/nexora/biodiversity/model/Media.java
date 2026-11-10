@@ -38,7 +38,7 @@ public class Media {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid", nullable = false)
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
     public Integer getMediaID() { return mediaID; }
 
@@ -64,8 +64,8 @@ public class Media {
 
     public void setComments(String comments) { this.comments = comments; }
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
 }

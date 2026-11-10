@@ -42,8 +42,8 @@ public class MaterialEntityService {
                     if (entity.getPreparations() != null) existing.setPreparations(entity.getPreparations());
                     if (entity.getDisposition() != null) existing.setDisposition(entity.getDisposition());
                     if (entity.getMaterialEntityRemarks() != null) existing.setMaterialEntityRemarks(entity.getMaterialEntityRemarks());
-                    if (entity.getMaterialEntityCategoryID() != null) existing.setMaterialEntityCategoryID(entity.getMaterialEntityCategoryID());
-                    if (entity.getMaterialEntityTypeID() != null) existing.setMaterialEntityTypeID(entity.getMaterialEntityTypeID());
+                    if (entity.getMaterialEntityCategory() != null) existing.setMaterialEntityCategory(entity.getMaterialEntityCategory());
+                    if (entity.getMaterialEntityType() != null) existing.setMaterialEntityType(entity.getMaterialEntityType());
                     return repository.save(existing);
                 });
     }

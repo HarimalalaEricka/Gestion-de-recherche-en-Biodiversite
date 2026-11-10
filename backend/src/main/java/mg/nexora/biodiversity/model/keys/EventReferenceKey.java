@@ -4,21 +4,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class EventReferenceKey implements Serializable {
-    private Integer eventID;
-    private Integer referenceID;
+    private Integer event;
+    private Integer reference;
 
     public EventReferenceKey() {}
 
-    public Integer getEventID() { return eventID; }
-    public void setEventID(Integer eventID) { this.eventID = eventID; }
-    public Integer getReferenceID() { return referenceID; }
-    public void setReferenceID(Integer referenceID) { this.referenceID = referenceID; }
+    public Integer getEvent() { return event; }
+    public void setEvent(Integer event) { this.event = event; }
+    public Integer getReference() { return reference; }
+    public void setReference(Integer reference) { this.reference = reference; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EventReferenceKey that = (EventReferenceKey) o;
-        return Objects.equals(eventID, that.eventID) && Objects.equals(referenceID, that.referenceID);
+        return Objects.equals(event, that.event) && Objects.equals(reference, that.reference);
     }
-    @Override public int hashCode() { return Objects.hash(eventID, referenceID); }
+    @Override public int hashCode() { return Objects.hash(event, reference); }
 }

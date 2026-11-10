@@ -41,10 +41,10 @@ public class MeasurementOrFactService {
                     if (entity.getMeasurementMethod() != null) existing.setMeasurementMethod(entity.getMeasurementMethod());
                     if (entity.getMeasurementDeterminedDate() != null) existing.setMeasurementDeterminedDate(entity.getMeasurementDeterminedDate());
                     if (entity.getMeasurementRemarks() != null) existing.setMeasurementRemarks(entity.getMeasurementRemarks());
-                    if (entity.getOccurrenceID() != null) existing.setOccurrenceID(entity.getOccurrenceID());
-                    if (entity.getMeasurementOrFactID1() != null) existing.setMeasurementOrFactID1(entity.getMeasurementOrFactID1());
-                    if (entity.getMeasurementUnitID() != null) existing.setMeasurementUnitID(entity.getMeasurementUnitID());
-                    if (entity.getMeasurementTypeID() != null) existing.setMeasurementTypeID(entity.getMeasurementTypeID());
+                    if (entity.getOccurrence() != null) existing.setOccurrence(entity.getOccurrence());
+                    if (entity.getMeasurementOrFact1() != null) existing.setMeasurementOrFact1(entity.getMeasurementOrFact1());
+                    if (entity.getMeasurementUnit() != null) existing.setMeasurementUnit(entity.getMeasurementUnit());
+                    if (entity.getMeasurementType() != null) existing.setMeasurementType(entity.getMeasurementType());
                     return repository.save(existing);
                 });
     }

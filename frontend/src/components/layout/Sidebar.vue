@@ -10,8 +10,6 @@ const route = useRoute();
 
 const brut = JSON.parse(localStorage.getItem("userConnected") || "{}");
 const userConnecter = brut.data ?? brut; // le rôle est dans brut.data
-console.log("userConnecter", userConnecter);
-console.log("role", userConnecter.role); // doit afficher "ADMIN"
 const menuVisible = computed(() =>
   app.menu.filter((item) => !item.role || item.role === userConnecter.role)
 );

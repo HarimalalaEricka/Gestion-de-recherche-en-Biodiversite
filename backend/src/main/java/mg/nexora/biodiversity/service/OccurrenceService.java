@@ -37,11 +37,11 @@ public class OccurrenceService {
         return repository.findById(id)
                 .map(existing -> {
                     if (entity.getIndividualCount() != null) existing.setIndividualCount(entity.getIndividualCount());
-                    if (entity.getGeologicalContextID() != null) existing.setGeologicalContextID(entity.getGeologicalContextID());
-                    if (entity.getOrganismID() != null) existing.setOrganismID(entity.getOrganismID());
+                    if (entity.getGeologicalContext() != null) existing.setGeologicalContext(entity.getGeologicalContext());
+                    if (entity.getOrganism() != null) existing.setOrganism(entity.getOrganism());
                     if (entity.getOccurrenceStatus() != null) existing.setOccurrenceStatus(entity.getOccurrenceStatus());
                     if (entity.getBasisOfRecord() != null) existing.setBasisOfRecord(entity.getBasisOfRecord());
-                    if (entity.getEventID() != null) existing.setEventID(entity.getEventID());
+                    if (entity.getEvent() != null) existing.setEvent(entity.getEvent());
                     return repository.save(existing);
                 });
     }

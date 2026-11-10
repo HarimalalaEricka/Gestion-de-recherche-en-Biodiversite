@@ -41,7 +41,7 @@ public class LocationService {
                     if (entity.getDecimalLatitude() != null) existing.setDecimalLatitude(entity.getDecimalLatitude());
                     if (entity.getDecimalLongitude() != null) existing.setDecimalLongitude(entity.getDecimalLongitude());
                     if (entity.getGeodeticDatum() != null) existing.setGeodeticDatum(entity.getGeodeticDatum());
-                    if (entity.getProvinceID() != null) existing.setProvinceID(entity.getProvinceID());
+                    if (entity.getProvince() != null) existing.setProvince(entity.getProvince());
                     return repository.save(existing);
                 });
     }

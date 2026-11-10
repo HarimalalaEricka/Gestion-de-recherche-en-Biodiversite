@@ -14,19 +14,19 @@ public class EventReference {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventid")
-    private Event eventID;
+    private Event event;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referenceid")
-    private BibliographicResource referenceID;
+    private BibliographicResource reference;
 
-    public Event getEventID() { return eventID; }
+    public Event getEvent() { return event; }
 
-    public void setEventID(Event eventID) { this.eventID = eventID; }
+    public void setEvent(Event event) { this.event = event; }
 
-    public BibliographicResource getReferenceID() { return referenceID; }
+    public BibliographicResource getReference() { return reference; }
 
-    public void setReferenceID(BibliographicResource referenceID) { this.referenceID = referenceID; }
+    public void setReference(BibliographicResource reference) { this.reference = reference; }
 
 }

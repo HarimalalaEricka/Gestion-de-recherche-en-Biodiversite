@@ -37,8 +37,8 @@ public class TableauPersonnaliseService {
         return repository.findById(id)
                 .map(existing -> {
                     if (entity.getNom() != null) existing.setNom(entity.getNom());
-                    if (entity.getDatasetID() != null) existing.setDatasetID(entity.getDatasetID());
-                    if (entity.getAgentID() != null) existing.setAgentID(entity.getAgentID());
+                    if (entity.getDataset() != null) existing.setDataset(entity.getDataset());
+                    if (entity.getAgent() != null) existing.setAgent(entity.getAgent());
                     return repository.save(existing);
                 });
     }

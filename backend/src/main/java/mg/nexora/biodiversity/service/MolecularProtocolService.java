@@ -38,7 +38,7 @@ public class MolecularProtocolService {
                 .map(existing -> {
                     if (entity.getAssayType() != null) existing.setAssayType(entity.getAssayType());
                     if (entity.getMolecularProtocolRemarks() != null) existing.setMolecularProtocolRemarks(entity.getMolecularProtocolRemarks());
-                    if (entity.getProtocolID() != null) existing.setProtocolID(entity.getProtocolID());
+                    if (entity.getProtocol() != null) existing.setProtocol(entity.getProtocol());
                     return repository.save(existing);
                 });
     }

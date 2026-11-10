@@ -25,8 +25,8 @@ public class OccurrenceMaterialEntityController {
     @GetMapping("/{occurrenceIDId}/{materialEntityIDId}")
     public ResponseEntity<OccurrenceMaterialEntity> findById(@PathVariable Integer occurrenceIDId, @PathVariable Integer materialEntityIDId) {
         OccurrenceMaterialEntityKey id = new OccurrenceMaterialEntityKey();
-        id.setOccurrenceID(occurrenceIDId);
-        id.setMaterialEntityID(materialEntityIDId);
+        id.setOccurrence(occurrenceIDId);
+        id.setMaterialEntity(materialEntityIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class OccurrenceMaterialEntityController {
     @DeleteMapping("/{occurrenceIDId}/{materialEntityIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer occurrenceIDId, @PathVariable Integer materialEntityIDId) {
         OccurrenceMaterialEntityKey id = new OccurrenceMaterialEntityKey();
-        id.setOccurrenceID(occurrenceIDId);
-        id.setMaterialEntityID(materialEntityIDId);
+        id.setOccurrence(occurrenceIDId);
+        id.setMaterialEntity(materialEntityIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

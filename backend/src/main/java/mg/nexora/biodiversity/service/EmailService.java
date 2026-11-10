@@ -40,6 +40,15 @@ public class EmailService {
                     + "Ce lien est à usage unique et expire automatiquement.\n"
                     + "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.";
             }
+            case COLLABORATOR_DEMANDE -> {
+                sujet = "Nexora : invitation à collaborer";
+                texte = "Bonjour,\n\n"
+                    + "Vous avez été invité à collaborer sur une recherche.\n"
+                    + "Cliquez sur le lien ci-dessous pour accepter l'invitation :\n\n"
+                    + lien + "\n\n"
+                    + "Ce lien est à usage unique et expire automatiquement.\n"
+                    + "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.";
+            }
             default -> throw new IllegalArgumentException("Type inconnu : " + type);
         }
 
