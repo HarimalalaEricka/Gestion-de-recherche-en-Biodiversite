@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { insertItem, getItems, getItemById } from '../../services/api'
+import { insertItem, getItems, getItemById, deleteItem  } from '../../services/api'
 
 usePage()
 
@@ -17,6 +17,7 @@ const role = ref('CO_CHERCHEUR')
 const collaborators = ref([])
 const recherche = ref(null)
 const utilisateurs = ref({})    
+const chercheursPrincipauxIds = ref([])
 
 const roles = [
     { label: 'Chercheur Principal', value: 'CHERCHEUR_PRINCIPAL' },
@@ -188,9 +189,89 @@ async function fetchRecherche() {
     }
 }
 
+async function fetchChercheursPrincipaux() {
+    try {
+        const { items } = await getItems(
+            'agent-recherches',
+            {
+                rechercheID: props.idRecherche,
+                roleCollaboration: 'CHERCHEUR_PRINCIPAL',
+                statut: 'ACCEPTEE'
+            },
+            { page: 1, perPage: 50 }
+        )
+        chercheursPrincipauxIds.value = items
+            .map(c => c.agent?.utilisateurId)
+            .filter(Boolean)
+    } catch (e) {
+        console.error('Erreur chargement du chercheur principal :', e)
+        chercheursPrincipauxIds.value = []
+    }
+}
+
+function lireUtilisateurConnecte() {
+    try {
+        return JSON.parse(localStorage.getItem('userConnected')) || null
+    } catch {
+        return null
+    }
+}
+
+const utilisateurConnecte = lireUtilisateurConnecte()
+const utilisateurConnecteId = Number(utilisateurConnecte?.data?.utilisateurID) || null
+
+const estChercheurPrincipal = computed(
+    () => utilisateurConnecteId !== null &&
+          chercheursPrincipauxIds.value.map(Number).includes(utilisateurConnecteId)
+)
+
+const suppressionEnCours = ref(null) // agentID en cours de suppression
+
+async function supprimer(collaborateur) {
+    if (!estChercheurPrincipal.value) return
+ 
+    const agentId = collaborateur.agent?.agentID
+    if (!agentId) return
+ 
+    const u = utilisateurs.value[collaborateur.agent?.utilisateurId]
+    const nom = u ? `${u.nom} ${u.prenom}` : 'ce collaborateur'
+    if (!window.confirm(`Retirer ${nom} de cette recherche ?`)) return
+ 
+    error.value = ''
+    message.value = ''
+    suppressionEnCours.value = agentId
+ 
+    try {
+        // DELETE agent-recherches/{agentId}/{rechercheId}
+        await deleteItem('agent-recherches', `${agentId}/${props.idRecherche}`)
+        message.value = 'Collaborateur retiré.'
+ 
+        // Si c'était le dernier de la page, on recule d'une page (le watch recharge)
+        if (collaborators.value.length === 1 && page.value > 1) page.value--
+        else await fetchCollaborateurs()
+ 
+    } catch (e) {
+        console.error('Erreur suppression :', e)
+ 
+        if (e.message?.includes('403')) {
+            error.value = 'Seul le chercheur principal peut retirer un collaborateur.'
+        } else if (e.message?.includes('409')) {
+            error.value = 'Vous ne pouvez pas vous retirer vous-même de la recherche.'
+        } else if (e.message?.includes('404')) {
+            error.value = 'Collaborateur introuvable.'
+        } else {
+            error.value = 'Impossible de retirer ce collaborateur.'
+        }
+    } finally {
+        suppressionEnCours.value = null
+    }
+}
+ 
+
 onMounted(() => {
     fetchCollaborateurs()
     fetchRecherche()
+    fetchChercheursPrincipaux()
 })
 
 onUnmounted(() => {
@@ -235,7 +316,7 @@ onUnmounted(() => {
         </ul>
 
         <!-- Invitation -->
-        <form @submit.prevent="inviter" class="card">
+        <form v-if="estChercheurPrincipal" @submit.prevent="inviter" class="card">
             <div class="card-header fw-semibold">
                 Inviter un collaborateur
             </div>
@@ -384,7 +465,15 @@ onUnmounted(() => {
                                 <td>{{ statutLabels[collaborateur.statut] || collaborateur.statut }}</td>
                                 <td>{{ formatDate(collaborateur.accepteLe || collaborateur.inviteLe) }}</td>
                                 <td class="text-end">
-                                    <button type="button" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    <button
+                                        v-if="estChercheurPrincipal && collaborateur.agent?.utilisateurId !== utilisateurConnecteId"
+                                        type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        :disabled="suppressionEnCours === collaborateur.agent?.agentID"
+                                        @click="supprimer(collaborateur)"
+                                    >
+                                        {{ suppressionEnCours === collaborateur.agent?.agentID ? 'Suppression...' : 'Supprimer' }}
+                                    </button>
                                 </td>
                             </tr>
                         </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 import { ref, watch, computed, onMounted, onUnmounted } from "vue";
-import { getItems, getItemById, uploadMedia } from "../../services/api";
+import { getItems, getItemById, uploadMedia, deleteItem } from "../../services/api";
 
 usePage()
 
@@ -45,6 +45,19 @@ let uid = 0;
 const viewer = ref(null);        // média actuellement ouvert
 const audioSrc = ref(null);      // source de l'audio (blob en mémoire)
 const audioLoading = ref(false);
+
+// Utilisateur connecté
+function lireUtilisateurConnecte() {
+  try {
+    return JSON.parse(localStorage.getItem("userConnected")) || null;
+  } catch {
+    return null;
+  }
+}
+const utilisateurConnecteId = Number(lireUtilisateurConnecte()?.data?.utilisateurID) || null;
+
+// Suppression
+const suppressionEnCours = ref(null); // mediaRechercheID en cours de suppression
 
 const formatDate = (d) => (d ? new Date(d).toLocaleDateString("fr-FR") : "-");
 
@@ -146,7 +159,7 @@ async function fetchMedias() {
       "medias-recherche/mes-medias",
       {
         rechercheID: props.idRecherche,
-        typeMedia: typeFiltre.value,     
+        typeMedia: typeFiltre.value,
         typeMediaRecherche: "MEDIA",
         q: terme.value.trim(),
       },
@@ -188,6 +201,37 @@ function resetFilters() {
 }
 
 watch([page, perPage], fetchMedias);
+
+// ---------- Suppression ----------
+
+async function supprimer(media) {
+  if (!window.confirm(`Supprimer « ${media.caption || "ce média"} » ?`)) return;
+
+  error.value = "";
+  suppressionEnCours.value = media.mediaRechercheID;
+
+  try {
+    // DELETE medias-recherche/{id}
+    await deleteItem("medias-recherche", media.mediaRechercheID);
+
+    if (viewer.value?.mediaRechercheID === media.mediaRechercheID) closeViewer();
+
+    // Si c'était le dernier de la page, on recule d'une page (le watch recharge)
+    if (medias.value.length === 1 && page.value > 1) page.value--;
+    else await fetchMedias();
+  } catch (e) {
+    console.error("Erreur suppression :", e);
+    if (e.message?.includes("403")) {
+      error.value = "Vous ne pouvez supprimer que vos propres médias.";
+    } else if (e.message?.includes("404")) {
+      error.value = "Média introuvable.";
+    } else {
+      error.value = "Impossible de supprimer ce média.";
+    }
+  } finally {
+    suppressionEnCours.value = null;
+  }
+}
 
 // ---------- Envoi de fichiers ----------
 
@@ -416,14 +460,15 @@ onUnmounted(() => {
               <th scope="col">Auteur</th>
               <th scope="col">Date</th>
               <th scope="col"></th>
+              <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading && medias.length === 0">
-              <td colspan="7" class="text-center text-body-secondary">Chargement...</td>
+              <td colspan="8" class="text-center text-body-secondary">Chargement...</td>
             </tr>
             <tr v-else-if="medias.length === 0">
-              <td colspan="7" class="text-center text-body-secondary">
+              <td colspan="8" class="text-center text-body-secondary">
                 {{ filtresActifs ? "Aucun média ne correspond à ces filtres" : "Aucun média" }}
               </td>
             </tr>
@@ -487,6 +532,17 @@ onUnmounted(() => {
                     class="btn btn-sm btn-outline-primary"
                     @click="openViewer(media)"
                   >{{ media.typeMedia === 'AUDIO' ? "Écouter" : "Voir" }}</button>
+                </td>
+                <td class="text-end">
+                  <button
+                    v-if="media.utilisateur?.utilisateurID === utilisateurConnecteId"
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    :disabled="suppressionEnCours === media.mediaRechercheID"
+                    @click="supprimer(media)"
+                  >
+                    {{ suppressionEnCours === media.mediaRechercheID ? "Suppression..." : "Supprimer" }}
+                  </button>
                 </td>
               </tr>
             </template>
