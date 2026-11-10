@@ -523,8 +523,15 @@ onMounted(fetchRecherches);
           <!-- Datasets -->
           <div class="card">
 
-            <div class="card-header fw-semibold">
-              Datasets
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+              <span>Datasets</span>
+
+              <router-link
+                class="btn btn-primary btn-sm"
+                :to="`/saisie/nouveau-dataset/${selected.rechercheID}`"
+              >
+                + Nouveau dataset
+              </router-link>
             </div>
 
             <div class="table-responsive">
@@ -563,7 +570,7 @@ onMounted(fetchRecherches);
                       v-for="d in datasets"
                       :key="d.datasetID"
                     >
-                      <td>{{ d.nom }}</td>
+                      <td>{{ d.datasetName }}</td>
                       <td>{{ d.nbObservations }}</td>
 
                       <td class="text-end">

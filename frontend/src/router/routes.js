@@ -1,8 +1,3 @@
-// Fichier généré à partir des pages du template (une route par page).
-// meta.page   : numéro de page d'origine (utilisé par custom.css : body[data-page="1"]…)
-// meta.active : numéro de l'entrée du menu à surligner
-// meta.layout : 'app' (sidebar + barre du haut) ou 'blank' (pages d'authentification, erreurs)
-// meta.public : true = page accessible sans être connecté (toutes les autres sont protégées)
 export default [
   { path: '/', redirect: '/auth/connexion' },
   { path: "/sommaire", component: () => import('../views/Sommaire.vue'),
@@ -48,9 +43,9 @@ export default [
     meta: { page: 13, active: 6, layout: 'app', title: "Notes personnelles" }, props: true },
 
   // ---------- Saisie ----------
-  { path: "/saisie/nouveau-dataset", component: () => import('../views/saisie/NouveauDataset.vue'),
+  { path: "/saisie/nouveau-dataset/:idRecherche", component: () => import('../views/saisie/NouveauDataset.vue'),
     meta: { page: 14, active: 6, layout: 'app', title: "Nouveau dataset" } },
-  { path: "/saisie/fiche-d-un-dataset", component: () => import('../views/saisie/FicheDUnDataset.vue'),
+  { path: "/saisie/fiche-d-un-dataset/:idDataset", component: () => import('../views/saisie/FicheDUnDataset.vue'),
     meta: { page: 15, active: 6, layout: 'app', title: "Fiche d'un dataset" } },
   { path: "/saisie/import-excel-csv", component: () => import('../views/saisie/ImportExcelCsv.vue'),
     meta: { page: 16, active: 6, layout: 'app', title: "Import Excel / CSV" } },

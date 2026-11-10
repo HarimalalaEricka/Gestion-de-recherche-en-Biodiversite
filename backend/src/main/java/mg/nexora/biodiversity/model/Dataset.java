@@ -20,9 +20,9 @@ public class Dataset {
 
     private String datasetName;
 
-    @Column(name = "licence")
-
-    private String licence;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "licenceid")
+    private Licence licence;
 
     @Column(name = "rightsholder")
 
@@ -32,6 +32,10 @@ public class Dataset {
     @JoinColumn(name = "rechercheid", nullable = false)
     private Recherche recherche;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agentid", nullable = false)
+    private Agent agent;
+
     public Integer getDatasetID() { return datasetID; }
 
     public void setDatasetID(Integer datasetID) { this.datasetID = datasetID; }
@@ -40,9 +44,9 @@ public class Dataset {
 
     public void setDatasetName(String datasetName) { this.datasetName = datasetName; }
 
-    public String getLicence() { return licence; }
+    public Licence getLicence() { return licence; }
 
-    public void setLicence(String licence) { this.licence = licence; }
+    public void setLicence(Licence licence) { this.licence = licence; }
 
     public String getRightsHolder() { return rightsHolder; }
 
@@ -51,5 +55,9 @@ public class Dataset {
     public Recherche getRecherche() { return recherche; }
 
     public void setRecherche(Recherche recherche) { this.recherche = recherche; }
+
+    public Agent getAgent() { return agent; }
+
+    public void setAgent(Agent agent) { this.agent = agent; }
 
 }
