@@ -273,7 +273,7 @@ onUnmounted(() => {
       </ol>
     </nav>
 
-    <h1 class="h3 mb-0">{{ recherche?.sujet || "Médias de la recherche" }}</h1>
+    <h1 class="h3 mb-0">{{ recherche?.sujet }}</h1>
 
     <ul class="nav nav-tabs">
       <li class="nav-item"><router-link class="nav-link" to="/recherches/mes-recherches">Recherches</router-link></li>
