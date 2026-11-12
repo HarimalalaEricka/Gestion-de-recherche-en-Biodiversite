@@ -31,6 +31,7 @@ const datasetTotalPages = computed(() =>
 
 const changingStatus = ref(false);
 const deleting = ref(false);
+const deletingDatasetID = ref(null);
 
 const totalCollaborateurs = ref(0);
 const collaborateursLoading = ref(false);
@@ -271,6 +272,31 @@ async function supprimer() {
 
   } finally {
     deleting.value = false;
+  }
+}
+
+// Suppression d'un dataset
+async function supprimerDataset(d) {
+  releaseFocus();
+
+  if (deletingDatasetID.value !== null) return;
+
+  deletingDatasetID.value = d.datasetID;
+
+  try {
+    await deleteItem("datasets", d.datasetID);
+
+    // fetchDatasets recule d'une page si la page courante devient vide
+    await fetchDatasets();
+
+  } catch (e) {
+    console.error(
+      "Erreur lors de la suppression du dataset :",
+      e
+    );
+
+  } finally {
+    deletingDatasetID.value = null;
   }
 }
 
@@ -617,12 +643,29 @@ onMounted(fetchRecherches);
                       <td>{{ d.nbObservations }}</td>
 
                       <td class="text-end">
-                        <router-link
-                          class="btn btn-sm btn-outline-primary"
-                          :to="`/saisie/fiche-d-un-dataset/${d.datasetID}`"
-                        >
-                          Ouvrir
-                        </router-link>
+                        <div class="d-flex justify-content-end gap-2">
+                          <router-link
+                            class="btn btn-sm btn-outline-primary"
+                            :to="`/saisie/fiche-d-un-dataset/${d.datasetID}`"
+                          >
+                            Ouvrir
+                          </router-link>
+
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            data-confirm="Voulez-vous vraiment supprimer ce dataset ? Cette action est irréversible."
+                            data-live
+                            :disabled="deletingDatasetID !== null"
+                            @confirmed="supprimerDataset(d)"
+                          >
+                            {{
+                              deletingDatasetID === d.datasetID
+                                ? "Suppression..."
+                                : "Supprimer"
+                            }}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </template>
