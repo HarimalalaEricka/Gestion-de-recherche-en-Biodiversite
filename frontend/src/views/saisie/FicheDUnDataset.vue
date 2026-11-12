@@ -1,6 +1,53 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getItemById } from '../../services/api'
+
+const route = useRoute()
+const router = useRouter()
+
 usePage()
+
+const idDataset = route.params.idDataset
+const dataset = ref(null)
+const recherche = ref(null)
+const createur = ref(null)
+async function loadDataset() {
+    try {
+        const data = await getItemById(`datasets/${idDataset}`)
+        dataset.value = data
+
+        const rechercheData = await getItemById(
+            `recherches/${data.recherche.rechercheID}`
+        )
+        recherche.value = rechercheData
+        await fetchUtilisateurByAgentId()
+
+    } catch (e) {
+        console.error('Erreur chargement du dataset :', e)
+    }
+}
+
+async function fetchUtilisateurByAgentId() {
+    try {
+        const userId = dataset.value?.agent?.utilisateurId
+
+        if (!userId) {
+            console.warn('Aucun utilisateur associé à cet agent.')
+            return
+        }
+        const utilisateur = await getItemById(`utilisateurs/${userId}`)
+        createur.value = utilisateur
+
+    } catch (e) {
+        console.error('Erreur chargement de l’utilisateur :', e)
+    }
+}
+
+onMounted(() => {
+    loadDataset()
+})
 </script>
 
 <template>
@@ -12,12 +59,12 @@ usePage()
             <li class="breadcrumb-item active" aria-current="page"><router-link to="/saisie/fiche-d-un-dataset">Fiche d&#39;un dataset</router-link></li>
         </ol>
         </nav>
-        <h1 class="h3 mb-0">Reptiles</h1>
+        <h1 class="h3 mb-0"> {{ dataset?.datasetName || 'Chargement...' }} </h1>
         <ul class="list-unstyled mb-0 d-grid gap-1">
-            <li><span class="text-body-secondary">Recherche :</span> Oiseaux d&#x27;Ankarafantsika</li>
-            <li><span class="text-body-secondary">Auteurs :</span> Rakoto Andry, Rasoa Voahangy</li>
-            <li><span class="text-body-secondary">Licence :</span> CC BY-NC 4.0</li>
-            <li><span class="text-body-secondary">Détenteur des droits :</span> The Peregrine Fund</li>
+            <li><span class="text-body-secondary">Recherche :</span> {{ recherche?.sujet || 'Chargement...' }}</li>
+            <li><span class="text-body-secondary">Créateur :</span> {{ createur?.nom || 'Chargement...' }} {{ createur?.prenom || 'Chargement...' }}</li>
+            <li><span class="text-body-secondary">Licence :</span> {{ dataset?.licence?.licenceCode || 'Chargement...' }} </li>
+            <li><span class="text-body-secondary">Détenteur des droits :</span> {{ dataset?.rightsHolder || 'Chargement...' }}</li>
             <li><span class="text-body-secondary">Protocoles :</span> Transect linéaire, Point d&#x27;écoute</li>
         </ul>
         <div class="row row-cols-2 row-cols-lg-3 g-3">

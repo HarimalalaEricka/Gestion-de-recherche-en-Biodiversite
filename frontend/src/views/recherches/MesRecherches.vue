@@ -1,4 +1,3 @@
-
 <script setup>
 import { usePage } from "../../composables/usePage";
 import { ref, computed, watch, onMounted } from "vue";
@@ -21,8 +20,18 @@ const selected = ref(null);
 const datasets = ref([]);
 const detailLoading = ref(false);
 
+// Pagination dédiée aux datasets
+const totalDatasets = ref(0);
+const datasetPage = ref(1);
+const datasetPerPage = ref(10);
+
+const datasetTotalPages = computed(() =>
+  Math.max(1, Math.ceil(totalDatasets.value / datasetPerPage.value))
+);
+
 const changingStatus = ref(false);
 const deleting = ref(false);
+const deletingDatasetID = ref(null);
 
 const totalCollaborateurs = ref(0);
 const collaborateursLoading = ref(false);
@@ -40,6 +49,36 @@ const formatDate = (d) =>
 
 const filtre = ref("ALL");
 
+// Évite d'envoyer une requête au backend à chaque frappe
+function debounce(fn, delay = 300) {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// Recherche par nom (sujet) : valeur saisie / valeur envoyée au backend
+const rechercheSearch = ref("");
+const rechercheQuery = ref("");
+
+const applyRechercheQuery = debounce((v) => {
+  rechercheQuery.value = v.trim();
+});
+
+watch(rechercheSearch, applyRechercheQuery);
+
+// Recherche par nom de dataset : valeur saisie / valeur envoyée au backend
+const datasetSearch = ref("");
+const datasetQuery = ref("");
+
+const applyDatasetQuery = debounce((v) => {
+  datasetQuery.value = v.trim();
+});
+
+watch(datasetSearch, applyDatasetQuery);
+
 const tabs = [
   { value: "ALL", label: "Tout" },
   { value: "PUBLIC", label: "Publiées" },
@@ -50,27 +89,58 @@ const tabs = [
 async function selectRecherche(r) {
   selected.value = r;
 
-  const currentRequestId = ++detailRequestId;
-
   datasets.value = [];
+  totalDatasets.value = 0;
   totalCollaborateurs.value = 0;
-  detailLoading.value = true;
+
+  // Le filtre de datasets ne suit pas d'une recherche à l'autre
+  datasetSearch.value = "";
+  datasetQuery.value = "";
 
   fetchCollaborateurs(r.rechercheID);
 
+  // Si on n'est pas déjà page 1, le watcher de datasetPage déclenchera le fetch
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1;
+  } else {
+    fetchDatasets();
+  }
+}
+
+async function fetchDatasets() {
+  if (!selected.value) return;
+
+  const rechercheID = selected.value.rechercheID;
+  const requestId = ++detailRequestId;
+
+  detailLoading.value = true;
+
   try {
-    const { items } = await getItems(
+    const filters = { "recherche.rechercheID": rechercheID, deleted: false };
+
+    if (datasetQuery.value) {
+      filters.datasetName = datasetQuery.value;
+    }
+
+    const { items, total: t } = await getItems(
       "datasets",
-      { rechercheID: r.rechercheID },
-      { page: 1, perPage: 100 }
+      filters,
+      { page: datasetPage.value, perPage: datasetPerPage.value }
     );
 
-    if (currentRequestId !== detailRequestId) return;
+    if (requestId !== detailRequestId) return;
+
+    // Page devenue vide (ex. dernier élément supprimé) : reculer d'une page
+    if (items.length === 0 && datasetPage.value > 1) {
+      datasetPage.value--;
+      return;
+    }
 
     datasets.value = items;
+    totalDatasets.value = t ?? 0;
 
   } catch (e) {
-    if (currentRequestId !== detailRequestId) return;
+    if (requestId !== detailRequestId) return;
 
     console.error(
       "Erreur lors de la récupération des datasets :",
@@ -78,9 +148,10 @@ async function selectRecherche(r) {
     );
 
     datasets.value = [];
+    totalDatasets.value = 0;
 
   } finally {
-    if (currentRequestId === detailRequestId) {
+    if (requestId === detailRequestId) {
       detailLoading.value = false;
     }
   }
@@ -94,7 +165,7 @@ async function fetchCollaborateurs(rechercheID) {
   try {
     const { total: t } = await getItems(
       "agent-recherches",
-      { rechercheID },
+      { "recherche.rechercheID": rechercheID },
       { page: 1, perPage: 1 }
     );
 
@@ -123,10 +194,15 @@ async function fetchRecherches() {
   loading.value = true;
 
   try {
-    const filters =
-      filtre.value === "ALL"
-        ? {}
-        : { confidentialite: filtre.value };
+    const filters = {};
+
+    if (filtre.value !== "ALL") {
+      filters.confidentialite = filtre.value;
+    }
+
+    if (rechercheQuery.value) {
+      filters.sujet = rechercheQuery.value;
+    }
 
     const { items, total: t } = await getItems(
       "recherches/mes-recherches",
@@ -157,6 +233,7 @@ async function fetchRecherches() {
     } else {
       selected.value = null;
       datasets.value = [];
+      totalDatasets.value = 0;
       totalCollaborateurs.value = 0;
 
       detailRequestId++;
@@ -229,6 +306,7 @@ async function supprimer() {
 
     selected.value = null;
     datasets.value = [];
+    totalDatasets.value = 0;
     totalCollaborateurs.value = 0;
     await fetchRecherches();
   } catch (e) {
@@ -242,8 +320,33 @@ async function supprimer() {
   }
 }
 
-// Filtres et pagination
-watch(filtre, () => {
+// Suppression d'un dataset
+async function supprimerDataset(d) {
+  releaseFocus();
+
+  if (deletingDatasetID.value !== null) return;
+
+  deletingDatasetID.value = d.datasetID;
+
+  try {
+    await deleteItem("datasets", d.datasetID);
+
+    // fetchDatasets recule d'une page si la page courante devient vide
+    await fetchDatasets();
+
+  } catch (e) {
+    console.error(
+      "Erreur lors de la suppression du dataset :",
+      e
+    );
+
+  } finally {
+    deletingDatasetID.value = null;
+  }
+}
+
+// Filtres et pagination des recherches
+watch([filtre, rechercheQuery], () => {
   if (page.value !== 1) {
     page.value = 1;
   } else {
@@ -252,6 +355,26 @@ watch(filtre, () => {
 });
 
 watch([page, perPage], fetchRecherches);
+
+// Pagination des datasets
+watch(datasetPage, fetchDatasets);
+
+// Une nouvelle recherche par nom repart de la page 1
+watch(datasetQuery, () => {
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1; // le watcher de datasetPage fera le fetch
+  } else {
+    fetchDatasets();
+  }
+});
+
+watch(datasetPerPage, () => {
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1; // le watcher de datasetPage fera le fetch
+  } else {
+    fetchDatasets();
+  }
+});
 
 onMounted(fetchRecherches);
 
@@ -285,6 +408,14 @@ onMounted(fetchRecherches);
             + Nouvelle recherche
           </router-link>
         </div>
+
+        <input
+          v-model="rechercheSearch"
+          type="search"
+          class="form-control form-control-sm"
+          placeholder="Filtrer par nom..."
+          aria-label="Filtrer les recherches"
+        />
 
         <!-- Filtres -->
         <ul class="nav nav-tabs">
@@ -369,7 +500,7 @@ onMounted(fetchRecherches);
 
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination des recherches -->
         <div
           class="d-flex flex-wrap justify-content-between align-items-center gap-2"
         >
@@ -382,7 +513,7 @@ onMounted(fetchRecherches);
             <select
               class="form-select form-select-sm w-auto"
               v-model.number="perPage"
-              aria-label="Par page"
+              aria-label="Recherches par page"
             >
               <option :value="5">5</option>
               <option :value="10">10</option>
@@ -463,7 +594,7 @@ onMounted(fetchRecherches);
               <div class="card">
                 <div class="card-body">
                   <div class="fs-3 fw-semibold">
-                    {{ datasets.length }}
+                    {{ totalDatasets }}
                   </div>
                   <div class="text-body-secondary">
                     datasets
@@ -523,8 +654,25 @@ onMounted(fetchRecherches);
           <!-- Datasets -->
           <div class="card">
 
-            <div class="card-header fw-semibold">
-              Datasets
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+              <span>Datasets</span>
+
+              <router-link
+                class="btn btn-primary btn-sm"
+                :to="`/saisie/nouveau-dataset/${selected.rechercheID}`"
+              >
+                + Nouveau dataset
+              </router-link>
+            </div>
+
+            <div class="card-body border-bottom py-2">
+              <input
+                v-model="datasetSearch"
+                type="search"
+                class="form-control form-control-sm"
+                placeholder="Filtrer par nom..."
+                aria-label="Filtrer les datasets"
+              />
             </div>
 
             <div class="table-responsive">
@@ -563,16 +711,39 @@ onMounted(fetchRecherches);
                       v-for="d in datasets"
                       :key="d.datasetID"
                     >
-                      <td>{{ d.nom }}</td>
+                      <td>{{ d.datasetName }}</td>
                       <td>{{ d.nbObservations }}</td>
 
                       <td class="text-end">
-                        <router-link
-                          class="btn btn-sm btn-outline-primary"
-                          :to="`/saisie/fiche-d-un-dataset/${d.datasetID}`"
-                        >
-                          Ouvrir
-                        </router-link>
+                        <div class="d-flex justify-content-end gap-2">
+                          <router-link
+                            class="btn btn-sm btn-outline-primary"
+                            :to="`/saisie/fiche-d-un-dataset/${d.datasetID}`"
+                          >
+                            Ouvrir
+                          </router-link>
+                          <router-link
+                            class="btn btn-sm btn-outline-secondary"
+                            :to="`/saisie/modifier-dataset/${d.datasetID}`"
+                          >
+                            Modifier
+                          </router-link>
+
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            data-confirm="Voulez-vous vraiment supprimer ce dataset ? Cette action est irréversible."
+                            data-live
+                            :disabled="deletingDatasetID !== null"
+                            @confirmed="supprimerDataset(d)"
+                          >
+                            {{
+                              deletingDatasetID === d.datasetID
+                                ? "Suppression..."
+                                : "Supprimer"
+                            }}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </template>
@@ -580,6 +751,51 @@ onMounted(fetchRecherches);
                 </tbody>
 
               </table>
+            </div>
+          </div>
+
+          <!-- Pagination des datasets -->
+          <div
+            class="d-flex flex-wrap justify-content-between align-items-center gap-2"
+          >
+            <small class="text-body-secondary">
+              {{ totalDatasets }} dataset(s)
+            </small>
+
+            <div class="d-flex align-items-center gap-2">
+
+              <select
+                class="form-select form-select-sm w-auto"
+                v-model.number="datasetPerPage"
+                aria-label="Datasets par page"
+              >
+                <option :value="5">5</option>
+                <option :value="10">10</option>
+                <option :value="20">20</option>
+              </select>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="datasetPage <= 1 || detailLoading"
+                @click="datasetPage--"
+              >
+                Précédent
+              </button>
+
+              <span class="small">
+                Page {{ datasetPage }} / {{ datasetTotalPages }}
+              </span>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="datasetPage >= datasetTotalPages || detailLoading"
+                @click="datasetPage++"
+              >
+                Suivant
+              </button>
+
             </div>
           </div>
 
