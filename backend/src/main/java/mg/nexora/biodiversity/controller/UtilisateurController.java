@@ -1,24 +1,37 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import mg.nexora.biodiversity.model.Utilisateur;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.server.ResponseStatusException;
+import mg.nexora.biodiversity.model.Agent;
+import mg.nexora.biodiversity.dto.*;
+import mg.nexora.biodiversity.model.*;
 import mg.nexora.biodiversity.service.UtilisateurService;
+import mg.nexora.biodiversity.repository.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
 public class UtilisateurController {
     private final UtilisateurService service;
+    private final AgentRepository repository;
 
-    public UtilisateurController(UtilisateurService service) {
+    public UtilisateurController(UtilisateurService service, AgentRepository repository) {
         this.service = service;
+        this.repository = repository;
     }
 
     @GetMapping
-    public List<Utilisateur> findAll() {
-        return service.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<Utilisateur> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -51,5 +64,21 @@ public class UtilisateurController {
         }
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Utilisateur> partialUpdate(@PathVariable Integer id, @RequestBody Utilisateur entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/my-agent")
+    public ResponseEntity<Agent> getMyAgent(Authentication authentication) {
+        String email = authentication.getName();
+        Integer utilisateurId = service.findIdByEmail(email);
+        Agent agent = repository.findByUtilisateurId(utilisateurId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agent not found for the authenticated user"));
+        return ResponseEntity.ok(agent);
     }
 }

@@ -4,5 +4,6 @@ public enum Role {
     ADMIN,
     RESEARCHER,
     VIEWER,
-    DATA_ENTRY
+    DATA_ENTRY,
+    STUDENT
 }

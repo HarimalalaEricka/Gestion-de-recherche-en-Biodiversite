@@ -44,6 +44,13 @@ public class BibliographicResourceController {
         return ResponseEntity.ok(service.save(entity));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<BibliographicResource> partialUpdate(@PathVariable Integer id, @RequestBody BibliographicResource entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {

@@ -26,7 +26,7 @@ public class Ligne {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid", nullable = false)
-    private Agent agentID;
+    private Agent agent;
 
     public Integer getLigneID() { return ligneID; }
 
@@ -40,8 +40,8 @@ public class Ligne {
 
     public void setTableauPersonnaliseID(TableauPersonnalise tableauPersonnaliseID) { this.tableauPersonnaliseID = tableauPersonnaliseID; }
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
 }

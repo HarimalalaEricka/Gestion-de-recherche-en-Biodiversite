@@ -1,11 +1,14 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.Dataset;
 import mg.nexora.biodiversity.service.DatasetService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/datasets")
@@ -17,8 +20,8 @@ public class DatasetController {
     }
 
     @GetMapping
-    public List<Dataset> findAll() {
-        return service.findAll();
+    public Page<Dataset> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -42,6 +45,13 @@ public class DatasetController {
         // Force the URL identifier to be the identifier used for the update.
         entity.setDatasetID(id);
         return ResponseEntity.ok(service.save(entity));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Dataset> partialUpdate(@PathVariable Integer id, @RequestBody Dataset entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

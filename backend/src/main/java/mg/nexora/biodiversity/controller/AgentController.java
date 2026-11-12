@@ -44,6 +44,13 @@ public class AgentController {
         return ResponseEntity.ok(service.save(entity));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Agent> partialUpdate(@PathVariable Integer id, @RequestBody Agent entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {
@@ -52,4 +59,5 @@ public class AgentController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -49,7 +49,7 @@ public class Taxon {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "taxonrankid", nullable = false)
-    private TaxonRank taxonRankID;
+    private TaxonRank taxonRank;
 
     public Integer getTaxonID() { return taxonID; }
 
@@ -91,8 +91,8 @@ public class Taxon {
 
     public void setSpecificEpithet(String specificEpithet) { this.specificEpithet = specificEpithet; }
 
-    public TaxonRank getTaxonRankID() { return taxonRankID; }
+    public TaxonRank getTaxonRank() { return taxonRank; }
 
-    public void setTaxonRankID(TaxonRank taxonRankID) { this.taxonRankID = taxonRankID; }
+    public void setTaxonRank(TaxonRank taxonRank) { this.taxonRank = taxonRank; }
 
 }

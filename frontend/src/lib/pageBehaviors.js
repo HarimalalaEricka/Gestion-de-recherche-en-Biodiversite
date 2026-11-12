@@ -319,7 +319,7 @@ export function initPage(root, { page, route, router }) {
       }
 
       const nextPage = event.submitter && event.submitter.dataset.next
-      showToast('Enregistré (démonstration)')
+      // showToast('Enregistré (démonstration)')
       storage.removeItem(draftKey)
 
       if (nextPage) setTimeout(() => go(nextPage), 700)
@@ -357,6 +357,13 @@ export function initPage(root, { page, route, router }) {
     } else if (action.dataset.confirm) {
       event.preventDefault()
       showConfirm(action.dataset.confirm, () => {
+        // Action réelle : on prévient Vue et on s'arrête là
+        if (action.hasAttribute('data-live')) {
+          action.dispatchEvent(new CustomEvent('confirmed'))
+          return
+        }
+
+        // Comportement de démonstration inchangé pour les autres éléments
         showToast('Action confirmée (démonstration)', 'secondary')
         if (href && href != '#') setTimeout(() => go(href), 700)
       })

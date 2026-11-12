@@ -33,4 +33,12 @@ public class NucleotideSequenceService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<NucleotideSequence> partialUpdate(Integer id, NucleotideSequence entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getSequence() != null) existing.setSequence(entity.getSequence());
+                    if (entity.getNucleotideSequenceRemarks() != null) existing.setNucleotideSequenceRemarks(entity.getNucleotideSequenceRemarks());
+                    return repository.save(existing);
+                });
+    }
 }

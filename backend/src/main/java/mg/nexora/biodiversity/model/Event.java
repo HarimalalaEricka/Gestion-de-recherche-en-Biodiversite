@@ -26,15 +26,15 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "protocolid")
-    private Protocol protocolID;
+    private Protocol protocol;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locationid", nullable = false)
-    private Location locationID;
+    private Location location;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "datasetid", nullable = false)
-    private Dataset datasetID;
+    private Dataset dataset;
 
     public Integer getEventID() { return eventID; }
 
@@ -48,16 +48,16 @@ public class Event {
 
     public void setSamplingProtocol(String samplingProtocol) { this.samplingProtocol = samplingProtocol; }
 
-    public Protocol getProtocolID() { return protocolID; }
+    public Protocol getProtocol() { return protocol; }
 
-    public void setProtocolID(Protocol protocolID) { this.protocolID = protocolID; }
+    public void setProtocol(Protocol protocol) { this.protocol = protocol; }
 
-    public Location getLocationID() { return locationID; }
+    public Location getLocation() { return location; }
 
-    public void setLocationID(Location locationID) { this.locationID = locationID; }
+    public void setLocation(Location location) { this.location = location; }
 
-    public Dataset getDatasetID() { return datasetID; }
+    public Dataset getDataset() { return dataset; }
 
-    public void setDatasetID(Dataset datasetID) { this.datasetID = datasetID; }
+    public void setDataset(Dataset dataset) { this.dataset = dataset; }
 
 }

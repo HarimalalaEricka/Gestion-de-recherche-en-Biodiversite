@@ -38,19 +38,19 @@ public class MeasurementOrFact {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid", nullable = false)
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "measurement_or_factid_1")
-    private MeasurementOrFact measurementOrFactID1;
+    private MeasurementOrFact measurementOrFact1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "measurementunitid", nullable = false)
-    private MeasurementUnit measurementUnitID;
+    private MeasurementUnit measurementUnit;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "measurementtypeid", nullable = false)
-    private MeasurementType measurementTypeID;
+    private MeasurementType measurementType;
 
     public Integer getMeasurementOrFactID() { return measurementOrFactID; }
 
@@ -76,20 +76,20 @@ public class MeasurementOrFact {
 
     public void setMeasurementRemarks(String measurementRemarks) { this.measurementRemarks = measurementRemarks; }
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
-    public MeasurementOrFact getMeasurementOrFactID1() { return measurementOrFactID1; }
+    public MeasurementOrFact getMeasurementOrFact1() { return measurementOrFact1; }
 
-    public void setMeasurementOrFactID1(MeasurementOrFact measurementOrFactID1) { this.measurementOrFactID1 = measurementOrFactID1; }
+    public void setMeasurementOrFact1(MeasurementOrFact measurementOrFact1) { this.measurementOrFact1 = measurementOrFact1; }
 
-    public MeasurementUnit getMeasurementUnitID() { return measurementUnitID; }
+    public MeasurementUnit getMeasurementUnit() { return measurementUnit; }
 
-    public void setMeasurementUnitID(MeasurementUnit measurementUnitID) { this.measurementUnitID = measurementUnitID; }
+    public void setMeasurementUnit(MeasurementUnit measurementUnit) { this.measurementUnit = measurementUnit; }
 
-    public MeasurementType getMeasurementTypeID() { return measurementTypeID; }
+    public MeasurementType getMeasurementType() { return measurementType; }
 
-    public void setMeasurementTypeID(MeasurementType measurementTypeID) { this.measurementTypeID = measurementTypeID; }
+    public void setMeasurementType(MeasurementType measurementType) { this.measurementType = measurementType; }
 
 }

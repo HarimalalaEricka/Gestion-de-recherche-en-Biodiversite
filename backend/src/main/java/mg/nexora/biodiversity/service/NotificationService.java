@@ -33,4 +33,18 @@ public class NotificationService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Notification> partialUpdate(Integer id, Notification entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getType() != null) existing.setType(entity.getType());
+                    if (entity.getTitre() != null) existing.setTitre(entity.getTitre());
+                    if (entity.getLue() != null) existing.setLue(entity.getLue());
+                    if (entity.getCreatedAt() != null) existing.setCreatedAt(entity.getCreatedAt());
+                    if (entity.getReadAt() != null) existing.setReadAt(entity.getReadAt());
+                    if (entity.getMessage() != null) existing.setMessage(entity.getMessage());
+                    if (entity.getLien() != null) existing.setLien(entity.getLien());
+                    if (entity.getUtilisateur() != null) existing.setUtilisateur(entity.getUtilisateur());
+                    return repository.save(existing);
+                });
+    }
 }

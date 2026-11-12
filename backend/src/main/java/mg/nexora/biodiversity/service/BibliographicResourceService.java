@@ -33,4 +33,13 @@ public class BibliographicResourceService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<BibliographicResource> partialUpdate(Integer id, BibliographicResource entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getReferenceRemarks() != null) existing.setReferenceRemarks(entity.getReferenceRemarks());
+                    if (entity.getReference() != null) existing.setReference(entity.getReference());
+                    if (entity.getReferenceType() != null) existing.setReferenceType(entity.getReferenceType());
+                    return repository.save(existing);
+                });
+    }
 }

@@ -33,4 +33,11 @@ public class PaysService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Pays> partialUpdate(Integer id, Pays entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getPays() != null) existing.setPays(entity.getPays());
+                    return repository.save(existing);
+                });
+    }
 }

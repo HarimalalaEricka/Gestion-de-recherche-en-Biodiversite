@@ -3,12 +3,6 @@ DROP DATABASE bio_test;
 CREATE DATABASE bio_test;
 \c bio_test
 
-CREATE TYPE AgentType AS ENUM (
-   'PERSON',
-   'GROUP',
-   'INSTITUTION'
-);
-
 CREATE TYPE basisOfRecord AS ENUM (
    'FOSSIL_SPECIMEN',
    'HUMAN_OBSERVATION',
@@ -88,14 +82,25 @@ CREATE TABLE recherche(
    PRIMARY KEY(rechercheID)
 );
 
+CREATE TABLE Licence(
+   licenceID SERIAL,
+   licenceName VARCHAR(255) NOT NULL,
+   licenceCode VARCHAR(100) UNIQUE NOT NULL,
+   licenceURI TEXT,
+   description TEXT,
+   isActive BOOLEAN DEFAULT TRUE,
+   PRIMARY KEY(licenceID)
+);
+
 CREATE TABLE Dataset(
    datasetID SERIAL,
    datasetName VARCHAR(500)  NOT NULL,
-   Licence TEXT,
    rightsHolder TEXT,
    rechercheID INTEGER NOT NULL,
+   licenceID INTEGER,
    PRIMARY KEY(datasetID),
-   FOREIGN KEY(rechercheID) REFERENCES recherche(rechercheID)
+   FOREIGN KEY(rechercheID) REFERENCES recherche(rechercheID),
+   FOREIGN KEY(licenceID) REFERENCES Licence(licenceID)
 );
 
 CREATE TABLE Pays(
@@ -179,8 +184,8 @@ CREATE TABLE materialEntityCategory(
 
 CREATE TABLE Agent(
    agentID SERIAL,
-   agentRemarks TEXT,
-   agentType AgentType NOT NULL,
+   UtilisateurID INTEGER,
+   orderRole INTEGER,
    PRIMARY KEY(agentID)
 );
 
@@ -562,3 +567,54 @@ CREATE INDEX idx_valeur_ligne ON valeur(ligneID);
 CREATE INDEX idx_valeur_attribut ON valeur(AttributID);
 CREATE INDEX idx_notification_utilisateur_date ON notification(UtilisateurID, created_at DESC);
 CREATE INDEX idx_notification_non_lues ON notification(UtilisateurID, created_at DESC) WHERE lue = FALSE;
+
+INSERT INTO Licence (
+    licenceName,
+    licenceCode,
+    licenceURI,
+    description,
+    isActive
+)
+VALUES
+(
+    'Creative Commons Zero 1.0 Universal',
+    'CC0 1.0',
+    'https://creativecommons.org/publicdomain/zero/1.0/',
+    'Permet de renoncer aux droits dans la mesure permise par la loi et de placer les données dans le domaine public.',
+    TRUE
+),
+(
+    'Creative Commons Attribution 4.0 International',
+    'CC BY 4.0',
+    'https://creativecommons.org/licenses/by/4.0/',
+    'Autorise la redistribution et l’adaptation, y compris à des fins commerciales, avec attribution.',
+    TRUE
+),
+(
+    'Creative Commons Attribution-ShareAlike 4.0 International',
+    'CC BY-SA 4.0',
+    'https://creativecommons.org/licenses/by-sa/4.0/',
+    'Autorise la redistribution et l’adaptation, y compris à des fins commerciales, avec attribution et partage sous la même licence.',
+    TRUE
+),
+(
+    'Creative Commons Attribution-NonCommercial 4.0 International',
+    'CC BY-NC 4.0',
+    'https://creativecommons.org/licenses/by-nc/4.0/',
+    'Autorise la redistribution et l’adaptation à des fins non commerciales, avec attribution.',
+    TRUE
+),
+(
+    'Creative Commons Attribution-NoDerivatives 4.0 International',
+    'CC BY-ND 4.0',
+    'https://creativecommons.org/licenses/by-nd/4.0/',
+    'Autorise la redistribution, y compris commerciale, avec attribution, mais sans partage de versions adaptées.',
+    TRUE
+),
+(
+    'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International',
+    'CC BY-NC-SA 4.0',
+    'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+    'Autorise la redistribution et l’adaptation à des fins non commerciales, avec attribution et partage sous la même licence.',
+    TRUE
+);

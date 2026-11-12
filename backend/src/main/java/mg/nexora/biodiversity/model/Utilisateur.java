@@ -3,6 +3,7 @@ package mg.nexora.biodiversity.model;
 import jakarta.persistence.*;
 import java.time.*;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import mg.nexora.biodiversity.model.enums.*;
 
 @Entity
@@ -30,10 +31,10 @@ public class Utilisateur {
 
     @Column(name = "email", nullable = false)
 
-    private String email;
+    private String email;   
 
-    @Column(name = "mot_de_passe", nullable = false)
-
+    @Column(name = "mot_de_passe")
+    @JsonIgnore
     private String motDePasse;
 
     @Enumerated(EnumType.STRING)
