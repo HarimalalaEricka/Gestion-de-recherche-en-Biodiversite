@@ -116,7 +116,7 @@ async function fetchDatasets() {
   detailLoading.value = true;
 
   try {
-    const filters = { rechercheID, deleted: false };
+    const filters = { "recherche.rechercheID": rechercheID, deleted: false };
 
     if (datasetQuery.value) {
       filters.datasetName = datasetQuery.value;
@@ -165,7 +165,7 @@ async function fetchCollaborateurs(rechercheID) {
   try {
     const { total: t } = await getItems(
       "agent-recherches",
-      { rechercheID },
+      { "recherche.rechercheID": rechercheID },
       { page: 1, perPage: 1 }
     );
 
