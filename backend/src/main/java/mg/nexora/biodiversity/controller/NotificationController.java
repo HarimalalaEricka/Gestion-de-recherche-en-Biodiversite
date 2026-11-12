@@ -44,6 +44,13 @@ public class NotificationController {
         return ResponseEntity.ok(service.save(entity));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Notification> partialUpdate(@PathVariable Integer id, @RequestBody Notification entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {

@@ -4,21 +4,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class OccurrenceMaterialEntityKey implements Serializable {
-    private Integer occurrenceID;
-    private Integer materialEntityID;
+    private Integer occurrence;
+    private Integer materialEntity;
 
     public OccurrenceMaterialEntityKey() {}
 
-    public Integer getOccurrenceID() { return occurrenceID; }
-    public void setOccurrenceID(Integer occurrenceID) { this.occurrenceID = occurrenceID; }
-    public Integer getMaterialEntityID() { return materialEntityID; }
-    public void setMaterialEntityID(Integer materialEntityID) { this.materialEntityID = materialEntityID; }
+    public Integer getOccurrence() { return occurrence; }
+    public void setOccurrence(Integer occurrence) { this.occurrence = occurrence; }
+    public Integer getMaterialEntity() { return materialEntity; }
+    public void setMaterialEntity(Integer materialEntity) { this.materialEntity = materialEntity; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OccurrenceMaterialEntityKey that = (OccurrenceMaterialEntityKey) o;
-        return Objects.equals(occurrenceID, that.occurrenceID) && Objects.equals(materialEntityID, that.materialEntityID);
+        return Objects.equals(occurrence, that.occurrence) && Objects.equals(materialEntity, that.materialEntity);
     }
-    @Override public int hashCode() { return Objects.hash(occurrenceID, materialEntityID); }
+    @Override public int hashCode() { return Objects.hash(occurrence, materialEntity); }
 }

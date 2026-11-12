@@ -764,7 +764,7 @@
             }
 
             const nextPage = event.submitter && event.submitter.dataset.next;
-            showToast('Enregistré (démonstration)');
+            // showToast('Enregistré (démonstration)');
             delete storage[draftKey];
 
             if (nextPage) {

@@ -1,24 +1,36 @@
 package mg.nexora.biodiversity.controller;
 
-import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import mg.nexora.biodiversity.model.MediaRecherche;
+import mg.nexora.biodiversity.model.enums.*;
 import mg.nexora.biodiversity.service.MediaRechercheService;
+import mg.nexora.biodiversity.service.UtilisateurService;
 
 @RestController
 @RequestMapping("/api/medias-recherche")
 public class MediaRechercheController {
-    private final MediaRechercheService service;
 
-    public MediaRechercheController(MediaRechercheService service) {
+    private final MediaRechercheService service;
+    private final UtilisateurService utilisateurService;
+
+    public MediaRechercheController(MediaRechercheService service, UtilisateurService utilisateurService) {
         this.service = service;
+        this.utilisateurService = utilisateurService;
     }
 
     @GetMapping
-    public List<MediaRecherche> findAll() {
-        return service.findAll();
+    public Page<MediaRecherche> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -26,6 +38,46 @@ public class MediaRechercheController {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Tous mes médias, filtres optionnels : recherche, type, texte
+    @GetMapping("/mes-medias")
+    public Page<MediaRecherche> mesMedias(
+            Authentication authentication,
+            @RequestParam(required = false) Integer rechercheID,
+            @RequestParam(required = false) TypeMedia typeMedia,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) TypeMediaRecherche typeMediaRecherche,
+            Pageable pageable) {
+
+        return service.findAllMesMedias( rechercheID, typeMedia, q, typeMediaRecherche, pageable);
+    }
+
+    // Mes médias d'une recherche (même logique, l'ID est dans le chemin)
+    @GetMapping("/mes-medias/{rechercheID}")
+    public Page<MediaRecherche> mesMediasDeLaRecherche(
+            @PathVariable Integer rechercheID,
+            @RequestParam(required = false) TypeMedia typeMedia,
+            @RequestParam(required = false) String q,
+            Authentication authentication,
+            @RequestParam(required = false) TypeMediaRecherche typeMediaRecherche,
+            Pageable pageable) {
+
+        return service.findAllMesMedias( rechercheID, typeMedia, q, typeMediaRecherche, pageable);
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MediaRecherche> upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("rechercheID") Integer rechercheID,
+            @RequestParam(required = false) String caption,
+            @RequestParam(required = false) String comments,
+            @RequestParam(required = true) TypeMediaRecherche type,
+            Authentication authentication) {
+
+        Integer utilisateurId = utilisateurService.findIdByEmail(authentication.getName());
+        MediaRecherche saved = service.upload(file, rechercheID, caption, comments, utilisateurId, type);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PostMapping
@@ -39,9 +91,15 @@ public class MediaRechercheController {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        // Force the URL identifier to be the identifier used for the update.
         entity.setMediaRechercheID(id);
         return ResponseEntity.ok(service.save(entity));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<MediaRecherche> partialUpdate(@PathVariable Integer id, @RequestBody MediaRecherche entity) {
+        return service.partialUpdate(id, entity)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

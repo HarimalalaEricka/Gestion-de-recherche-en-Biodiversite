@@ -33,4 +33,13 @@ public class LigneService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Ligne> partialUpdate(Integer id, Ligne entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getDateCreation() != null) existing.setDateCreation(entity.getDateCreation());
+                    if (entity.getTableauPersonnaliseID() != null) existing.setTableauPersonnaliseID(entity.getTableauPersonnaliseID());
+                    if (entity.getAgent() != null) existing.setAgent(entity.getAgent());
+                    return repository.save(existing);
+                });
+    }
 }

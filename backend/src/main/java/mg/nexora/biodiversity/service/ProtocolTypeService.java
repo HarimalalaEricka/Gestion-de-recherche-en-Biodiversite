@@ -33,4 +33,11 @@ public class ProtocolTypeService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<ProtocolType> partialUpdate(Integer id, ProtocolType entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getType() != null) existing.setType(entity.getType());
+                    return repository.save(existing);
+                });
+    }
 }

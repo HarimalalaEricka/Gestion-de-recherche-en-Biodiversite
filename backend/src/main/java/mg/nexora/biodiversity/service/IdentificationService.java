@@ -33,4 +33,16 @@ public class IdentificationService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Identification> partialUpdate(Integer id, Identification entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getDateIdentified() != null) existing.setDateIdentified(entity.getDateIdentified());
+                    if (entity.getIdentificationQualifier() != null) existing.setIdentificationQualifier(entity.getIdentificationQualifier());
+                    if (entity.getIsAcceptedIdentification() != null) existing.setIsAcceptedIdentification(entity.getIsAcceptedIdentification());
+                    if (entity.getTaxon() != null) existing.setTaxon(entity.getTaxon());
+                    if (entity.getAgent() != null) existing.setAgent(entity.getAgent());
+                    if (entity.getOccurrence() != null) existing.setOccurrence(entity.getOccurrence());
+                    return repository.save(existing);
+                });
+    }
 }

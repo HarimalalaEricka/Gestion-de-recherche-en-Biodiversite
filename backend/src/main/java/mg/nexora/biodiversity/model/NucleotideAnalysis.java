@@ -26,23 +26,23 @@ public class NucleotideAnalysis {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "identificationid")
-    private Identification identificationID;
+    private Identification identification;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nucleotidesequenceid", nullable = false)
-    private NucleotideSequence nucleotideSequenceID;
+    private NucleotideSequence nucleotideSequence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "molecularprotocolid", nullable = false)
-    private MolecularProtocol molecularProtocolID;
+    private MolecularProtocol molecularProtocol;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materialentityid", nullable = false)
-    private MaterialEntity materialEntityID;
+    private MaterialEntity materialEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventid", nullable = false)
-    private Event eventID;
+    private Event event;
 
     public Integer getNucleotideAnalysisID() { return nucleotideAnalysisID; }
 
@@ -56,24 +56,24 @@ public class NucleotideAnalysis {
 
     public void setTotalReadCount(Long totalReadCount) { this.totalReadCount = totalReadCount; }
 
-    public Identification getIdentificationID() { return identificationID; }
+    public Identification getIdentification() { return identification; }
 
-    public void setIdentificationID(Identification identificationID) { this.identificationID = identificationID; }
+    public void setIdentification(Identification identification) { this.identification = identification; }
 
-    public NucleotideSequence getNucleotideSequenceID() { return nucleotideSequenceID; }
+    public NucleotideSequence getNucleotideSequence() { return nucleotideSequence; }
 
-    public void setNucleotideSequenceID(NucleotideSequence nucleotideSequenceID) { this.nucleotideSequenceID = nucleotideSequenceID; }
+    public void setNucleotideSequence(NucleotideSequence nucleotideSequence) { this.nucleotideSequence = nucleotideSequence; }
 
-    public MolecularProtocol getMolecularProtocolID() { return molecularProtocolID; }
+    public MolecularProtocol getMolecularProtocol() { return molecularProtocol; }
 
-    public void setMolecularProtocolID(MolecularProtocol molecularProtocolID) { this.molecularProtocolID = molecularProtocolID; }
+    public void setMolecularProtocol(MolecularProtocol molecularProtocol) { this.molecularProtocol = molecularProtocol; }
 
-    public MaterialEntity getMaterialEntityID() { return materialEntityID; }
+    public MaterialEntity getMaterialEntity() { return materialEntity; }
 
-    public void setMaterialEntityID(MaterialEntity materialEntityID) { this.materialEntityID = materialEntityID; }
+    public void setMaterialEntity(MaterialEntity materialEntity) { this.materialEntity = materialEntity; }
 
-    public Event getEventID() { return eventID; }
+    public Event getEvent() { return event; }
 
-    public void setEventID(Event eventID) { this.eventID = eventID; }
+    public void setEvent(Event event) { this.event = event; }
 
 }

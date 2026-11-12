@@ -14,19 +14,60 @@ public class AgentRecherche {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
-    private Agent agentID;
+    private Agent agent;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid")
-    private Recherche rechercheID;
+    private Recherche recherche;
 
-    public Agent getAgentID() { return agentID; }
+    // orderrole supprimé : remplacé par roleCollaboration
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_collaboration", nullable = false, length = 30)
+    private RoleCollaboration roleCollaboration = RoleCollaboration.CHERCHEUR_PRINCIPAL;
 
-    public Recherche getRechercheID() { return rechercheID; }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false, length = 20)
+    private StatutCollaboration statut = StatutCollaboration.ACCEPTEE;
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    // Simple Integer (et non une relation Utilisateur) : évite de sérialiser un Utilisateur
+    // (mot de passe haché inclus) dans les réponses JSON de ce CRUD.
+    @Column(name = "invite_par")
+    private Integer inviteParId;
+
+    @Column(name = "invite_le")
+    private Instant inviteLe;
+
+    @Column(name = "accepte_le")
+    private Instant accepteLe;
+
+    public Agent getAgent() { return agent; }
+
+    public void setAgent(Agent agent) { this.agent = agent; }
+
+    public Recherche getRecherche() { return recherche; }
+
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
+
+    public RoleCollaboration getRoleCollaboration() { return roleCollaboration; }
+
+    public void setRoleCollaboration(RoleCollaboration roleCollaboration) { this.roleCollaboration = roleCollaboration; }
+
+    public StatutCollaboration getStatut() { return statut; }
+
+    public void setStatut(StatutCollaboration statut) { this.statut = statut; }
+
+    public Integer getInviteParId() { return inviteParId; }
+
+    public void setInviteParId(Integer inviteParId) { this.inviteParId = inviteParId; }
+
+    public Instant getInviteLe() { return inviteLe; }
+
+    public void setInviteLe(Instant inviteLe) { this.inviteLe = inviteLe; }
+
+    public Instant getAccepteLe() { return accepteLe; }
+
+    public void setAccepteLe(Instant accepteLe) { this.accepteLe = accepteLe; }
 
 }

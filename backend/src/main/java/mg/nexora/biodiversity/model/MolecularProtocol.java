@@ -26,7 +26,7 @@ public class MolecularProtocol {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "protocolid", nullable = false)
-    private Protocol protocolID;
+    private Protocol protocol;
 
     public Integer getMolecularProtocolID() { return molecularProtocolID; }
 
@@ -40,8 +40,8 @@ public class MolecularProtocol {
 
     public void setMolecularProtocolRemarks(String molecularProtocolRemarks) { this.molecularProtocolRemarks = molecularProtocolRemarks; }
 
-    public Protocol getProtocolID() { return protocolID; }
+    public Protocol getProtocol() { return protocol; }
 
-    public void setProtocolID(Protocol protocolID) { this.protocolID = protocolID; }
+    public void setProtocol(Protocol protocol) { this.protocol = protocol; }
 
 }

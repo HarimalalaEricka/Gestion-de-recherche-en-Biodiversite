@@ -33,4 +33,11 @@ public class MeasurementUnitService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<MeasurementUnit> partialUpdate(Integer id, MeasurementUnit entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getMeasurementUnit() != null) existing.setMeasurementUnit(entity.getMeasurementUnit());
+                    return repository.save(existing);
+                });
+    }
 }

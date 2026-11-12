@@ -22,7 +22,7 @@ public class OrganismInteraction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid", nullable = false)
-    private Occurrence occurrenceID;
+    private Occurrence occurrence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrenceid_1", nullable = false)
@@ -30,11 +30,11 @@ public class OrganismInteraction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventid", nullable = false)
-    private Event eventID;
+    private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisminteractiontypeid", nullable = false)
-    private OrganismInteractionType organismInteractionTypeID;
+    private OrganismInteractionType organismInteractionType;
 
     public Integer getOrganismInteractionID() { return organismInteractionID; }
 
@@ -44,20 +44,20 @@ public class OrganismInteraction {
 
     public void setOrganismInteractionDescription(String organismInteractionDescription) { this.organismInteractionDescription = organismInteractionDescription; }
 
-    public Occurrence getOccurrenceID() { return occurrenceID; }
+    public Occurrence getOccurrence() { return occurrence; }
 
-    public void setOccurrenceID(Occurrence occurrenceID) { this.occurrenceID = occurrenceID; }
+    public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
     public Occurrence getOccurrenceID1() { return occurrenceID1; }
 
     public void setOccurrenceID1(Occurrence occurrenceID1) { this.occurrenceID1 = occurrenceID1; }
 
-    public Event getEventID() { return eventID; }
+    public Event getEvent() { return event; }
 
-    public void setEventID(Event eventID) { this.eventID = eventID; }
+    public void setEvent(Event event) { this.event = event; }
 
-    public OrganismInteractionType getOrganismInteractionTypeID() { return organismInteractionTypeID; }
+    public OrganismInteractionType getOrganismInteractionType() { return organismInteractionType; }
 
-    public void setOrganismInteractionTypeID(OrganismInteractionType organismInteractionTypeID) { this.organismInteractionTypeID = organismInteractionTypeID; }
+    public void setOrganismInteractionType(OrganismInteractionType organismInteractionType) { this.organismInteractionType = organismInteractionType; }
 
 }

@@ -33,4 +33,12 @@ public class AgentService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Agent> partialUpdate(Integer id, Agent entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getUtilisateurId() != null) existing.setUtilisateurId(entity.getUtilisateurId());
+                    // if (entity.getOrderRole() != null) existing.setOrderRole(entity.getOrderRole());
+                    return repository.save(existing);
+                });
+    }
 }

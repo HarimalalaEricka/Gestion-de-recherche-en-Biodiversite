@@ -25,8 +25,8 @@ public class EventReferenceController {
     @GetMapping("/{eventIDId}/{referenceIDId}")
     public ResponseEntity<EventReference> findById(@PathVariable Integer eventIDId, @PathVariable Integer referenceIDId) {
         EventReferenceKey id = new EventReferenceKey();
-        id.setEventID(eventIDId);
-        id.setReferenceID(referenceIDId);
+        id.setEvent(eventIDId);
+        id.setReference(referenceIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class EventReferenceController {
     @DeleteMapping("/{eventIDId}/{referenceIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer eventIDId, @PathVariable Integer referenceIDId) {
         EventReferenceKey id = new EventReferenceKey();
-        id.setEventID(eventIDId);
-        id.setReferenceID(referenceIDId);
+        id.setEvent(eventIDId);
+        id.setReference(referenceIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

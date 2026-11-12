@@ -25,8 +25,8 @@ public class IdentificationReferenceController {
     @GetMapping("/{identificationIDId}/{referenceIDId}")
     public ResponseEntity<IdentificationReference> findById(@PathVariable Integer identificationIDId, @PathVariable Integer referenceIDId) {
         IdentificationReferenceKey id = new IdentificationReferenceKey();
-        id.setIdentificationID(identificationIDId);
-        id.setReferenceID(referenceIDId);
+        id.setIdentification(identificationIDId);
+        id.setReference(referenceIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class IdentificationReferenceController {
     @DeleteMapping("/{identificationIDId}/{referenceIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer identificationIDId, @PathVariable Integer referenceIDId) {
         IdentificationReferenceKey id = new IdentificationReferenceKey();
-        id.setIdentificationID(identificationIDId);
-        id.setReferenceID(referenceIDId);
+        id.setIdentification(identificationIDId);
+        id.setReference(referenceIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

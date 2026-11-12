@@ -1,0 +1,115 @@
+package mg.nexora.biodiversity.controller;
+
+import jakarta.validation.Valid;
+import mg.nexora.biodiversity.dto.LoginRequest;
+import mg.nexora.biodiversity.dto.LoginResponse;
+import mg.nexora.biodiversity.model.Utilisateur;
+import mg.nexora.biodiversity.repository.UtilisateurRepository;
+import mg.nexora.biodiversity.security.JwtService;
+import mg.nexora.biodiversity.model.enums.StatutUser;
+import mg.nexora.biodiversity.model.enums.TypeToken;
+import mg.nexora.biodiversity.service.TokenService;
+import mg.nexora.biodiversity.dto.ResetPasswordRequest;
+import mg.nexora.biodiversity.dto.ForgotPasswordRequest;
+import mg.nexora.biodiversity.dto.ChangerMotDePasseRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    private final UtilisateurRepository repo;
+    private final PasswordEncoder encoder;
+    private final JwtService jwtService;
+    private final TokenService tokenService;
+
+    public AuthController(UtilisateurRepository repo, PasswordEncoder encoder, JwtService jwtService, TokenService tokenService) {
+        this.repo = repo;
+        this.encoder = encoder;
+        this.jwtService = jwtService;
+        this.tokenService = tokenService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+        Utilisateur u = repo.findByEmail(req.email()).orElse(null);
+
+        if (u == null || u.getStatut() != StatutUser.ACTIVE || u.getMotDePasse() == null
+                || !encoder.matches(req.motDePasse(), u.getMotDePasse())) {
+            return ResponseEntity.status(401).body(Map.of("erreur", "Identifiants incorrects"));
+        }
+
+        String role = u.getRole().name();
+        String token = jwtService.generate(u.getEmail(), role);
+        return ResponseEntity.ok(new LoginResponse(token, u.getEmail(), u.getNom(), role));
+    }
+
+    /** Renvoie l'utilisateur connecté (le frontend s'en sert pour vérifier le jeton). */
+    @GetMapping("/me")
+    public ResponseEntity<?> me(Authentication auth) {
+        Utilisateur u = repo.findByEmail(auth.getName()).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(401).body(Map.of("erreur", "Utilisateur introuvable"));
+        }
+        return ResponseEntity.ok(Map.of(
+                "utilisateurID", u.getUtilisateurID(),
+                "email", u.getEmail(),
+                "nom", u.getNom() == null ? "" : u.getNom(),
+                "prenom", u.getPrenom() == null ? "" : u.getPrenom(),
+                "telephone", u.getTelephone() == null ? "" : u.getTelephone(),
+                "role", u.getRole().name(),
+                "statut", u.getStatut().name(),
+                "dateCreation", u.getDateCreation() == null ? "" : u.getDateCreation().toString()));
+    }
+
+    @PostMapping("/mot-de-passe-oublie")
+    public ResponseEntity<?> motDePasseOublie(@Valid @RequestBody ForgotPasswordRequest req) {
+        tokenService.demander(req.email(), TypeToken.RESET_PASSWORD);
+        // Même réponse dans tous les cas
+        return ResponseEntity.ok(Map.of("message",
+                "Si cette adresse existe, un e-mail de réinitialisation vient d'être envoyé."));
+    }
+
+    @PostMapping("/reinitialisation")
+    public ResponseEntity<?> reinitialiser(@Valid @RequestBody ResetPasswordRequest req) {
+        if (!tokenService.valider(req.token(), req.motDePasse(), TypeToken.RESET_PASSWORD)) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Lien invalide ou expiré"));
+        }
+        return ResponseEntity.ok(Map.of("message", "Mot de passe modifié"));
+    }
+
+    @PostMapping("/activation")
+    public ResponseEntity<?> activer(@Valid @RequestBody ResetPasswordRequest req) {
+        if (!tokenService.valider(req.token(), req.motDePasse(), TypeToken.INVITATION)) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Lien invalide ou expiré"));
+        }
+        return ResponseEntity.ok(Map.of("message", "Compte activé"));
+    }
+    @PutMapping("/me/mot-de-passe")
+    public ResponseEntity<?> changerMotDePasse(Authentication auth,
+                                            @RequestBody ChangerMotDePasseRequest req) {
+        Utilisateur u = repo.findByEmail(auth.getName()).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(401).body(Map.of("erreur", "Utilisateur introuvable"));
+        }
+
+        if (!encoder.matches(req.ancienMotDePasse(), u.getMotDePasse())) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Ancien mot de passe incorrect"));
+        }
+        if (req.nouveauMotDePasse() == null || req.nouveauMotDePasse().length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "Le nouveau mot de passe doit contenir au moins 8 caractères"));
+        }
+        if (!req.nouveauMotDePasse().equals(req.confirmation())) {
+            return ResponseEntity.badRequest().body(Map.of("erreur", "La confirmation ne correspond pas"));
+        }
+
+        u.setMotDePasse(encoder.encode(req.nouveauMotDePasse()));
+        repo.save(u);
+        return ResponseEntity.ok(Map.of("message", "Mot de passe modifié"));
+    }
+}

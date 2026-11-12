@@ -34,7 +34,7 @@ public class Protocol {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "protocoltypeid", nullable = false)
-    private ProtocolType protocolTypeID;
+    private ProtocolType protocolType;
 
     public Integer getProtocolID() { return protocolID; }
 
@@ -56,8 +56,8 @@ public class Protocol {
 
     public void setProtocolRemarks(String protocolRemarks) { this.protocolRemarks = protocolRemarks; }
 
-    public ProtocolType getProtocolTypeID() { return protocolTypeID; }
+    public ProtocolType getProtocolType() { return protocolType; }
 
-    public void setProtocolTypeID(ProtocolType protocolTypeID) { this.protocolTypeID = protocolTypeID; }
+    public void setProtocolType(ProtocolType protocolType) { this.protocolType = protocolType; }
 
 }

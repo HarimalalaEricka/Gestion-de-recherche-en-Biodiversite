@@ -25,8 +25,8 @@ public class OccurrenceAgentController {
     @GetMapping("/{agentIDId}/{occurrenceIDId}")
     public ResponseEntity<OccurrenceAgent> findById(@PathVariable Integer agentIDId, @PathVariable Integer occurrenceIDId) {
         OccurrenceAgentKey id = new OccurrenceAgentKey();
-        id.setAgentID(agentIDId);
-        id.setOccurrenceID(occurrenceIDId);
+        id.setAgent(agentIDId);
+        id.setOccurrence(occurrenceIDId);
         return service.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -38,8 +38,8 @@ public class OccurrenceAgentController {
     @DeleteMapping("/{agentIDId}/{occurrenceIDId}")
     public ResponseEntity<Void> delete(@PathVariable Integer agentIDId, @PathVariable Integer occurrenceIDId) {
         OccurrenceAgentKey id = new OccurrenceAgentKey();
-        id.setAgentID(agentIDId);
-        id.setOccurrenceID(occurrenceIDId);
+        id.setAgent(agentIDId);
+        id.setOccurrence(occurrenceIDId);
         if (service.findById(id).isEmpty()) return ResponseEntity.notFound().build();
         service.deleteById(id);
         return ResponseEntity.noContent().build();

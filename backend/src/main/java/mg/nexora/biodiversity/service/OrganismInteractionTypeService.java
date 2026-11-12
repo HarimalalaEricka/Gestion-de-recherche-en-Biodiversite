@@ -33,4 +33,11 @@ public class OrganismInteractionTypeService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<OrganismInteractionType> partialUpdate(Integer id, OrganismInteractionType entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getType() != null) existing.setType(entity.getType());
+                    return repository.save(existing);
+                });
+    }
 }

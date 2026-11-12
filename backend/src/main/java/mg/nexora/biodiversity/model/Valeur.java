@@ -34,11 +34,11 @@ public class Valeur {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ligneid", nullable = false)
-    private Ligne ligneID;
+    private Ligne ligne;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attributid", nullable = false)
-    private Attribut attributID;
+    private Attribut attribut;
 
     public Integer getValeurID() { return valeurID; }
 
@@ -60,12 +60,12 @@ public class Valeur {
 
     public void setValeurDate(LocalDateTime valeurDate) { this.valeurDate = valeurDate; }
 
-    public Ligne getLigneID() { return ligneID; }
+    public Ligne getLigne() { return ligne; }
 
-    public void setLigneID(Ligne ligneID) { this.ligneID = ligneID; }
+    public void setLigne(Ligne ligne) { this.ligne = ligne; }
 
-    public Attribut getAttributID() { return attributID; }
+    public Attribut getAttribut() { return attribut; }
 
-    public void setAttributID(Attribut attributID) { this.attributID = attributID; }
+    public void setAttribut(Attribut attribut) { this.attribut = attribut; }
 
 }

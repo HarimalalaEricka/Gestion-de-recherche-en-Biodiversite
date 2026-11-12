@@ -20,9 +20,9 @@ public class Dataset {
 
     private String datasetName;
 
-    @Column(name = "licence")
-
-    private String licence;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "licenceid")
+    private Licence licence;
 
     @Column(name = "rightsholder")
 
@@ -30,7 +30,14 @@ public class Dataset {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rechercheid", nullable = false)
-    private Recherche rechercheID;
+    private Recherche recherche;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agentid", nullable = false)
+    private Agent agent;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 
     public Integer getDatasetID() { return datasetID; }
 
@@ -40,16 +47,28 @@ public class Dataset {
 
     public void setDatasetName(String datasetName) { this.datasetName = datasetName; }
 
-    public String getLicence() { return licence; }
+    public Licence getLicence() { return licence; }
 
-    public void setLicence(String licence) { this.licence = licence; }
+    public void setLicence(Licence licence) { this.licence = licence; }
 
     public String getRightsHolder() { return rightsHolder; }
 
     public void setRightsHolder(String rightsHolder) { this.rightsHolder = rightsHolder; }
 
-    public Recherche getRechercheID() { return rechercheID; }
+    public Recherche getRecherche() { return recherche; }
 
-    public void setRechercheID(Recherche rechercheID) { this.rechercheID = rechercheID; }
+    public void setRecherche(Recherche recherche) { this.recherche = recherche; }
+
+    public Agent getAgent() { return agent; }
+
+    public void setAgent(Agent agent) { this.agent = agent; }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

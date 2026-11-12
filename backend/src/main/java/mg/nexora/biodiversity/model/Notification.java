@@ -47,7 +47,7 @@ public class Notification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateurid", nullable = false)
-    private Utilisateur utilisateurID;
+    private Utilisateur utilisateur;
 
     public Integer getNotificationID() { return notificationID; }
 
@@ -81,8 +81,8 @@ public class Notification {
 
     public void setLien(String lien) { this.lien = lien; }
 
-    public Utilisateur getUtilisateurID() { return utilisateurID; }
+    public Utilisateur getUtilisateur() { return utilisateur; }
 
-    public void setUtilisateurID(Utilisateur utilisateurID) { this.utilisateurID = utilisateurID; }
+    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 
 }

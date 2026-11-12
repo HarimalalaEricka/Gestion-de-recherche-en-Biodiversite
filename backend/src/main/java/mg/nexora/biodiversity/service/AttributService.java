@@ -33,4 +33,13 @@ public class AttributService {
     public void deleteById(Integer id) {
         repository.deleteById(id);
     }
+    public Optional<Attribut> partialUpdate(Integer id, Attribut entity) {
+        return repository.findById(id)
+                .map(existing -> {
+                    if (entity.getNom() != null) existing.setNom(entity.getNom());
+                    if (entity.getCle() != null) existing.setCle(entity.getCle());
+                    if (entity.getTypeDonnee() != null) existing.setTypeDonnee(entity.getTypeDonnee());
+                    return repository.save(existing);
+                });
+    }
 }

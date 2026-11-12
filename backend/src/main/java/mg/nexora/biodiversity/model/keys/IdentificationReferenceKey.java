@@ -4,21 +4,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class IdentificationReferenceKey implements Serializable {
-    private Integer identificationID;
-    private Integer referenceID;
+    private Integer identification;
+    private Integer reference;
 
     public IdentificationReferenceKey() {}
 
-    public Integer getIdentificationID() { return identificationID; }
-    public void setIdentificationID(Integer identificationID) { this.identificationID = identificationID; }
-    public Integer getReferenceID() { return referenceID; }
-    public void setReferenceID(Integer referenceID) { this.referenceID = referenceID; }
+    public Integer getIdentification() { return identification; }
+    public void setIdentification(Integer identification) { this.identification = identification; }
+    public Integer getReference() { return reference; }
+    public void setReference(Integer reference) { this.reference = reference; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IdentificationReferenceKey that = (IdentificationReferenceKey) o;
-        return Objects.equals(identificationID, that.identificationID) && Objects.equals(referenceID, that.referenceID);
+        return Objects.equals(identification, that.identification) && Objects.equals(reference, that.reference);
     }
-    @Override public int hashCode() { return Objects.hash(identificationID, referenceID); }
+    @Override public int hashCode() { return Objects.hash(identification, reference); }
 }

@@ -16,25 +16,17 @@ public class Agent {
 
     private Integer agentID;
 
-    @Column(name = "agentremarks")
-
-    private String agentRemarks;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "agenttype", nullable = false)
-
-    private AgentType agentType;
+    @Column(name = "utilisateurid")
+    private Integer utilisateurId;
 
     public Integer getAgentID() { return agentID; }
 
     public void setAgentID(Integer agentID) { this.agentID = agentID; }
 
-    public String getAgentRemarks() { return agentRemarks; }
+    public Integer getUtilisateurId() { return utilisateurId; }
 
-    public void setAgentRemarks(String agentRemarks) { this.agentRemarks = agentRemarks; }
+    public void setUtilisateurId(Integer utilisateurId) { this.utilisateurId = utilisateurId; }
 
-    public AgentType getAgentType() { return agentType; }
 
-    public void setAgentType(AgentType agentType) { this.agentType = agentType; }
 
 }

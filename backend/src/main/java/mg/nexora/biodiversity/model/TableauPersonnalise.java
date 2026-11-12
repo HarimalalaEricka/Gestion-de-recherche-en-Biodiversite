@@ -22,11 +22,11 @@ public class TableauPersonnalise {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "datasetid", nullable = false)
-    private Dataset datasetID;
+    private Dataset dataset;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid", nullable = false)
-    private Agent agentID;
+    private Agent agent;
 
     public Integer getTableauPersonnaliseID() { return tableauPersonnaliseID; }
 
@@ -36,12 +36,12 @@ public class TableauPersonnalise {
 
     public void setNom(String nom) { this.nom = nom; }
 
-    public Dataset getDatasetID() { return datasetID; }
+    public Dataset getDataset() { return dataset; }
 
-    public void setDatasetID(Dataset datasetID) { this.datasetID = datasetID; }
+    public void setDataset(Dataset dataset) { this.dataset = dataset; }
 
-    public Agent getAgentID() { return agentID; }
+    public Agent getAgent() { return agent; }
 
-    public void setAgentID(Agent agentID) { this.agentID = agentID; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
 }

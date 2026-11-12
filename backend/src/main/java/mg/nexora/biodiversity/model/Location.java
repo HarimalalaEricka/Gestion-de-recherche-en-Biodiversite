@@ -38,7 +38,7 @@ public class Location {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provinceid", nullable = false)
-    private Province provinceID;
+    private Province province;
 
     public Integer getLocationID() { return locationID; }
 
@@ -64,8 +64,8 @@ public class Location {
 
     public void setGeodeticDatum(String geodeticDatum) { this.geodeticDatum = geodeticDatum; }
 
-    public Province getProvinceID() { return provinceID; }
+    public Province getProvince() { return province; }
 
-    public void setProvinceID(Province provinceID) { this.provinceID = provinceID; }
+    public void setProvince(Province province) { this.province = province; }
 
 }
