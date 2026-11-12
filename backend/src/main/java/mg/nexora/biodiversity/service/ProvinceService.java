@@ -1,11 +1,16 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mg.nexora.biodiversity.model.Province;
 import mg.nexora.biodiversity.repository.ProvinceRepository;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -17,8 +22,8 @@ public class ProvinceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Province> findAll() {
-        return repository.findAll();
+    public Page<Province> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Province>from(params), pageable);
     }
 
     @Transactional(readOnly = true)

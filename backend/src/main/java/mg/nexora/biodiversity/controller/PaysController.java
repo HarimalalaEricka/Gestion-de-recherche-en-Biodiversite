@@ -1,11 +1,15 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.Pays;
 import mg.nexora.biodiversity.service.PaysService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/pays")
@@ -17,8 +21,9 @@ public class PaysController {
     }
 
     @GetMapping
-    public List<Pays> findAll() {
-        return service.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<Pays> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")

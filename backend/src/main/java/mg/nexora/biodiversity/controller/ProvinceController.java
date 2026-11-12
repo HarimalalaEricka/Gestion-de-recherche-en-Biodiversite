@@ -1,11 +1,15 @@
 package mg.nexora.biodiversity.controller;
 
+import java.util.Map;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.Province;
 import mg.nexora.biodiversity.service.ProvinceService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/provinces")
@@ -17,8 +21,9 @@ public class ProvinceController {
     }
 
     @GetMapping
-    public List<Province> findAll() {
-        return service.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<Province> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")

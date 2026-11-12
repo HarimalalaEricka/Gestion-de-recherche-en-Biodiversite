@@ -2,6 +2,7 @@ package mg.nexora.biodiversity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import mg.nexora.biodiversity.model.Protocol;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ProtocolRepository extends JpaRepository<Protocol, Integer> {
+public interface ProtocolRepository extends JpaRepository<Protocol, Integer>, JpaSpecificationExecutor<Protocol> {
 }

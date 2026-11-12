@@ -101,7 +101,7 @@ export default [
     meta: { page: 37, active: 36, layout: 'app', title: "Inviter un utilisateur", role: "ADMIN" } },
   { path: "/admin/fiche-d-un-utilisateur", component: () => import('../views/admin/FicheDUnUtilisateur.vue'),
     meta: { page: 38, active: 36, layout: 'app', title: "Fiche d'un utilisateur", role: "ADMIN" } },
-  { path: "/admin/referentiels", component: () => import('../views/admin/Referentiels.vue'),
+  { path: "/admin/referentiels/:type", component: () => import('../views/admin/Referentiels.vue'),
     meta: { page: 39, active: 39, layout: 'app', title: "Référentiels", role: "ADMIN" } },
   { path: "/admin/agents", component: () => import('../views/admin/Agents.vue'),
     meta: { page: 40, active: 40, layout: 'app', title: "Agents", role: "ADMIN" } },
