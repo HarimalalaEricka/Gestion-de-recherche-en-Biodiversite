@@ -99,9 +99,10 @@ public class RechercheService {
     @Transactional(readOnly = true)
     public Page<Recherche> findByUtilisateur(Integer utilisateurId,
                                             Confidentiality confidentialite,
+                                            String sujet,
                                             Pageable pageable) {
-        return confidentialite == null
-                ? repository.findByUtilisateurId(utilisateurId, pageable)
-                : repository.findByUtilisateurIdAndConfidentialite(utilisateurId, confidentialite, pageable);
+        String recherche = sujet == null ? "" : sujet.trim();
+
+        return repository.findByUtilisateurId(utilisateurId, confidentialite, recherche, pageable);
     }
 }

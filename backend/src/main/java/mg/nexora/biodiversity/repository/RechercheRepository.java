@@ -10,29 +10,20 @@ import mg.nexora.biodiversity.model.Recherche;
 import mg.nexora.biodiversity.model.enums.*;
 
 public interface RechercheRepository extends JpaRepository<Recherche, Integer>, JpaSpecificationExecutor<Recherche> {
-    @Query("""
-        SELECT r FROM Recherche r
-        WHERE EXISTS (
-            SELECT 1 FROM AgentRecherche ar
-            WHERE ar.recherche = r
-              AND ar.agent.utilisateurId = :utilisateurId
-        )
-        """)
-    Page<Recherche> findByUtilisateurId(
-            @Param("utilisateurId") Integer utilisateurId,
-            Pageable pageable);
 
     @Query("""
         SELECT r FROM Recherche r
-        WHERE r.confidentialite = :confidentialite
-        AND EXISTS (
+        WHERE (r.confidentialite = :confidentialite OR :confidentialite IS NULL)
+          AND LOWER(r.sujet) LIKE LOWER(CONCAT('%', :sujet, '%'))
+          AND EXISTS (
             SELECT 1 FROM AgentRecherche ar
             WHERE ar.recherche = r
-            AND ar.agent.utilisateurId = :utilisateurId
-        )
+              AND ar.agent.utilisateurId = :utilisateurId
+          )
         """)
-    Page<Recherche> findByUtilisateurIdAndConfidentialite(
+    Page<Recherche> findByUtilisateurId(
             @Param("utilisateurId") Integer utilisateurId,
             @Param("confidentialite") Confidentiality confidentialite,
+            @Param("sujet") String sujet,
             Pageable pageable);
 }

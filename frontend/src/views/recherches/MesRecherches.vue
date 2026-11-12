@@ -49,6 +49,36 @@ const formatDate = (d) =>
 
 const filtre = ref("ALL");
 
+// Évite d'envoyer une requête au backend à chaque frappe
+function debounce(fn, delay = 300) {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// Recherche par nom (sujet) : valeur saisie / valeur envoyée au backend
+const rechercheSearch = ref("");
+const rechercheQuery = ref("");
+
+const applyRechercheQuery = debounce((v) => {
+  rechercheQuery.value = v.trim();
+});
+
+watch(rechercheSearch, applyRechercheQuery);
+
+// Recherche par nom de dataset : valeur saisie / valeur envoyée au backend
+const datasetSearch = ref("");
+const datasetQuery = ref("");
+
+const applyDatasetQuery = debounce((v) => {
+  datasetQuery.value = v.trim();
+});
+
+watch(datasetSearch, applyDatasetQuery);
+
 const tabs = [
   { value: "ALL", label: "Tout" },
   { value: "PUBLIC", label: "Publiées" },
@@ -62,6 +92,10 @@ async function selectRecherche(r) {
   datasets.value = [];
   totalDatasets.value = 0;
   totalCollaborateurs.value = 0;
+
+  // Le filtre de datasets ne suit pas d'une recherche à l'autre
+  datasetSearch.value = "";
+  datasetQuery.value = "";
 
   fetchCollaborateurs(r.rechercheID);
 
@@ -82,9 +116,15 @@ async function fetchDatasets() {
   detailLoading.value = true;
 
   try {
+    const filters = { rechercheID, deleted: false };
+
+    if (datasetQuery.value) {
+      filters.datasetName = datasetQuery.value;
+    }
+
     const { items, total: t } = await getItems(
       "datasets",
-      { rechercheID, deleted: false },
+      filters,
       { page: datasetPage.value, perPage: datasetPerPage.value }
     );
 
@@ -154,10 +194,15 @@ async function fetchRecherches() {
   loading.value = true;
 
   try {
-    const filters =
-      filtre.value === "ALL"
-        ? {}
-        : { confidentialite: filtre.value };
+    const filters = {};
+
+    if (filtre.value !== "ALL") {
+      filters.confidentialite = filtre.value;
+    }
+
+    if (rechercheQuery.value) {
+      filters.sujet = rechercheQuery.value;
+    }
 
     const { items, total: t } = await getItems(
       "recherches/mes-recherches",
@@ -301,7 +346,7 @@ async function supprimerDataset(d) {
 }
 
 // Filtres et pagination des recherches
-watch(filtre, () => {
+watch([filtre, rechercheQuery], () => {
   if (page.value !== 1) {
     page.value = 1;
   } else {
@@ -313,6 +358,15 @@ watch([page, perPage], fetchRecherches);
 
 // Pagination des datasets
 watch(datasetPage, fetchDatasets);
+
+// Une nouvelle recherche par nom repart de la page 1
+watch(datasetQuery, () => {
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1; // le watcher de datasetPage fera le fetch
+  } else {
+    fetchDatasets();
+  }
+});
 
 watch(datasetPerPage, () => {
   if (datasetPage.value !== 1) {
@@ -354,6 +408,14 @@ onMounted(fetchRecherches);
             + Nouvelle recherche
           </router-link>
         </div>
+
+        <input
+          v-model="rechercheSearch"
+          type="search"
+          class="form-control form-control-sm"
+          placeholder="Filtrer par nom..."
+          aria-label="Filtrer les recherches"
+        />
 
         <!-- Filtres -->
         <ul class="nav nav-tabs">
@@ -601,6 +663,16 @@ onMounted(fetchRecherches);
               >
                 + Nouveau dataset
               </router-link>
+            </div>
+
+            <div class="card-body border-bottom py-2">
+              <input
+                v-model="datasetSearch"
+                type="search"
+                class="form-control form-control-sm"
+                placeholder="Filtrer par nom..."
+                aria-label="Filtrer les datasets"
+              />
             </div>
 
             <div class="table-responsive">

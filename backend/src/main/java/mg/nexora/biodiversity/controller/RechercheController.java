@@ -79,10 +79,10 @@ public class RechercheController {
     public Page<Recherche> mesRecherches(
             Authentication authentication,
             @RequestParam(required = false) Confidentiality confidentialite,
+            @RequestParam(required = false) String sujet,
             Pageable pageable) {
 
-        System.out.println("CTRL confidentialite = " + confidentialite);
         Integer utilisateurId = utilisateurService.findIdByEmail(authentication.getName());
-        return service.findByUtilisateur(utilisateurId, confidentialite, pageable);
+        return service.findByUtilisateur(utilisateurId, confidentialite, sujet, pageable);
     }
 }
