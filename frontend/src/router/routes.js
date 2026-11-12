@@ -45,6 +45,8 @@ export default [
   // ---------- Saisie ----------
   { path: "/saisie/nouveau-dataset/:idRecherche", component: () => import('../views/saisie/NouveauDataset.vue'),
     meta: { page: 14, active: 6, layout: 'app', title: "Nouveau dataset" } },
+  { path: "/saisie/modifier-dataset/:idDataset", component: () => import('../views/saisie/ModifierDataset.vue'),
+    meta: { page: 14, active: 6, layout: 'app', title: "Modifier dataset" } },
   { path: "/saisie/fiche-d-un-dataset/:idDataset", component: () => import('../views/saisie/FicheDUnDataset.vue'),
     meta: { page: 15, active: 6, layout: 'app', title: "Fiche d'un dataset" } },
   { path: "/saisie/import-excel-csv", component: () => import('../views/saisie/ImportExcelCsv.vue'),

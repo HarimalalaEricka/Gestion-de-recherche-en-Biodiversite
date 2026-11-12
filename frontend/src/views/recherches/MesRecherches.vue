@@ -722,6 +722,12 @@ onMounted(fetchRecherches);
                           >
                             Ouvrir
                           </router-link>
+                          <router-link
+                            class="btn btn-sm btn-outline-secondary"
+                            :to="`/saisie/modifier-dataset/${d.datasetID}`"
+                          >
+                            Modifier
+                          </router-link>
 
                           <button
                             type="button"
