@@ -1,4 +1,3 @@
-
 <script setup>
 import { usePage } from "../../composables/usePage";
 import { ref, computed, watch, onMounted } from "vue";
@@ -20,6 +19,15 @@ const totalPages = computed(() =>
 const selected = ref(null);
 const datasets = ref([]);
 const detailLoading = ref(false);
+
+// Pagination dédiée aux datasets
+const totalDatasets = ref(0);
+const datasetPage = ref(1);
+const datasetPerPage = ref(10);
+
+const datasetTotalPages = computed(() =>
+  Math.max(1, Math.ceil(totalDatasets.value / datasetPerPage.value))
+);
 
 const changingStatus = ref(false);
 const deleting = ref(false);
@@ -50,27 +58,48 @@ const tabs = [
 async function selectRecherche(r) {
   selected.value = r;
 
-  const currentRequestId = ++detailRequestId;
-
   datasets.value = [];
+  totalDatasets.value = 0;
   totalCollaborateurs.value = 0;
-  detailLoading.value = true;
 
   fetchCollaborateurs(r.rechercheID);
 
+  // Si on n'est pas déjà page 1, le watcher de datasetPage déclenchera le fetch
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1;
+  } else {
+    fetchDatasets();
+  }
+}
+
+async function fetchDatasets() {
+  if (!selected.value) return;
+
+  const rechercheID = selected.value.rechercheID;
+  const requestId = ++detailRequestId;
+
+  detailLoading.value = true;
+
   try {
-    const { items } = await getItems(
+    const { items, total: t } = await getItems(
       "datasets",
-      { rechercheID: r.rechercheID },
-      { page: 1, perPage: 100 }
+      { rechercheID, deleted: false },
+      { page: datasetPage.value, perPage: datasetPerPage.value }
     );
 
-    if (currentRequestId !== detailRequestId) return;
+    if (requestId !== detailRequestId) return;
+
+    // Page devenue vide (ex. dernier élément supprimé) : reculer d'une page
+    if (items.length === 0 && datasetPage.value > 1) {
+      datasetPage.value--;
+      return;
+    }
 
     datasets.value = items;
+    totalDatasets.value = t ?? 0;
 
   } catch (e) {
-    if (currentRequestId !== detailRequestId) return;
+    if (requestId !== detailRequestId) return;
 
     console.error(
       "Erreur lors de la récupération des datasets :",
@@ -78,9 +107,10 @@ async function selectRecherche(r) {
     );
 
     datasets.value = [];
+    totalDatasets.value = 0;
 
   } finally {
-    if (currentRequestId === detailRequestId) {
+    if (requestId === detailRequestId) {
       detailLoading.value = false;
     }
   }
@@ -157,6 +187,7 @@ async function fetchRecherches() {
     } else {
       selected.value = null;
       datasets.value = [];
+      totalDatasets.value = 0;
       totalCollaborateurs.value = 0;
 
       detailRequestId++;
@@ -229,6 +260,7 @@ async function supprimer() {
 
     selected.value = null;
     datasets.value = [];
+    totalDatasets.value = 0;
     totalCollaborateurs.value = 0;
     await fetchRecherches();
   } catch (e) {
@@ -242,7 +274,7 @@ async function supprimer() {
   }
 }
 
-// Filtres et pagination
+// Filtres et pagination des recherches
 watch(filtre, () => {
   if (page.value !== 1) {
     page.value = 1;
@@ -252,6 +284,17 @@ watch(filtre, () => {
 });
 
 watch([page, perPage], fetchRecherches);
+
+// Pagination des datasets
+watch(datasetPage, fetchDatasets);
+
+watch(datasetPerPage, () => {
+  if (datasetPage.value !== 1) {
+    datasetPage.value = 1; // le watcher de datasetPage fera le fetch
+  } else {
+    fetchDatasets();
+  }
+});
 
 onMounted(fetchRecherches);
 
@@ -369,7 +412,7 @@ onMounted(fetchRecherches);
 
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination des recherches -->
         <div
           class="d-flex flex-wrap justify-content-between align-items-center gap-2"
         >
@@ -382,7 +425,7 @@ onMounted(fetchRecherches);
             <select
               class="form-select form-select-sm w-auto"
               v-model.number="perPage"
-              aria-label="Par page"
+              aria-label="Recherches par page"
             >
               <option :value="5">5</option>
               <option :value="10">10</option>
@@ -463,7 +506,7 @@ onMounted(fetchRecherches);
               <div class="card">
                 <div class="card-body">
                   <div class="fs-3 fw-semibold">
-                    {{ datasets.length }}
+                    {{ totalDatasets }}
                   </div>
                   <div class="text-body-secondary">
                     datasets
@@ -587,6 +630,51 @@ onMounted(fetchRecherches);
                 </tbody>
 
               </table>
+            </div>
+          </div>
+
+          <!-- Pagination des datasets -->
+          <div
+            class="d-flex flex-wrap justify-content-between align-items-center gap-2"
+          >
+            <small class="text-body-secondary">
+              {{ totalDatasets }} dataset(s)
+            </small>
+
+            <div class="d-flex align-items-center gap-2">
+
+              <select
+                class="form-select form-select-sm w-auto"
+                v-model.number="datasetPerPage"
+                aria-label="Datasets par page"
+              >
+                <option :value="5">5</option>
+                <option :value="10">10</option>
+                <option :value="20">20</option>
+              </select>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="datasetPage <= 1 || detailLoading"
+                @click="datasetPage--"
+              >
+                Précédent
+              </button>
+
+              <span class="small">
+                Page {{ datasetPage }} / {{ datasetTotalPages }}
+              </span>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="datasetPage >= datasetTotalPages || detailLoading"
+                @click="datasetPage++"
+              >
+                Suivant
+              </button>
+
             </div>
           </div>
 

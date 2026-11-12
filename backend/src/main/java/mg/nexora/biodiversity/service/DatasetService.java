@@ -1,11 +1,16 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mg.nexora.biodiversity.model.Dataset;
 import mg.nexora.biodiversity.repository.DatasetRepository;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -17,8 +22,8 @@ public class DatasetService {
     }
 
     @Transactional(readOnly = true)
-    public List<Dataset> findAll() {
-        return repository.findAll();
+    public Page<Dataset> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Dataset>from(params), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -31,7 +36,13 @@ public class DatasetService {
     }
 
     public void deleteById(Integer id) {
-        repository.deleteById(id);
+        Dataset dataset = repository.findById(id)
+            .orElseThrow(() ->
+                new RuntimeException("Dataset introuvable")
+            );
+
+        dataset.setDeleted(true);
+        repository.save(dataset);
     }
     public Optional<Dataset> partialUpdate(Integer id, Dataset entity) {
         return repository.findById(id)

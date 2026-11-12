@@ -36,6 +36,9 @@ public class Dataset {
     @JoinColumn(name = "agentid", nullable = false)
     private Agent agent;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     public Integer getDatasetID() { return datasetID; }
 
     public void setDatasetID(Integer datasetID) { this.datasetID = datasetID; }
@@ -59,5 +62,13 @@ public class Dataset {
     public Agent getAgent() { return agent; }
 
     public void setAgent(Agent agent) { this.agent = agent; }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }
