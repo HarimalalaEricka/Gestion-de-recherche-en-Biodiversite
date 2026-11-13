@@ -1,7 +1,6 @@
-
 <script setup>
 import { usePage } from '../../composables/usePage'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getItems } from '../../services/api'
 
@@ -9,21 +8,14 @@ usePage()
 
 const route = useRoute()
 
-// Données
-const pays = ref([])
-const provinces = ref([])
-const protocols = ref([])
-
-// Type de référentiel sélectionné
 const type = computed(() => route.params.type || 'pays')
 
-// Configuration des référentiels
 const configurations = {
   pays: {
     titre: 'Pays',
     endpoint: 'pays',
-    champ: 'pays',
     identifiant: 'paysID',
+    filtreChamp: 'pays',
     colonnes: [
       { label: 'Pays', champ: 'pays' },
       { label: 'Utilisée par', champ: 'utilisee_par' }
@@ -33,8 +25,8 @@ const configurations = {
   provinces: {
     titre: 'Provinces',
     endpoint: 'provinces',
-    champ: 'province',
     identifiant: 'provinceID',
+    filtreChamp: 'province',
     colonnes: [
       { label: 'Province', champ: 'province' },
       { label: 'Pays', champ: 'pays.pays' },
@@ -46,33 +38,20 @@ const configurations = {
     titre: 'Protocoles',
     endpoint: 'protocols',
     identifiant: 'protocolID',
+    filtreChamp: 'protocolName',
     colonnes: [
-        { label: 'Protocole', champ: 'protocolName' },
-        { label: 'Description', champ: 'protocolDescription' },
-        { label: 'Référence', champ: 'protocolReferences' },
-        { label: 'Type', champ: 'protocolType.type' },
-        { label: 'Remarque', champ: 'protocolRemarks' }
+      { label: 'Protocole', champ: 'protocolName' },
+      { label: 'Description', champ: 'protocolDescription' },
+      { label: 'Référence', champ: 'protocolReferences' },
+      { label: 'Type', champ: 'protocolType.type' },
+      { label: 'Remarque', champ: 'protocolRemarks' }
     ]
-    }
+  }
 }
 
 const configuration = computed(() =>
   configurations[type.value] || configurations.pays
 )
-
-const donnees = computed(() => {
-  switch (type.value) {
-    case 'provinces':
-      return provinces.value
-
-    case 'pays':
-    default:
-      return pays.value
-
-    case 'protocols':
-      return protocols.value
-  }
-})
 
 function getValeur(objet, chemin) {
   return chemin.split('.').reduce(
@@ -81,44 +60,109 @@ function getValeur(objet, chemin) {
   ) ?? '-'
 }
 
+const donnees = ref([])
+const total = ref(0)
+const loading = ref(false)
+
+const page = ref(1)
+const perPage = ref(10)
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(total.value / perPage.value))
+)
+
+function debounce(fn, delay = 300) {
+  let timer
+
+  const debounced = (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), delay)
+  }
+
+  debounced.cancel = () => clearTimeout(timer)
+
+  return debounced
+}
+
+const recherche = ref('')
+const requete = ref('')
+
+const applyRequete = debounce((v) => {
+  requete.value = v.trim()
+})
+
+watch(recherche, applyRequete)
+
+let requestId = 0
+
 async function fetchDonnees() {
+  const id = ++requestId
+
+  loading.value = true
+
   try {
-    const { items } = await getItems(
+    const filters = {}
+
+    if (requete.value) {
+      filters[configuration.value.filtreChamp] = requete.value
+    }
+
+    const { items, total: t } = await getItems(
       configuration.value.endpoint,
-      {},
-      {}
+      filters,
+      {
+        page: page.value,
+        perPage: perPage.value
+      }
     )
 
-    if (type.value === 'provinces') {
-      provinces.value = items
-    } else if (type.value === 'pays') {
-      pays.value = items
-    }
-    else if (type.value === 'protocols') {
-      protocols.value = items
+    if (id !== requestId) return
+
+    if (items.length === 0 && page.value > 1) {
+      page.value--
+      return
     }
 
-    console.log('Données récupérées:', items)
+    donnees.value = items
+    total.value = t ?? 0
 
   } catch (error) {
+    if (id !== requestId) return
+
     console.error(
       'Erreur lors de la récupération des données:',
       error
     )
 
-    if (type.value === 'provinces') {
-      provinces.value = []
-    } else if (type.value === 'protocols') {
-      protocols.value = []
-    } else if (type.value === 'pays') {
-      pays.value = []
+    donnees.value = []
+    total.value = 0
+
+  } finally {
+    if (id === requestId) {
+      loading.value = false
     }
   }
 }
 
-// Charger les données à chaque changement d'onglet
-watch(type, fetchDonnees, { immediate: true })
+watch(type, () => {
+  applyRequete.cancel()
+  recherche.value = ''
+  requete.value = ''
+  donnees.value = []
+  total.value = 0
+})
 
+watch([type, requete, perPage], () => {
+  if (page.value !== 1) {
+    page.value = 1 
+  } else {
+    fetchDonnees()
+  }
+})
+
+watch(page, fetchDonnees)
+
+onMounted(fetchDonnees)
 </script>
 
 <template>
@@ -177,54 +221,130 @@ watch(type, fetchDonnees, { immediate: true })
 
     <!-- Bouton Ajouter -->
     <div class="d-flex flex-wrap gap-2 justify-content-end">
-
       <button class="btn btn-primary" type="button">
         + Ajouter
       </button>
-
     </div>
 
     <!-- Tableau -->
     <div class="card">
-        <div class="card-header"> 
-            <input type="search" class="form-control form-control-sm table-filter" placeholder="Filtrer..." aria-label="Filtrer" >
-        </div>
+      <div class="card-header">
+        <input
+          v-model="recherche"
+          type="search"
+          class="form-control form-control-sm table-filter"
+          placeholder="Filtrer..."
+          aria-label="Filtrer"
+        />
+      </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" data-table>
-            <thead>
-                <tr>
-                <th v-for="colonne in configuration.colonnes" :key="colonne.champ" scope="col">
-                    {{ colonne.label }}
-                </th>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th
+                v-for="colonne in configuration.colonnes"
+                :key="colonne.champ"
+                scope="col"
+              >
+                {{ colonne.label }}
+              </th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
 
-                <th scope="col"></th>
-                </tr>
-            </thead>
+          <tbody>
 
-            <tbody>
+            <tr v-if="loading">
+              <td
+                :colspan="configuration.colonnes.length + 1"
+                class="text-center text-body-secondary"
+              >
+                Chargement...
+              </td>
+            </tr>
 
-                <tr v-if="donnees.length === 0">
-                <td :colspan="configuration.colonnes.length + 1" class="text-center" >
-                    Aucun élément disponible
-                </td>
-                </tr>
+            <tr v-else-if="donnees.length === 0">
+              <td
+                :colspan="configuration.colonnes.length + 1"
+                class="text-center text-body-secondary"
+              >
+                Aucun élément disponible
+              </td>
+            </tr>
 
-                <tr v-for="p in donnees" :key="p[configuration.identifiant]" >
-
-                <td v-for="colonne in configuration.colonnes" :key="colonne.champ">
-                    {{ getValeur(p, colonne.champ) }}
+            <template v-else>
+              <tr
+                v-for="p in donnees"
+                :key="p[configuration.identifiant]"
+              >
+                <td
+                  v-for="colonne in configuration.colonnes"
+                  :key="colonne.champ"
+                >
+                  {{ getValeur(p, colonne.champ) }}
                 </td>
 
                 <td class="text-end">
-                    <router-link class="btn btn-sm btn-outline-primary" :to="`/recherches/mes-recherches/${p[configuration.identifiant]}`" >
-                        Ouvrir
-                    </router-link>
+                  <router-link
+                    class="btn btn-sm btn-outline-primary"
+                    :to="`/recherches/mes-recherches/${p[configuration.identifiant]}`"
+                  >
+                    Ouvrir
+                  </router-link>
                 </td>
-                </tr>
-            </tbody>
-            </table>
+              </tr>
+            </template>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div
+        class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2"
+      >
+        <small class="text-body-secondary">
+          {{ total }} élément(s)
+        </small>
+
+        <div class="d-flex align-items-center gap-2">
+
+          <select
+            class="form-select form-select-sm w-auto"
+            v-model.number="perPage"
+            aria-label="Éléments par page"
+          >
+            <option :value="5">5</option>
+            <option :value="10">10</option>
+            <option :value="20">20</option>
+            <option :value="50">50</option>
+          </select>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            :disabled="page <= 1 || loading"
+            @click="page--"
+          >
+            Précédent
+          </button>
+
+          <span class="small">
+            Page {{ page }} / {{ totalPages }}
+          </span>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            :disabled="page >= totalPages || loading"
+            @click="page++"
+          >
+            Suivant
+          </button>
+
         </div>
-        </div>
+      </div>
+    </div>
   </main>
 </template>
