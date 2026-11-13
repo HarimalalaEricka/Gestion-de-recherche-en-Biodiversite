@@ -149,9 +149,9 @@ async function fetchCollaborateurs() {
         const { items, total: t } = await getItems(
             'agent-recherches',
             {
-                rechercheID: props.idRecherche,
-                roleCollaboration: roleFiltre.value,  // "" est ignoré par getItems
-                statut: statutFiltre.value,           // "" est ignoré par getItems
+                "recherche.rechercheID": props.idRecherche,
+                roleCollaboration: roleFiltre.value,  
+                statut: statutFiltre.value,           
                 q: terme.value.trim(),
             },
             { page: page.value, perPage: perPage.value }

@@ -1,5 +1,6 @@
 package mg.nexora.biodiversity.service;
 
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<Event> findAll() {
-        return repository.findAll();
+    public Page<Event> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Event>from(params), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -47,8 +48,5 @@ public class EventService {
                     if (entity.getDataset() != null) existing.setDataset(entity.getDataset());
                     return repository.save(existing);
                 });
-    }
-    public List<Event> findByDatasetId( Integer datasetId) {
-        return repository.findByDataset_DatasetID(datasetId);
     }
 }

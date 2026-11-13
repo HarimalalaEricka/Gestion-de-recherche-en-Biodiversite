@@ -1,11 +1,14 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.Event;
 import mg.nexora.biodiversity.service.EventService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/events")
@@ -17,8 +20,8 @@ public class EventController {
     }
 
     @GetMapping
-    public List<Event> findAll() {
-        return service.findAll();
+    public Page<Event> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -58,10 +61,5 @@ public class EventController {
         }
         service.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/datasets/{datasetId}")
-    public List<Event> findByDatasetId(@PathVariable Integer datasetId) {
-        return service.findByDatasetId(datasetId);
     }
 }

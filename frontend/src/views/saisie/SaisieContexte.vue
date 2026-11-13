@@ -10,12 +10,10 @@ const route = useRoute()
 const router = useRouter()
 const idDataset = Number(route.params.idDataset)
 
-const protocols = ref([])
 const pays = ref([])
 const provinces = ref([])
 
 const dateEvenement = ref('')
-const protocolSelected = ref(null)
 const paysSelected = ref(null)
 const provinceSelected = ref(null)
 const commune = ref('')
@@ -26,6 +24,129 @@ const longitude = ref('')
 const formRef = ref(null)
 const error = ref('')
 const loading = ref(false)
+
+/* ------------------------------------------------------------------ */
+/* Protocole : champ de recherche avec suggestions (côté backend)      */
+/* ------------------------------------------------------------------ */
+
+const protocolInput = ref('')          // texte saisi
+const protocolSelected = ref(null)     // ID du protocole choisi
+const protocolResults = ref([])
+const protocolOpen = ref(false)
+const protocolLoading = ref(false)
+const protocolActive = ref(-1)         // index surligné au clavier
+
+function debounce(fn, delay = 300) {
+    let timer
+
+    return (...args) => {
+        clearTimeout(timer)
+        timer = setTimeout(() => fn(...args), delay)
+    }
+}
+
+let protocolRequestId = 0
+
+async function searchProtocols() {
+    const requestId = ++protocolRequestId
+
+    protocolLoading.value = true
+
+    try {
+        const filters = {}
+        const q = protocolInput.value.trim()
+
+        if (q) {
+            filters.protocolName = q
+        }
+
+        const { items } = await getItems('protocols', filters, {
+            page: 1,
+            perPage: 4,
+            sort: 'protocolName,asc'
+        })
+
+        if (requestId !== protocolRequestId) return
+
+        protocolResults.value = items
+        protocolActive.value = items.length ? 0 : -1
+
+    } catch (e) {
+        if (requestId !== protocolRequestId) return
+
+        console.error('Erreur recherche des protocoles :', e)
+        protocolResults.value = []
+        protocolActive.value = -1
+
+    } finally {
+        if (requestId === protocolRequestId) {
+            protocolLoading.value = false
+        }
+    }
+}
+
+const searchProtocolsDebounced = debounce(searchProtocols)
+
+function onProtocolInput() {
+    // Le texte a changé : l'ancien choix n'est plus valable
+    protocolSelected.value = null
+    protocolOpen.value = true
+    searchProtocolsDebounced()
+}
+
+function onProtocolFocus() {
+    protocolOpen.value = true
+    searchProtocols()
+}
+
+function closeProtocols() {
+    protocolOpen.value = false
+}
+
+function chooseProtocol(p) {
+    protocolSelected.value = p.protocolID
+    protocolInput.value = p.protocolName
+    protocolOpen.value = false
+}
+
+function clearProtocol() {
+    protocolSelected.value = null
+    protocolInput.value = ''
+    protocolResults.value = []
+    protocolOpen.value = false
+}
+
+function onProtocolKeydown(e) {
+    if (!protocolOpen.value && e.key === 'ArrowDown') {
+        protocolOpen.value = true
+        searchProtocols()
+        return
+    }
+
+    if (!protocolOpen.value) return
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        protocolActive.value =
+            (protocolActive.value + 1) % Math.max(protocolResults.value.length, 1)
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        protocolActive.value =
+            (protocolActive.value - 1 + protocolResults.value.length) %
+            Math.max(protocolResults.value.length, 1)
+    } else if (e.key === 'Enter') {
+        // Évite aussi la soumission du formulaire quand la liste est ouverte
+        e.preventDefault()
+        const p = protocolResults.value[protocolActive.value]
+        if (p) chooseProtocol(p)
+    } else if (e.key === 'Escape') {
+        protocolOpen.value = false
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Pays / provinces                                                    */
+/* ------------------------------------------------------------------ */
 
 const provincesFiltrees = computed(() =>
     provinces.value.filter(
@@ -42,11 +163,21 @@ function parseCoord(v) {
     return s === '' ? null : Number(s)
 }
 
+/* ------------------------------------------------------------------ */
+/* Enregistrement                                                      */
+/* ------------------------------------------------------------------ */
+
 async function submit() {
     error.value = ''
 
     if (!formRef.value.checkValidity()) {
         formRef.value.classList.add('was-validated')
+        return
+    }
+
+    // Du texte tapé mais aucun protocole choisi dans la liste
+    if (protocolInput.value.trim() && !protocolSelected.value) {
+        error.value = 'Choisissez un protocole dans la liste, ou videz le champ.'
         return
     }
 
@@ -91,15 +222,6 @@ async function submit() {
 
 const TOUT = { page: 1, perPage: 1000 }
 
-async function loadProtocols() {
-    try {
-        const { items } = await getItems('protocols', {}, TOUT)
-        protocols.value = items
-    } catch (e) {
-        console.error('Erreur chargement des protocoles :', e)
-    }
-}
-
 async function loadLocation() {
     try {
         const [paysRes, provincesRes] = await Promise.all([
@@ -113,10 +235,7 @@ async function loadLocation() {
     }
 }
 
-onMounted(() => {
-    loadProtocols()
-    loadLocation()
-})
+onMounted(loadLocation)
 </script>
 
 <template>
@@ -176,23 +295,82 @@ onMounted(() => {
               />
             </div>
 
+            <!-- Protocole : recherche avec suggestions -->
             <div class="col-md">
               <label class="form-label" for="f3">Protocole</label>
-              <select
-                class="form-select"
-                id="f3"
-                name="protocole"
-                v-model="protocolSelected"
-              >
-                <option :value="null">-- Choisir --</option>
-                <option
-                  v-for="protocol in protocols"
-                  :key="protocol.protocolID"
-                  :value="protocol.protocolID"
+
+              <div class="position-relative">
+                <div class="input-group">
+                  <input
+                    id="f3"
+                    name="protocole"
+                    type="text"
+                    class="form-control"
+                    :class="{ 'is-valid': protocolSelected }"
+                    placeholder="Rechercher un protocole..."
+                    autocomplete="off"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="protocol-list"
+                    :aria-expanded="protocolOpen"
+                    v-model="protocolInput"
+                    @input="onProtocolInput"
+                    @focus="onProtocolFocus"
+                    @blur="closeProtocols"
+                    @keydown="onProtocolKeydown"
+                  />
+                  <button
+                    v-if="protocolInput"
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    aria-label="Effacer le protocole"
+                    @mousedown.prevent
+                    @click="clearProtocol"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <ul
+                  v-if="protocolOpen"
+                  id="protocol-list"
+                  class="list-group position-absolute w-100 shadow"
+                  style="z-index: 1050; max-height: 240px; overflow-y: auto"
+                  role="listbox"
                 >
-                  {{ protocol.protocolName }}
-                </option>
-              </select>
+                  <li
+                    v-if="protocolLoading"
+                    class="list-group-item text-body-secondary"
+                  >
+                    Recherche...
+                  </li>
+
+                  <li
+                    v-else-if="protocolResults.length === 0"
+                    class="list-group-item text-body-secondary"
+                  >
+                    Aucun protocole trouvé
+                  </li>
+
+                  <template v-else>
+                    <!-- mousedown.prevent : garde le focus, sinon le blur ferme la liste avant le clic -->
+                    <li
+                      v-for="(p, i) in protocolResults"
+                      :key="p.protocolID"
+                      class="list-group-item list-group-item-action"
+                      :class="{ active: i === protocolActive }"
+                      role="option"
+                      :aria-selected="i === protocolActive"
+                      style="cursor: pointer"
+                      @mousedown.prevent
+                      @click="chooseProtocol(p)"
+                      @mouseenter="protocolActive = i"
+                    >
+                      {{ p.protocolName }}
+                    </li>
+                  </template>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
