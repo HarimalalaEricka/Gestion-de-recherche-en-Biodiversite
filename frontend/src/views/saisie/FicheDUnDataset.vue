@@ -2,7 +2,7 @@
 import { usePage } from '../../composables/usePage'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getItemById } from '../../services/api'
+import { getItemById, getItems } from '../../services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,6 +13,9 @@ const idDataset = route.params.idDataset
 const dataset = ref(null)
 const recherche = ref(null)
 const createur = ref(null)
+
+const totalevents = ref(0)
+const events = ref([])
 async function loadDataset() {
     try {
         const data = await getItemById(`datasets/${idDataset}`)
@@ -29,6 +32,17 @@ async function loadDataset() {
     }
 }
 
+async function loadEvents() {
+    try {
+        const { items, total } = await getItems(`events/datasets/${idDataset}`)
+        events.value = items
+        totalevents.value = total
+        console.log('Événements chargés :', events.value)
+        console.log('Total des événements :', totalevents.value)
+    } catch (e) {
+        console.error('Erreur chargement des événements :', e)
+    }
+}
 async function fetchUtilisateurByAgentId() {
     try {
         const userId = dataset.value?.agent?.utilisateurId
@@ -46,7 +60,8 @@ async function fetchUtilisateurByAgentId() {
 }
 
 onMounted(() => {
-    loadDataset()
+    loadDataset(),
+    loadEvents()
 })
 </script>
 
@@ -71,7 +86,7 @@ onMounted(() => {
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <div class="fs-3 fw-semibold">5</div>
+                        <div class="fs-3 fw-semibold"> {{ totalevents}} </div>
                         <div class="text-body-secondary">événements</div>
                     </div>
                 </div>
@@ -112,7 +127,18 @@ onMounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr v-if="events.length === 0">
+                                    <td colspan="5" class="text-center text-body-secondary">Aucun événement trouvé.</td>
+                                </tr>
+                                <tr v-for="event in events" :key="event.eventID">
+                                    <td>{{ event.eventDate }}</td>
+                                    <td>{{ event.location.municipality || 'N/A' }}</td>
+                                    <td>{{ event.protocol?.protocolName || 'N/A' }}</td>
+                                    <td>{{ event.observations?.length || 0 }}</td>
+                                    <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
+                                            :to="`/saisie/detail-d-un-evenement/${event.eventID}`">Ouvrir</router-link></td>
+                                </tr>
+                                <!-- <tr>
                                     <td>12/09/2026</td>
                                     <td>Parc national d&#x27;Andasibe</td>
                                     <td>Transect linéaire</td>
@@ -143,7 +169,7 @@ onMounted(() => {
                                     <td>5</td>
                                     <td class="text-end"><router-link class="btn btn-sm btn-outline-primary"
                                             to="/saisie/detail-d-un-evenement">Ouvrir</router-link></td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>
@@ -151,7 +177,7 @@ onMounted(() => {
             </div>
         </div>
         <div class="d-flex flex-wrap gap-2"><router-link class="btn btn-primary"
-                to="/saisie/saisie-contexte">Saisir</router-link><router-link class="btn btn-outline-secondary"
+                :to="`/saisie/saisie-contexte/${idDataset}`">Saisir</router-link><router-link class="btn btn-outline-secondary"
                 to="/saisie/import-excel-csv">Importer Excel / CSV</router-link><a class="btn btn-outline-secondary"
                 href="#" data-demo>Exporter CSV</a><a class="btn btn-outline-secondary" href="#" data-demo>Exporter
                 Excel</a></div>

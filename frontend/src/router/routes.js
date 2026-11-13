@@ -51,7 +51,7 @@ export default [
     meta: { page: 15, active: 6, layout: 'app', title: "Fiche d'un dataset" } },
   { path: "/saisie/import-excel-csv", component: () => import('../views/saisie/ImportExcelCsv.vue'),
     meta: { page: 16, active: 6, layout: 'app', title: "Import Excel / CSV" } },
-  { path: "/saisie/saisie-contexte", component: () => import('../views/saisie/SaisieContexte.vue'),
+  { path: "/saisie/saisie-contexte/:idDataset", component: () => import('../views/saisie/SaisieContexte.vue'),
     meta: { page: 17, active: 17, layout: 'app', title: "Saisie : contexte" } },
   { path: "/saisie/saisie-observations", component: () => import('../views/saisie/SaisieObservations.vue'),
     meta: { page: 18, active: 17, layout: 'app', title: "Saisie : observations" } },

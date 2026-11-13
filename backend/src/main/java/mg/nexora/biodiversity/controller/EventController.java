@@ -59,4 +59,9 @@ public class EventController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/datasets/{datasetId}")
+    public List<Event> findByDatasetId(@PathVariable Integer datasetId) {
+        return service.findByDatasetId(datasetId);
+    }
 }

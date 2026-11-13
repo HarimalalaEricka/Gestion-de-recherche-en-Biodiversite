@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mg.nexora.biodiversity.model.Event;
 import mg.nexora.biodiversity.repository.EventRepository;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -43,5 +47,8 @@ public class EventService {
                     if (entity.getDataset() != null) existing.setDataset(entity.getDataset());
                     return repository.save(existing);
                 });
+    }
+    public List<Event> findByDatasetId( Integer datasetId) {
+        return repository.findByDataset_DatasetID(datasetId);
     }
 }
