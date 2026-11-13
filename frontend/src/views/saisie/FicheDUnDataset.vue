@@ -3,6 +3,9 @@ import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getItemById, getItems } from '../../services/api'
+import { useAccessError } from '../../composables/useAccessError'
+
+const { gererAcces } = useAccessError()
 
 const route = useRoute()
 
@@ -29,6 +32,7 @@ async function loadDataset() {
         await fetchUtilisateurByAgentId()
 
     } catch (e) {
+        if (gererAcces(e)) return      
         console.error('Erreur chargement du dataset :', e)
     }
 }

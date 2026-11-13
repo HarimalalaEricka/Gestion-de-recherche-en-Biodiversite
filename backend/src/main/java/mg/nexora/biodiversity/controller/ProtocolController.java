@@ -21,7 +21,6 @@ public class ProtocolController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Page<Protocol> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
         return service.findAll(params, pageable);
     }
@@ -34,12 +33,14 @@ public class ProtocolController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Protocol> create(@RequestBody Protocol entity) {
         Protocol saved = service.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Protocol> update(@PathVariable Integer id, @RequestBody Protocol entity) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -50,6 +51,7 @@ public class ProtocolController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Protocol> partialUpdate(@PathVariable Integer id, @RequestBody Protocol entity) {
         return service.partialUpdate(id, entity)
                 .map(ResponseEntity::ok)
@@ -57,6 +59,7 @@ public class ProtocolController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();

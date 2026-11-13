@@ -21,7 +21,6 @@ public class ProvinceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Page<Province> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
         return service.findAll(params, pageable);
     }
@@ -34,12 +33,14 @@ public class ProvinceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Province> create(@RequestBody Province entity) {
         Province saved = service.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Province> update(@PathVariable Integer id, @RequestBody Province entity) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -50,6 +51,7 @@ public class ProvinceController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Province> partialUpdate(@PathVariable Integer id, @RequestBody Province entity) {
         return service.partialUpdate(id, entity)
                 .map(ResponseEntity::ok)
@@ -57,6 +59,7 @@ public class ProvinceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
