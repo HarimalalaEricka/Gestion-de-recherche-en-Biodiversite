@@ -25,16 +25,13 @@ const formRef = ref(null)
 const error = ref('')
 const loading = ref(false)
 
-/* ------------------------------------------------------------------ */
-/* Protocole : champ de recherche avec suggestions (côté backend)      */
-/* ------------------------------------------------------------------ */
 
-const protocolInput = ref('')          // texte saisi
-const protocolSelected = ref(null)     // ID du protocole choisi
+const protocolInput = ref('')          
+const protocolSelected = ref(null)     
 const protocolResults = ref([])
 const protocolOpen = ref(false)
 const protocolLoading = ref(false)
-const protocolActive = ref(-1)         // index surligné au clavier
+const protocolActive = ref(-1)         
 
 function debounce(fn, delay = 300) {
     let timer
@@ -144,9 +141,6 @@ function onProtocolKeydown(e) {
     }
 }
 
-/* ------------------------------------------------------------------ */
-/* Pays / provinces                                                    */
-/* ------------------------------------------------------------------ */
 
 const provincesFiltrees = computed(() =>
     provinces.value.filter(
@@ -163,9 +157,6 @@ function parseCoord(v) {
     return s === '' ? null : Number(s)
 }
 
-/* ------------------------------------------------------------------ */
-/* Enregistrement                                                      */
-/* ------------------------------------------------------------------ */
 
 async function submit() {
     error.value = ''
@@ -402,18 +393,10 @@ onMounted(loadLocation)
               <label class="form-label" for="f6">
                 Province<span class="text-danger"> *</span>
               </label>
-              <select
-                class="form-select"
-                id="f6"
-                name="province"
-                v-model="provinceSelected"
-                required
+              <select class="form-select" id="f6" name="province" v-model="provinceSelected" required
               >
                 <option :value="null" disabled>-- Choisir --</option>
-                <option
-                  v-for="pr in provincesFiltrees"
-                  :key="pr.provinceID"
-                  :value="pr.provinceID"
+                <option v-for="pr in provincesFiltrees" :key="pr.provinceID" :value="pr.provinceID"
                 >
                   {{ pr.province }}
                 </option>
@@ -424,13 +407,7 @@ onMounted(loadLocation)
               <label class="form-label" for="f7">
                 Commune<span class="text-danger"> *</span>
               </label>
-              <input
-                class="form-control"
-                type="text"
-                id="f7"
-                name="commune"
-                v-model="commune"
-                required
+              <input class="form-control" type="text" id="f7" name="commune" v-model="commune" required
               />
             </div>
           </div>
@@ -438,38 +415,19 @@ onMounted(loadLocation)
           <div class="row g-3">
             <div class="col-md">
               <label class="form-label" for="f8">Localité</label>
-              <input
-                class="form-control"
-                type="text"
-                id="f8"
-                name="localite"
-                v-model="localite"
+              <input class="form-control" type="text" id="f8" name="localite" v-model="localite"
               />
             </div>
 
             <div class="col-md">
               <label class="form-label" for="f9">Latitude</label>
-              <input
-                class="form-control"
-                type="text"
-                inputmode="decimal"
-                id="f9"
-                name="latitude"
-                v-model="latitude"
-                placeholder="-18.9"
+              <input class="form-control" type="text" inputmode="decimal" id="f9" name="latitude" v-model="latitude" placeholder="-18.9"
               />
             </div>
 
             <div class="col-md">
               <label class="form-label" for="f10">Longitude</label>
-              <input
-                class="form-control"
-                type="text"
-                inputmode="decimal"
-                id="f10"
-                name="longitude"
-                v-model="longitude"
-                placeholder="48.4"
+              <input class="form-control" type="text" inputmode="decimal" id="f10" name="longitude" v-model="longitude" placeholder="48.4"
               />
             </div>
           </div>
@@ -485,10 +443,7 @@ onMounted(loadLocation)
       </div>
 
       <div class="d-flex flex-wrap gap-2">
-        <router-link
-          class="btn btn-outline-secondary"
-          to="/saisie/brouillons-hors-ligne"
-          data-toast="Brouillon enregistré"
+        <router-link class="btn btn-outline-secondary" to="/saisie/brouillons-hors-ligne" data-toast="Brouillon enregistré"
         >
           Enregistrer le brouillon
         </router-link>
