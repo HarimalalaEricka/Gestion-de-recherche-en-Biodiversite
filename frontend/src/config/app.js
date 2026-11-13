@@ -21,11 +21,11 @@ export default {
       "t": "Mes recherches",
       "i": "folder2-open"
     },
-    {
-      "p": 17,
-      "t": "Saisie",
-      "i": "pencil-square"
-    },
+    // {
+    //   "p": 17,
+    //   "t": "Saisie",
+    //   "i": "pencil-square"
+    // },
     {
       "l": "Tableaux personnalisés"
     },

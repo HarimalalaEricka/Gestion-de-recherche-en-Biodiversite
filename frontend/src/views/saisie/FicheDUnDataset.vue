@@ -201,9 +201,9 @@ onMounted(() => {
     <nav class="page-breadcrumb breadcrumb" aria-label="Fil d'Ariane">
       <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><router-link to="/accueil">Accueil</router-link></li>
-        <li class="breadcrumb-item"><router-link to="/saisie/saisie-contexte">Saisie</router-link></li>
+        <li class="breadcrumb-item"><router-link :to="`/saisie/saisie-contexte/${idDataset}`">Saisie</router-link></li>
         <li class="breadcrumb-item active" aria-current="page">
-          <router-link to="/saisie/fiche-d-un-dataset">Fiche d&#39;un dataset</router-link>
+          <router-link :to="`/saisie/fiche-d-un-dataset/${idDataset}`">Fiche d&#39;un dataset</router-link>
         </li>
       </ol>
     </nav>
