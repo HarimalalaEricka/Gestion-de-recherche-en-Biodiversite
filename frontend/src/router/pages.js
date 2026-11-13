@@ -39,7 +39,7 @@ export const pages = {
   36: "/admin/utilisateurs",
   37: "/admin/inviter-un-utilisateur",
   38: "/admin/fiche-d-un-utilisateur",
-  39: "/admin/referentiels",
+  39: "/admin/referentiels/pays",
   40: "/admin/agents",
   41: "/admin/journal-des-evenements",
   42: "/erreurs/acces-refuse",
