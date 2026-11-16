@@ -35,4 +35,18 @@ public interface AgentRechercheRepository extends JpaRepository<AgentRecherche, 
                            @Param("rechercheId") Integer rechercheId,
                            @Param("role") RoleCollaboration role,
                            @Param("statut") StatutCollaboration statut);
+
+       @Query("""
+       SELECT COUNT(ar) > 0 FROM AgentRecherche ar
+       WHERE ar.recherche.rechercheID = :rechercheId
+       AND ar.agent.utilisateurId = :userId
+       AND ar.statut = :statut
+       """)
+       boolean existsMembre(@Param("rechercheId") Integer rechercheId,
+                            @Param("userId") Integer userId,
+                            @Param("statut") StatutCollaboration statut);
+
+       default boolean estMembre(Integer rechercheId, Integer userId) {
+              return existsMembre(rechercheId, userId, StatutCollaboration.ACCEPTEE);
+       }
 }

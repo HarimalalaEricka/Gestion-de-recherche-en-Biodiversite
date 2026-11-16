@@ -51,7 +51,7 @@ export default [
     meta: { page: 15, active: 6, layout: 'app', title: "Fiche d'un dataset" } },
   { path: "/saisie/import-excel-csv", component: () => import('../views/saisie/ImportExcelCsv.vue'),
     meta: { page: 16, active: 6, layout: 'app', title: "Import Excel / CSV" } },
-  { path: "/saisie/saisie-contexte", component: () => import('../views/saisie/SaisieContexte.vue'),
+  { path: "/saisie/saisie-contexte/:idDataset", component: () => import('../views/saisie/SaisieContexte.vue'),
     meta: { page: 17, active: 17, layout: 'app', title: "Saisie : contexte" } },
   { path: "/saisie/saisie-observations", component: () => import('../views/saisie/SaisieObservations.vue'),
     meta: { page: 18, active: 17, layout: 'app', title: "Saisie : observations" } },
@@ -65,7 +65,7 @@ export default [
     meta: { page: 22, active: 17, layout: 'app', title: "Saisie : récapitulatif" } },
   { path: "/saisie/brouillons-hors-ligne", component: () => import('../views/saisie/BrouillonsHorsLigne.vue'),
     meta: { page: 23, active: 17, layout: 'app', title: "Brouillons hors ligne" } },
-  { path: "/saisie/detail-d-un-evenement", component: () => import('../views/saisie/DetailDUnEvenement.vue'),
+  { path: "/saisie/detail-d-un-evenement/:idEvent", component: () => import('../views/saisie/DetailDUnEvenement.vue'),
     meta: { page: 24, active: 17, layout: 'app', title: "Détail d'un événement" } },
 
   // ---------- Validation ----------

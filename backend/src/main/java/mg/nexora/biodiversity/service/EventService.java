@@ -1,29 +1,25 @@
 package mg.nexora.biodiversity.service;
 
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mg.nexora.biodiversity.model.Event;
 import mg.nexora.biodiversity.repository.EventRepository;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
-public class EventService {
+public class EventService extends SecuredService<Event>{
     private final EventRepository repository;
 
-    public EventService(EventRepository repository) {
+    public EventService(EventRepository repository, AccessGuard guard) {
+        super(repository, guard, "dataset.recherche", "eventID");
         this.repository = repository;
-    }
-
-    @Transactional(readOnly = true)
-    public List<Event> findAll() {
-        return repository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Event> findById(Integer id) {
-        return repository.findById(id);
     }
 
     public Event save(Event entity) {

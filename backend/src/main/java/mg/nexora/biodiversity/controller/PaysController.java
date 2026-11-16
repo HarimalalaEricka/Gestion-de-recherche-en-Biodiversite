@@ -21,7 +21,6 @@ public class PaysController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Page<Pays> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
         return service.findAll(params, pageable);
     }
@@ -34,12 +33,14 @@ public class PaysController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pays> create(@RequestBody Pays entity) {
         Pays saved = service.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pays> update(@PathVariable Integer id, @RequestBody Pays entity) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -50,6 +51,7 @@ public class PaysController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pays> partialUpdate(@PathVariable Integer id, @RequestBody Pays entity) {
         return service.partialUpdate(id, entity)
                 .map(ResponseEntity::ok)
@@ -57,6 +59,7 @@ public class PaysController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
