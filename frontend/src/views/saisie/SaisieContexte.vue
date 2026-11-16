@@ -1,6 +1,6 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { insertItem, getItems } from '../../services/api'
 
@@ -25,205 +25,391 @@ const formRef = ref(null)
 const error = ref('')
 const loading = ref(false)
 
+/* ---------- Utilitaires ---------- */
 
-const protocolInput = ref('')          
-const protocolSelected = ref(null)     
+function debounce(fn, delay = 300) {
+  let timer
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), delay)
+  }
+}
+
+function parseCoord(v) {
+  const s = String(v ?? '').trim().replace(',', '.')
+  return s === '' ? null : Number(s)
+}
+
+/* ---------- Protocole (recherche avec suggestions) ---------- */
+
+const protocolInput = ref('')
+const protocolSelected = ref(null)
 const protocolResults = ref([])
 const protocolOpen = ref(false)
 const protocolLoading = ref(false)
-const protocolActive = ref(-1)         
-
-function debounce(fn, delay = 300) {
-    let timer
-
-    return (...args) => {
-        clearTimeout(timer)
-        timer = setTimeout(() => fn(...args), delay)
-    }
-}
+const protocolActive = ref(-1)
 
 let protocolRequestId = 0
 
 async function searchProtocols() {
-    const requestId = ++protocolRequestId
+  const requestId = ++protocolRequestId
+  protocolLoading.value = true
 
-    protocolLoading.value = true
+  try {
+    const filters = {}
+    const q = protocolInput.value.trim()
+    if (q) filters.protocolName = q
 
-    try {
-        const filters = {}
-        const q = protocolInput.value.trim()
+    const { items } = await getItems('protocols', filters, {
+      page: 1,
+      perPage: 4,
+      sort: 'protocolName,asc'
+    })
 
-        if (q) {
-            filters.protocolName = q
-        }
+    if (requestId !== protocolRequestId) return
 
-        const { items } = await getItems('protocols', filters, {
-            page: 1,
-            perPage: 4,
-            sort: 'protocolName,asc'
-        })
-
-        if (requestId !== protocolRequestId) return
-
-        protocolResults.value = items
-        protocolActive.value = items.length ? 0 : -1
-
-    } catch (e) {
-        if (requestId !== protocolRequestId) return
-
-        console.error('Erreur recherche des protocoles :', e)
-        protocolResults.value = []
-        protocolActive.value = -1
-
-    } finally {
-        if (requestId === protocolRequestId) {
-            protocolLoading.value = false
-        }
-    }
+    protocolResults.value = items
+    protocolActive.value = items.length ? 0 : -1
+  } catch (e) {
+    if (requestId !== protocolRequestId) return
+    console.error('Erreur recherche des protocoles :', e)
+    protocolResults.value = []
+    protocolActive.value = -1
+  } finally {
+    if (requestId === protocolRequestId) protocolLoading.value = false
+  }
 }
 
 const searchProtocolsDebounced = debounce(searchProtocols)
 
 function onProtocolInput() {
-    // Le texte a changé : l'ancien choix n'est plus valable
-    protocolSelected.value = null
-    protocolOpen.value = true
-    searchProtocolsDebounced()
+  protocolSelected.value = null
+  protocolOpen.value = true
+  searchProtocolsDebounced()
 }
 
 function onProtocolFocus() {
-    protocolOpen.value = true
-    searchProtocols()
+  protocolOpen.value = true
+  searchProtocols()
 }
 
 function closeProtocols() {
-    protocolOpen.value = false
+  protocolOpen.value = false
 }
 
 function chooseProtocol(p) {
-    protocolSelected.value = p.protocolID
-    protocolInput.value = p.protocolName
-    protocolOpen.value = false
+  protocolSelected.value = p.protocolID
+  protocolInput.value = p.protocolName
+  protocolOpen.value = false
 }
 
 function clearProtocol() {
-    protocolSelected.value = null
-    protocolInput.value = ''
-    protocolResults.value = []
-    protocolOpen.value = false
+  protocolSelected.value = null
+  protocolInput.value = ''
+  protocolResults.value = []
+  protocolOpen.value = false
 }
 
 function onProtocolKeydown(e) {
-    if (!protocolOpen.value && e.key === 'ArrowDown') {
-        protocolOpen.value = true
-        searchProtocols()
-        return
-    }
+  if (!protocolOpen.value && e.key === 'ArrowDown') {
+    protocolOpen.value = true
+    searchProtocols()
+    return
+  }
 
-    if (!protocolOpen.value) return
+  if (!protocolOpen.value) return
 
-    if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        protocolActive.value =
-            (protocolActive.value + 1) % Math.max(protocolResults.value.length, 1)
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        protocolActive.value =
-            (protocolActive.value - 1 + protocolResults.value.length) %
-            Math.max(protocolResults.value.length, 1)
-    } else if (e.key === 'Enter') {
-        // Évite aussi la soumission du formulaire quand la liste est ouverte
-        e.preventDefault()
-        const p = protocolResults.value[protocolActive.value]
-        if (p) chooseProtocol(p)
-    } else if (e.key === 'Escape') {
-        protocolOpen.value = false
-    }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    protocolActive.value =
+      (protocolActive.value + 1) % Math.max(protocolResults.value.length, 1)
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    protocolActive.value =
+      (protocolActive.value - 1 + protocolResults.value.length) %
+      Math.max(protocolResults.value.length, 1)
+  } else if (e.key === 'Enter') {
+    e.preventDefault()
+    const p = protocolResults.value[protocolActive.value]
+    if (p) chooseProtocol(p)
+  } else if (e.key === 'Escape') {
+    protocolOpen.value = false
+  }
 }
 
+/* ---------- Pays / provinces ---------- */
 
 const provincesFiltrees = computed(() =>
-    provinces.value.filter(
-        (pr) => !paysSelected.value || pr.pays?.paysID === paysSelected.value
-    )
+  provinces.value.filter(
+    (pr) => !paysSelected.value || pr.pays?.paysID === paysSelected.value
+  )
 )
 
 watch(paysSelected, () => {
-    provinceSelected.value = null
+  provinceSelected.value = null
 })
 
-function parseCoord(v) {
-    const s = String(v ?? '').trim().replace(',', '.')
-    return s === '' ? null : Number(s)
+/* ---------- Lieu existant ---------- */
+
+const locationSelected = ref(null) // locationID du lieu pris comme base
+const locationOriginal = ref(null) // valeurs du lieu au moment du choix
+const locationInput = ref('')
+const locationResults = ref([])
+const locationOpen = ref(false)
+const locationLoading = ref(false)
+const showLocationSearch = ref(false)
+
+let locationRequestId = 0
+
+const provinceById = computed(
+  () => new Map(provinces.value.map((p) => [p.provinceID, p]))
+)
+
+// "Province, Pays" d'un lieu
+function locationPlace(l) {
+  const prov = provinceById.value.get(l.province?.provinceID) ?? l.province
+  const paysId = prov?.pays?.paysID
+  const paysName = pays.value.find((x) => x.paysID === paysId)?.pays ?? prov?.pays?.pays
+  return [prov?.province, paysName].filter(Boolean).join(', ')
 }
 
+function locationCoords(l) {
+  const lat = l.decimalLatitude
+  const lng = l.decimalLongitude
+  return lat != null && lng != null ? `${lat}, ${lng}` : 'Sans coordonnées'
+}
+
+async function searchLocations() {
+  const requestId = ++locationRequestId
+  locationLoading.value = true
+
+  try {
+    const q = locationInput.value.trim()
+    const opts = { page: 1, perPage: 8, sort: 'locality,asc' }
+
+    const [byLocality, byMunicipality] = await Promise.all([
+      getItems('locations', q ? { locality: q } : {}, opts),
+      q ? getItems('locations', { municipality: q }, opts) : { items: [] }
+    ])
+
+    if (requestId !== locationRequestId) return
+
+    const unique = new Map()
+    ;[...byLocality.items, ...byMunicipality.items].forEach((l) =>
+      unique.set(l.locationID, l)
+    )
+    locationResults.value = [...unique.values()].slice(0, 10)
+  } catch (e) {
+    if (requestId !== locationRequestId) return
+    console.error('Erreur recherche des lieux :', e)
+    locationResults.value = []
+  } finally {
+    if (requestId === locationRequestId) locationLoading.value = false
+  }
+}
+
+const searchLocationsDebounced = debounce(searchLocations)
+
+function openLocationSearch() {
+  showLocationSearch.value = true
+  locationOpen.value = true
+  searchLocations()
+}
+
+// Annulation possible à tout moment : ferme la recherche sans rien changer
+function cancelLocationSearch() {
+  showLocationSearch.value = false
+  locationOpen.value = false
+  locationInput.value = ''
+  locationResults.value = []
+  locationRequestId++ // ignore les réponses en cours
+  locationLoading.value = false
+}
+
+function onLocationInput() {
+  locationOpen.value = true
+  searchLocationsDebounced()
+}
+
+async function chooseLocation(l) {
+  cancelLocationSearch()
+
+  const prov = provinceById.value.get(l.province?.provinceID)
+  const provinceID = prov?.provinceID ?? l.province?.provinceID ?? null
+
+  locationSelected.value = l.locationID
+  locationOriginal.value = {
+    commune: l.municipality ?? '',
+    localite: l.locality ?? '',
+    lat: l.decimalLatitude ?? null,
+    lng: l.decimalLongitude ?? null,
+    provinceID
+  }
+
+  commune.value = l.municipality ?? ''
+  localite.value = l.locality ?? ''
+  latitude.value = l.decimalLatitude ?? ''
+  longitude.value = l.decimalLongitude ?? ''
+
+  paysSelected.value = prov?.pays?.paysID ?? null
+  await nextTick() // le watch(paysSelected) remet la province à null
+  provinceSelected.value = provinceID
+}
+
+// On garde les valeurs des champs, on arrête juste de réutiliser l'ancien lieu
+function detachLocation() {
+  locationSelected.value = null
+  locationOriginal.value = null
+}
+
+// Vrai si l'utilisateur a changé au moins un champ du lieu choisi
+const locationModified = computed(() => {
+  const o = locationOriginal.value
+  if (!locationSelected.value || !o) return false
+
+  const t = (s) => String(s ?? '').trim()
+  return (
+    t(commune.value) !== t(o.commune) ||
+    t(localite.value) !== t(o.localite) ||
+    parseCoord(latitude.value) !== o.lat ||
+    parseCoord(longitude.value) !== o.lng ||
+    (provinceSelected.value ?? null) !== o.provinceID
+  )
+})
+
+/* ---------- Ma position ---------- */
+
+const geoLoading = ref(false)
+const geoError = ref('')
+let geoErrorTimer = null
+
+function useMyPosition() {
+  clearTimeout(geoErrorTimer)
+  geoError.value = ''
+
+  if (!navigator.geolocation) {
+    geoError.value = 'Géolocalisation non supportée'
+    return
+  }
+
+  geoLoading.value = true
+
+  const onSuccess = ({ coords }) => {
+    clearTimeout(geoErrorTimer) // annule une erreur encore en attente
+    geoError.value = ''
+    latitude.value = coords.latitude.toFixed(6)
+    longitude.value = coords.longitude.toFixed(6)
+    geoLoading.value = false
+  }
+
+  // L'erreur n'est affichée qu'après un court délai : si une position
+  // arrive entre-temps, onSuccess annule l'affichage.
+  const onFail = (e) => {
+    console.warn('Géolocalisation :', e.code, e.message)
+    clearTimeout(geoErrorTimer)
+    geoErrorTimer = setTimeout(() => {
+      geoError.value =
+        e.code === 1 ? 'Autorisation de localisation refusée'
+        : e.code === 2 ? 'Position indisponible'
+        : 'Délai dépassé, réessayez'
+      geoLoading.value = false
+    }, 1500)
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    onSuccess,
+    (e) => {
+      // Autorisation refusée : inutile de réessayer
+      if (e.code === 1) return onFail(e)
+
+      // Le 1er essai (GPS précis) a échoué : on retente en précision normale
+      navigator.geolocation.getCurrentPosition(onSuccess, onFail, {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 60000
+      })
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  )
+}
+
+onBeforeUnmount(() => clearTimeout(geoErrorTimer))
+
+/* ---------- Soumission ---------- */
 
 async function submit() {
-    error.value = ''
+  error.value = ''
 
-    if (!formRef.value.checkValidity()) {
-        formRef.value.classList.add('was-validated')
-        return
-    }
+  if (!formRef.value.checkValidity()) {
+    formRef.value.classList.add('was-validated')
+    return
+  }
 
-    // Du texte tapé mais aucun protocole choisi dans la liste
-    if (protocolInput.value.trim() && !protocolSelected.value) {
-        error.value = 'Choisissez un protocole dans la liste, ou videz le champ.'
-        return
-    }
+  if (protocolInput.value.trim() && !protocolSelected.value) {
+    error.value = 'Choisissez un protocole dans la liste, ou videz le champ.'
+    return
+  }
 
-    const lat = parseCoord(latitude.value)
-    const lng = parseCoord(longitude.value)
+  const lat = parseCoord(latitude.value)
+  const lng = parseCoord(longitude.value)
 
-    if (Number.isNaN(lat) || Number.isNaN(lng)) {
-        error.value = 'Latitude ou longitude invalide'
-        return
-    }
+  if (Number.isNaN(lat) || Number.isNaN(lng)) {
+    error.value = 'Latitude ou longitude invalide'
+    return
+  }
 
-    loading.value = true
-    try {
-        const location = await insertItem('locations', {
+  loading.value = true
+  try {
+    // Lieu choisi et inchangé : on réutilise son ID. Sinon, nouveau lieu.
+    const reuse = locationSelected.value && !locationModified.value
+
+    const locationID = reuse
+      ? locationSelected.value
+      : (
+          await insertItem('locations', {
             municipality: commune.value,
             locality: localite.value,
             decimalLatitude: lat,
             decimalLongitude: lng,
             province: provinceSelected.value
-                ? { provinceID: provinceSelected.value }
-                : null
-        })
+              ? { provinceID: provinceSelected.value }
+              : null
+          })
+        ).locationID
 
-        const event = await insertItem('events', {
-            eventDate: `${dateEvenement.value}T00:00:00`,
-            dataset: { datasetID: idDataset },
-            location: { locationID: location.locationID },
-            protocol: protocolSelected.value
-                ? { protocolID: protocolSelected.value }
-                : null
-        })
+    await insertItem('events', {
+      eventDate: `${dateEvenement.value}T00:00:00`,
+      dataset: { datasetID: idDataset },
+      location: { locationID },
+      protocol: protocolSelected.value
+        ? { protocolID: protocolSelected.value }
+        : null
+    })
 
-        router.push(`/saisie/saisie-observations/${idDataset}`)
-
-    } catch (e) {
-        console.error('Erreur enregistrement du contexte :', e)
-        error.value = "Erreur lors de l'enregistrement du contexte"
-    } finally {
-        loading.value = false
-    }
+    router.push(`/saisie/saisie-observations/${idDataset}`)
+  } catch (e) {
+    console.error('Erreur enregistrement du contexte :', e)
+    error.value = "Erreur lors de l'enregistrement du contexte"
+  } finally {
+    loading.value = false
+  }
 }
+
+/* ---------- Chargement initial ---------- */
 
 const TOUT = { page: 1, perPage: 1000 }
 
 async function loadLocation() {
-    try {
-        const [paysRes, provincesRes] = await Promise.all([
-            getItems('pays', {}, TOUT),
-            getItems('provinces', {}, TOUT)
-        ])
-        pays.value = paysRes.items
-        provinces.value = provincesRes.items
-    } catch (e) {
-        console.error('Erreur chargement des lieux :', e)
-    }
+  try {
+    const [paysRes, provincesRes] = await Promise.all([
+      getItems('pays', {}, TOUT),
+      getItems('provinces', {}, TOUT)
+    ])
+    pays.value = paysRes.items
+    provinces.value = provincesRes.items
+  } catch (e) {
+    console.error('Erreur chargement des lieux :', e)
+  }
 }
 
 onMounted(loadLocation)
@@ -236,9 +422,7 @@ onMounted(loadLocation)
       <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><router-link to="/accueil">Accueil</router-link></li>
         <li class="breadcrumb-item"><router-link to="/saisie/saisie-contexte">Saisie</router-link></li>
-        <li class="breadcrumb-item active" aria-current="page">
-          <router-link to="/saisie/saisie-contexte">Saisie : contexte</router-link>
-        </li>
+        <li class="breadcrumb-item active" aria-current="page">Saisie : contexte</li>
       </ol>
     </nav>
 
@@ -286,7 +470,7 @@ onMounted(loadLocation)
               />
             </div>
 
-            <!-- Protocole : recherche avec suggestions -->
+            <!-- Protocole -->
             <div class="col-md">
               <label class="form-label" for="f3">Protocole</label>
 
@@ -329,10 +513,7 @@ onMounted(loadLocation)
                   style="z-index: 1050; max-height: 240px; overflow-y: auto"
                   role="listbox"
                 >
-                  <li
-                    v-if="protocolLoading"
-                    class="list-group-item text-body-secondary"
-                  >
+                  <li v-if="protocolLoading" class="list-group-item text-body-secondary">
                     Recherche...
                   </li>
 
@@ -344,7 +525,6 @@ onMounted(loadLocation)
                   </li>
 
                   <template v-else>
-                    <!-- mousedown.prevent : garde le focus, sinon le blur ferme la liste avant le clic -->
                     <li
                       v-for="(p, i) in protocolResults"
                       :key="p.protocolID"
@@ -372,10 +552,97 @@ onMounted(loadLocation)
         <div class="card-header fw-semibold">Lieu</div>
         <div class="card-body d-grid gap-3">
 
-          <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-outline-secondary" href="#" data-demo>
-              Choisir un lieu existant
-            </a>
+          <div class="d-grid gap-2">
+            <div class="d-flex flex-wrap gap-2">
+              <button
+                v-if="!showLocationSearch"
+                type="button"
+                class="btn btn-outline-secondary"
+                @click="openLocationSearch"
+              >
+                {{ locationSelected ? 'Choisir un autre lieu' : 'Choisir un lieu existant' }}
+              </button>
+
+              <button
+                v-else
+                type="button"
+                class="btn btn-outline-danger"
+                @click="cancelLocationSearch"
+              >
+                Annuler
+              </button>
+
+              <button
+                v-if="locationSelected && !showLocationSearch && !locationModified"
+                type="button"
+                class="btn btn-outline-secondary"
+                @click="detachLocation"
+              >
+                Ne plus réutiliser ce lieu
+              </button>
+            </div>
+
+            <div v-if="showLocationSearch" class="position-relative">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Rechercher par localité ou commune..."
+                autocomplete="off"
+                v-model="locationInput"
+                @input="onLocationInput"
+                @keydown.esc="cancelLocationSearch"
+              />
+
+              <ul
+                v-if="locationOpen"
+                class="list-group position-absolute w-100 shadow"
+                style="z-index: 1050; max-height: 300px; overflow-y: auto"
+              >
+                <li v-if="locationLoading" class="list-group-item text-body-secondary">
+                  Recherche...
+                </li>
+
+                <li
+                  v-else-if="!locationResults.length"
+                  class="list-group-item text-body-secondary"
+                >
+                  Aucun lieu trouvé
+                </li>
+
+                <template v-else>
+                  <li
+                    v-for="l in locationResults"
+                    :key="l.locationID"
+                    class="list-group-item list-group-item-action"
+                    style="cursor: pointer"
+                    @click="chooseLocation(l)"
+                  >
+                    <div class="fw-semibold">
+                      {{ [l.locality, l.municipality].filter(Boolean).join(', ') || 'Lieu #' + l.locationID }}
+                    </div>
+                    <small class="text-body-secondary d-block">
+                      {{ locationPlace(l) || 'Province inconnue' }}
+                    </small>
+                    <small class="text-body-secondary d-block">
+                      {{ locationCoords(l) }}
+                    </small>
+                  </li>
+                </template>
+              </ul>
+            </div>
+
+            <div
+              v-if="locationSelected"
+              class="alert py-2 mb-0"
+              :class="locationModified ? 'alert-warning' : 'alert-info'"
+            >
+              <template v-if="locationModified">
+                Vous avez modifié le lieu choisi : un nouveau lieu sera créé à l'enregistrement.
+              </template>
+              <template v-else>
+                Lieu existant sélectionné : il sera réutilisé tel quel. Modifiez un champ pour créer un nouveau lieu.
+              </template>
+            </div>
           </div>
 
           <div class="row g-3">
@@ -393,10 +660,18 @@ onMounted(loadLocation)
               <label class="form-label" for="f6">
                 Province<span class="text-danger"> *</span>
               </label>
-              <select class="form-select" id="f6" name="province" v-model="provinceSelected" required
+              <select
+                class="form-select"
+                id="f6"
+                name="province"
+                v-model="provinceSelected"
+                required
               >
                 <option :value="null" disabled>-- Choisir --</option>
-                <option v-for="pr in provincesFiltrees" :key="pr.provinceID" :value="pr.provinceID"
+                <option
+                  v-for="pr in provincesFiltrees"
+                  :key="pr.provinceID"
+                  :value="pr.provinceID"
                 >
                   {{ pr.province }}
                 </option>
@@ -407,7 +682,13 @@ onMounted(loadLocation)
               <label class="form-label" for="f7">
                 Commune<span class="text-danger"> *</span>
               </label>
-              <input class="form-control" type="text" id="f7" name="commune" v-model="commune" required
+              <input
+                class="form-control"
+                type="text"
+                id="f7"
+                name="commune"
+                v-model="commune"
+                required
               />
             </div>
           </div>
@@ -415,25 +696,52 @@ onMounted(loadLocation)
           <div class="row g-3">
             <div class="col-md">
               <label class="form-label" for="f8">Localité</label>
-              <input class="form-control" type="text" id="f8" name="localite" v-model="localite"
+              <input
+                class="form-control"
+                type="text"
+                id="f8"
+                name="localite"
+                v-model="localite"
               />
             </div>
 
             <div class="col-md">
               <label class="form-label" for="f9">Latitude</label>
-              <input class="form-control" type="text" inputmode="decimal" id="f9" name="latitude" v-model="latitude" placeholder="-18.9"
+              <input
+                class="form-control"
+                type="text"
+                inputmode="decimal"
+                id="f9"
+                name="latitude"
+                v-model="latitude"
+                placeholder="-18.9"
               />
             </div>
 
             <div class="col-md">
               <label class="form-label" for="f10">Longitude</label>
-              <input class="form-control" type="text" inputmode="decimal" id="f10" name="longitude" v-model="longitude" placeholder="48.4"
+              <input
+                class="form-control"
+                type="text"
+                inputmode="decimal"
+                id="f10"
+                name="longitude"
+                v-model="longitude"
+                placeholder="48.4"
               />
             </div>
           </div>
 
-          <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-outline-secondary" href="#" data-demo>Ma position</a>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              :disabled="geoLoading"
+              @click="useMyPosition"
+            >
+              {{ geoLoading ? 'Localisation...' : 'Ma position' }}
+            </button>
+            <small v-if="geoError" class="text-danger">{{ geoError }}</small>
           </div>
         </div>
       </div>
@@ -443,7 +751,10 @@ onMounted(loadLocation)
       </div>
 
       <div class="d-flex flex-wrap gap-2">
-        <router-link class="btn btn-outline-secondary" to="/saisie/brouillons-hors-ligne" data-toast="Brouillon enregistré"
+        <router-link
+          class="btn btn-outline-secondary"
+          to="/saisie/brouillons-hors-ligne"
+          data-toast="Brouillon enregistré"
         >
           Enregistrer le brouillon
         </router-link>
