@@ -1,24 +1,34 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import mg.nexora.biodiversity.model.Occurrence;
-import mg.nexora.biodiversity.repository.OccurrenceRepository;
+import mg.nexora.biodiversity.model.*;
+import mg.nexora.biodiversity.service.*;
+import mg.nexora.biodiversity.repository.*;
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
 public class OccurrenceService {
     private final OccurrenceRepository repository;
+    private final AgentRepository agentRepository;
+    private final OccurrenceAgentRepository occurrenceAgentRepository;
 
-    public OccurrenceService(OccurrenceRepository repository) {
+    public OccurrenceService(OccurrenceRepository repository, AgentRepository agentRepository, OccurrenceAgentRepository occurrenceAgentRepository) {
         this.repository = repository;
+        this.agentRepository = agentRepository;
+        this.occurrenceAgentRepository = occurrenceAgentRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<Occurrence> findAll() {
-        return repository.findAll();
+    public Page<Occurrence> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Occurrence>from(params), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -26,7 +36,28 @@ public class OccurrenceService {
         return repository.findById(id);
     }
 
-    public Occurrence save(Occurrence entity) {
+    @Transactional
+    public Occurrence save(Occurrence entity, Integer utilisateurId) {
+
+        Agent agent = agentRepository.findByUtilisateurId(utilisateurId)
+            .orElseThrow(() -> new RuntimeException(
+                "Aucun agent associé à cet utilisateur."
+            ));
+
+        Occurrence savedOccurrence = repository.save(entity);
+
+        OccurrenceAgent occurrenceAgent = new OccurrenceAgent();
+        occurrenceAgent.setOccurrence(savedOccurrence);
+        occurrenceAgent.setAgent(agent);
+
+        occurrenceAgentRepository.save(occurrenceAgent);
+
+        return savedOccurrence;
+    }
+
+    // Modification simple, sans recréer l'association avec l'agent
+    @Transactional
+    public Occurrence update(Occurrence entity) {
         return repository.save(entity);
     }
 

@@ -438,16 +438,18 @@ onMounted(loadLocation)
 
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <router-link class="nav-link active" to="/saisie/saisie-contexte">1 Contexte</router-link>
+          <router-link class="nav-link active" :to="`/saisie/saisie-contexte/${idDataset}`">
+            1 Contexte
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/saisie/saisie-observations">2 Observations</router-link>
+          <span class="nav-link disabled" aria-disabled="true">2 Observations</span>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/saisie/saisie-identification">3 Identification</router-link>
+          <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/saisie/saisie-complements">4 Compléments</router-link>
+          <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
         </li>
       </ul>
 

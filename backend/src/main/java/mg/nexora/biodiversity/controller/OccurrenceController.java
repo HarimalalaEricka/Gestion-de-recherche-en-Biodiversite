@@ -1,24 +1,31 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import mg.nexora.biodiversity.model.Occurrence;
+import mg.nexora.biodiversity.model.*;
 import mg.nexora.biodiversity.service.OccurrenceService;
+import mg.nexora.biodiversity.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/occurrences")
 public class OccurrenceController {
     private final OccurrenceService service;
+    private final UtilisateurRepository utilisateurRepository;
 
-    public OccurrenceController(OccurrenceService service) {
+    public OccurrenceController(OccurrenceService service, UtilisateurRepository utilisateurRepository) {
         this.service = service;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     @GetMapping
-    public List<Occurrence> findAll() {
-        return service.findAll();
+     public Page<Occurrence> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -29,19 +36,33 @@ public class OccurrenceController {
     }
 
     @PostMapping
-    public ResponseEntity<Occurrence> create(@RequestBody Occurrence entity) {
-        Occurrence saved = service.save(entity);
+    public ResponseEntity<Occurrence> create(
+            @RequestBody Occurrence entity,
+            Authentication authentication) {
+
+        Utilisateur utilisateur = utilisateurRepository
+            .findByEmail(authentication.getName())
+            .orElseThrow(() -> new RuntimeException(
+                "Utilisateur introuvable."
+            ));
+
+        Occurrence saved = service.save(entity, utilisateur.getUtilisateurID());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Occurrence> update(@PathVariable Integer id, @RequestBody Occurrence entity) {
+    public ResponseEntity<Occurrence> update(
+            @PathVariable Integer id,
+            @RequestBody Occurrence entity) {
+
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        // Force the URL identifier to be the identifier used for the update.
+
         entity.setOccurrenceID(id);
-        return ResponseEntity.ok(service.save(entity));
+
+        return ResponseEntity.ok(service.update(entity));
     }
 
     @PatchMapping("/{id}")

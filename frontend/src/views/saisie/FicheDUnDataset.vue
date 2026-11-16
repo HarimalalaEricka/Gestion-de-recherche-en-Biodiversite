@@ -58,6 +58,7 @@ async function fetchUtilisateurByAgentId() {
 /* ------------------------------------------------------------------ */
 
 const totalEventsDataset = ref(0)
+const totalObservation = ref(0)
 
 async function fetchTotalEvents() {
     try {
@@ -70,6 +71,20 @@ async function fetchTotalEvents() {
     } catch (e) {
         console.error('Erreur chargement du total des événements :', e)
         totalEventsDataset.value = 0
+    }
+}
+
+async function fetchTotalObservations() {
+    try {
+        const { total } = await getItems(
+            'occurrences',
+            { 'event.dataset.datasetID': idDataset },
+            { page: 1, perPage: 1 }
+        )
+        totalObservation.value = total ?? 0
+    } catch (e) {
+        console.error('Erreur chargement du total des événements :', e)
+        totalObservation.value = 0
     }
 }
 
@@ -192,6 +207,7 @@ onMounted(() => {
     loadDataset()
     fetchTotalEvents()
     fetchEvents()
+    fetchTotalObservations()
 })
 </script>
 
@@ -233,7 +249,7 @@ onMounted(() => {
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="fs-3 fw-semibold">12</div>
+            <div class="fs-3 fw-semibold"> {{ totalObservation}} </div>
             <div class="text-body-secondary">observations</div>
           </div>
         </div>
@@ -307,7 +323,7 @@ onMounted(() => {
                   <td>{{ formatDate(event.eventDate) }}</td>
                   <td>{{ event.location?.municipality || 'N/A' }}</td>
                   <td>{{ event.protocol?.protocolName || 'N/A' }}</td>
-                  <td>{{ event.observations?.length || 0 }}</td>
+                  <td>{{ event.occurrences?.length || 0 }}</td>
                   <td class="text-end">
                     <router-link
                       class="btn btn-sm btn-outline-primary"
