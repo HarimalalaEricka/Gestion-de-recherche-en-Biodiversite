@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import { getItemById } from '../../services/api'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useAccessError } from '../../composables/useAccessError'
 
 // Correction des icônes de marqueur avec Vite
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
@@ -12,7 +13,7 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 
 usePage()
-
+const { gererAcces } = useAccessError()
 const route = useRoute()
 const idEvent = route.params.idEvent
 
@@ -23,6 +24,7 @@ async function fetchEvent() {
     const response = await getItemById('events', idEvent)
     event.value = response
   } catch (error) {
+    if (gererAcces(error)) return
     console.error('Erreur lors de la récupération de l\'événement :', error)
   }
 }

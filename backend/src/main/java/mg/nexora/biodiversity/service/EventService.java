@@ -14,21 +14,12 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
-public class EventService {
+public class EventService extends SecuredService<Event>{
     private final EventRepository repository;
 
-    public EventService(EventRepository repository) {
+    public EventService(EventRepository repository, AccessGuard guard) {
+        super(repository, guard, "dataset.recherche", "eventID");
         this.repository = repository;
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Event> findAll(Map<String, String> params, Pageable pageable) {
-        return repository.findAll(FilterSpec.<Event>from(params), pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Event> findById(Integer id) {
-        return repository.findById(id);
     }
 
     public Event save(Event entity) {
