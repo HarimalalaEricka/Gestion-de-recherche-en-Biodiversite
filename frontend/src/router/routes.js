@@ -65,7 +65,7 @@ export default [
     meta: { page: 22, active: 17, layout: 'app', title: "Saisie : récapitulatif" } },
   { path: "/saisie/brouillons-hors-ligne", component: () => import('../views/saisie/BrouillonsHorsLigne.vue'),
     meta: { page: 23, active: 17, layout: 'app', title: "Brouillons hors ligne" } },
-  { path: "/saisie/detail-d-un-evenement", component: () => import('../views/saisie/DetailDUnEvenement.vue'),
+  { path: "/saisie/detail-d-un-evenement/:idEvent", component: () => import('../views/saisie/DetailDUnEvenement.vue'),
     meta: { page: 24, active: 17, layout: 'app', title: "Détail d'un événement" } },
 
   // ---------- Validation ----------
