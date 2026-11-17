@@ -463,6 +463,7 @@ onBeforeUnmount(() => {
         <!-- ================================== -->
 
         <div class="d-flex flex-wrap gap-2">
+            <router-link class="btn btn-primary" :to="`/saisie/saisie-observations/${idEvent}`">Saisir</router-link>
 
             <a
                 class="btn btn-outline-danger"

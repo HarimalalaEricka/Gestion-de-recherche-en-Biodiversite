@@ -17,7 +17,11 @@ public class FilterSpec {
     private static final Set<String> BLOCKED = Set.of("motDePasse");
 
     // Profondeur maximale d'un chemin imbriqué : "recherche.rechercheID" = 2
-    private static final int MAX_DEPTH = 3;
+    private static int maxDepth = 6;
+
+    static void setMaxDepth(int value) {
+        maxDepth = value;
+    }
 
     public static <T> Specification<T> from(Map<String, String> params) {
         return (root, query, cb) -> {
@@ -82,7 +86,7 @@ public class FilterSpec {
      */
     private static Path<?> resolve(Root<?> root, String key) {
         String[] parts = key.split("\\.");
-        if (parts.length > MAX_DEPTH) return null;
+        if (parts.length > maxDepth) return null;
 
         Path<?> path = root;
         for (String part : parts) {

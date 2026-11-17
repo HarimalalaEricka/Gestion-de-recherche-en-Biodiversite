@@ -88,6 +88,32 @@ async function fetchTotalObservations() {
     }
 }
 
+function fetchOccurrencesCountForEvent(eventId) {
+    return getItems(
+        'occurrences',
+        { 'event.eventID': eventId },
+        { page: 1, perPage: 1 }
+    ).then(({ total }) => total ?? 0)
+}
+
+const occurrenceCounts = ref({})
+
+async function loadOccurrenceCounts(items, requestId) {
+    const entries = await Promise.all(
+        items.map(async (e) => {
+            try {
+                return [e.eventID, await fetchOccurrencesCountForEvent(e.eventID)]
+            } catch (err) {
+                console.error(`Erreur comptage observations (${e.eventID}) :`, err)
+                return [e.eventID, null] // null = erreur
+            }
+        })
+    )
+    if (requestId !== eventsRequestId) return
+
+    occurrenceCounts.value = Object.fromEntries(entries)
+}
+
 /* ------------------------------------------------------------------ */
 /* Liste des événements (pagination + filtres lieu / protocole)        */
 /* ------------------------------------------------------------------ */
@@ -174,6 +200,8 @@ async function fetchEvents() {
 
         events.value = items
         eventsTotal.value = total ?? 0
+        occurrenceCounts.value = {}
+        loadOccurrenceCounts(items, requestId)
 
     } catch (e) {
         if (requestId !== eventsRequestId) return
@@ -323,7 +351,11 @@ onMounted(() => {
                   <td>{{ formatDate(event.eventDate) }}</td>
                   <td>{{ event.location?.municipality || 'N/A' }}</td>
                   <td>{{ event.protocol?.protocolName || 'N/A' }}</td>
-                  <td>{{ event.occurrences?.length || 0 }}</td>
+                  <td>
+                    <template v-if="occurrenceCounts[event.eventID] === undefined">…</template>
+                    <template v-else-if="occurrenceCounts[event.eventID] === null">N/A</template>
+                    <template v-else>{{ occurrenceCounts[event.eventID] }}</template>
+                  </td>
                   <td class="text-end">
                     <router-link
                       class="btn btn-sm btn-outline-primary"

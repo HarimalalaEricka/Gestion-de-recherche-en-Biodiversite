@@ -350,16 +350,16 @@ onMounted(() => {
 
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <router-link class="nav-link" :to="versContexte">1 Contexte</router-link>
+            <span class="nav-link disabled">1 Contexte</span>
         </li>
         <li class="nav-item">
             <router-link class="nav-link active" :to="versOnglet('/saisie/saisie-observations')">2 Observations</router-link>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link" :to="versOnglet('/saisie/saisie-identification')">3 Identification</router-link>
+          <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
         </li>
         <li class="nav-item">
-            <router-link class="nav-link" :to="versOnglet('/saisie/saisie-complements')">4 Compléments</router-link>
+          <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
         </li>
     </ul>
 
@@ -406,6 +406,7 @@ onMounted(() => {
                   <th scope="col">Nombre d'individus</th>
                   <th scope="col">Date de l'événement</th>
                   <th scope="col">Lieu</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
 
@@ -436,6 +437,20 @@ onMounted(() => {
                     <td>{{ o.individualCount ?? '—' }}</td>
                     <td>{{ formatDate(o.event?.eventDate ?? evenement?.eventDate) }}</td>
                     <td>{{ o.event?.location?.municipality ?? evenement?.location?.municipality ?? '-' }}</td>
+                    <td>
+                      <router-link
+                        class="btn btn-sm btn-outline-secondary"
+                        :to="`/partage/detail-d-une-observation/${o.occurrenceID}`"
+                      >
+                        Détails
+                      </router-link>
+                      <router-link
+                        class="btn btn-sm btn-outline-primary"
+                        :to="`/saisie/saisie-identification/${o.occurrenceID}`"
+                        >
+                        Identification
+                      </router-link>
+                    </td>
                   </tr>
                 </template>
 

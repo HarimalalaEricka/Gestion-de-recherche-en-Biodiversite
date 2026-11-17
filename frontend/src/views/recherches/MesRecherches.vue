@@ -39,6 +39,8 @@ const collaborateursLoading = ref(false);
 let collaborateursRequestId = 0;
 let detailRequestId = 0;
 
+const totalOccurrences = ref(0);
+
 const confidentialityLabels = {
   PRIVATE: "Privée",
   PUBLIC: "Publique",
@@ -92,12 +94,14 @@ async function selectRecherche(r) {
   datasets.value = [];
   totalDatasets.value = 0;
   totalCollaborateurs.value = 0;
+  totalOccurrences.value = 0;
 
   // Le filtre de datasets ne suit pas d'une recherche à l'autre
   datasetSearch.value = "";
   datasetQuery.value = "";
 
   fetchCollaborateurs(r.rechercheID);
+  fetchTotalOccurrences(r.rechercheID);
 
   // Si on n'est pas déjà page 1, le watcher de datasetPage déclenchera le fetch
   if (datasetPage.value !== 1) {
@@ -190,6 +194,39 @@ async function fetchCollaborateurs(rechercheID) {
   }
 }
 
+let occurrencesRequestId = 0;
+const occurrencesLoading = ref(false);
+
+async function fetchTotalOccurrences(rechercheID) {
+  const requestId = ++occurrencesRequestId;
+
+  occurrencesLoading.value = true;
+
+  try {
+    const { total: t } = await getItems(
+      "occurrences",
+      { "event.dataset.recherche.rechercheID": rechercheID },
+      { page: 1, perPage: 1 }
+    );
+
+    if (requestId !== occurrencesRequestId) return;
+
+    totalOccurrences.value = t ?? 0;
+
+  } catch (e) {
+    if (requestId !== occurrencesRequestId) return;
+
+    console.error("Erreur lors du chargement des observations :", e);
+
+    totalOccurrences.value = 0;
+
+  } finally {
+    if (requestId === occurrencesRequestId) {
+      occurrencesLoading.value = false;
+    }
+  }
+}
+
 async function fetchRecherches() {
   loading.value = true;
 
@@ -235,7 +272,9 @@ async function fetchRecherches() {
       datasets.value = [];
       totalDatasets.value = 0;
       totalCollaborateurs.value = 0;
+      totalOccurrences.value = 0;
 
+      occurrencesRequestId++;
       detailRequestId++;
       collaborateursRequestId++;
     }
@@ -333,6 +372,7 @@ async function supprimerDataset(d) {
 
     // fetchDatasets recule d'une page si la page courante devient vide
     await fetchDatasets();
+    fetchTotalOccurrences(selected.value.rechercheID);
 
   } catch (e) {
     console.error(
@@ -608,7 +648,7 @@ onMounted(fetchRecherches);
               <div class="card">
                 <div class="card-body">
                   <div class="fs-3 fw-semibold">
-                    236
+                    {{ occurrencesLoading ? "..." : totalOccurrences }}
                   </div>
                   <div class="text-body-secondary">
                     observations
