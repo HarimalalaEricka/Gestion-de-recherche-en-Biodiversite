@@ -1,11 +1,15 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 import mg.nexora.biodiversity.model.Identification;
 import mg.nexora.biodiversity.service.IdentificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/identifications")
@@ -17,8 +21,8 @@ public class IdentificationController {
     }
 
     @GetMapping
-    public List<Identification> findAll() {
-        return service.findAll();
+    public Page<Identification> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")
@@ -29,9 +33,9 @@ public class IdentificationController {
     }
 
     @PostMapping
-    public ResponseEntity<Identification> create(@RequestBody Identification entity) {
-        Identification saved = service.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Identification create(@RequestBody Identification req, Authentication auth) {
+        return service.creerAvecAgent(req, auth.getName());
     }
 
     @PutMapping("/{id}")

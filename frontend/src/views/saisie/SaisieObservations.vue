@@ -680,9 +680,9 @@ onMounted(() => {
         <router-link class="btn btn-outline-secondary" to="/saisie/brouillons-hors-ligne">
           Enregistrer le brouillon
         </router-link>
-        <router-link class="btn btn-primary" :to="versOnglet('/saisie/saisie-identification')">
+        <!-- <router-link class="btn btn-primary" :to="versOnglet('/saisie/saisie-identification')">
           Suivant : identification
-        </router-link>
+        </router-link> -->
       </div>
 
     </template>
