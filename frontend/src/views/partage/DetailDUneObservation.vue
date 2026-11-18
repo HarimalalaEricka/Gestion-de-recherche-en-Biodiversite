@@ -1,6 +1,51 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { getItemById, getItems } from '../../services/api'
+
 usePage()
+
+const route = useRoute()
+
+const idOccurrence = Number(route.params.idOccurrence)
+const occurrence = ref(null)
+const identifications = ref([])
+
+const page = ref(1);
+const perPage = ref(10);
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+
+const formatDate = (d) => (d ? new Date(d).toLocaleDateString("fr-FR") : "-");
+const isAccepted = (identification) => identification?.isAcceptedIdentification === true;
+async function fetchOccurrence() {
+    try {
+        occurrence.value = await getItemById("occurrences", idOccurrence);
+    } catch(e) {
+        console.error("Erreur lors du chargement de l'occurrence: ", e);
+    }
+}
+
+const total = ref(0)
+
+async function fetchIdentifications() {
+    try {
+        const { items, total: totalCount } = await getItems(
+            "identifications",
+            { 'occurrence.occurrenceID': idOccurrence },
+            { page: page.value, perPage: perPage.value, sort: "dateIdentified,desc" }
+        )
+        identifications.value = items
+        total.value = totalCount
+    } catch (e) {
+        console.error("Erreur lors du chargement des identifications: ", e)
+    }
+}
+
+onMounted(() => {
+    fetchOccurrence()
+    fetchIdentifications()
+})
 </script>
 
 <template>
@@ -19,9 +64,9 @@ usePage()
                     <div class="card-header fw-semibold">Événement</div>
                     <div class="card-body d-grid gap-3">
                         <ul class="list-unstyled mb-0 d-grid gap-1">
-                            <li><span class="text-body-secondary">Date :</span> 28/08/2026</li>
-                            <li><span class="text-body-secondary">Dataset :</span> Mammifères</li>
-                            <li><span class="text-body-secondary">Protocole :</span> Point d&#x27;écoute</li>
+                            <li><span class="text-body-secondary">Date :</span> {{formatDate(occurrence?.event?.eventDate)}} </li>
+                            <li><span class="text-body-secondary">Dataset :</span> {{occurrence?.event?.dataset?.datasetName}} </li>
+                            <li><span class="text-body-secondary">Protocole :</span> {{occurrence?.event?.protocol?.protocolName}} </li>
                         </ul>
                     </div>
                 </div>
@@ -29,10 +74,10 @@ usePage()
                     <div class="card-header fw-semibold">Lieu</div>
                     <div class="card-body d-grid gap-3">
                         <ul class="list-unstyled mb-0 d-grid gap-1">
-                            <li><span class="text-body-secondary">Pays :</span> Madagascar</li>
-                            <li><span class="text-body-secondary">Province :</span> Alaotra-Mangoro</li>
-                            <li><span class="text-body-secondary">Commune :</span> Andasibe</li>
-                            <li><span class="text-body-secondary">Coordonnées :</span> -18,9 ; 48,4</li>
+                            <li><span class="text-body-secondary">Pays :</span> {{occurrence?.event?.location?.province?.pays?.pays}} </li>
+                            <li><span class="text-body-secondary">Province :</span> {{occurrence?.event?.location?.province?.province}} </li>
+                            <li><span class="text-body-secondary">Commune :</span> {{occurrence?.event?.location?.municipality}} </li>
+                            <li><span class="text-body-secondary">Coordonnées :</span> {{occurrence?.event?.location?.decimalLatitude}} ; {{occurrence?.event?.location?.decimalLongitude}}</li>
                         </ul>
                     </div>
                 </div>
@@ -40,10 +85,10 @@ usePage()
                     <div class="card-header fw-semibold">Organisme et observation</div>
                     <div class="card-body d-grid gap-3">
                         <ul class="list-unstyled mb-0 d-grid gap-1">
-                            <li><span class="text-body-secondary">Portée :</span> Individu</li>
-                            <li><span class="text-body-secondary">Détection :</span> Détecté</li>
-                            <li><span class="text-body-secondary">Type de donnée :</span> Observation humaine</li>
-                            <li><span class="text-body-secondary">Nombre :</span> 2</li>
+                            <li><span class="text-body-secondary">Portée :</span> {{occurrence?.organism?.organismScope}} </li>
+                            <li><span class="text-body-secondary">Détection :</span> {{occurrence?.occurrenceStatus}} </li>
+                            <li><span class="text-body-secondary">Type de donnée :</span> {{occurrence?.basisOfRecord}}</li>
+                            <li><span class="text-body-secondary">Nombre :</span> {{occurrence?.individualCount}} </li>
                         </ul>
                     </div>
                 </div>
@@ -65,23 +110,27 @@ usePage()
                                             <th scope="col">Identifié par</th>
                                             <th scope="col">Qualificatif</th>
                                             <th scope="col">Acceptée</th>
+                                            <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Lemur catta</td>
-                                            <td>12/09/2026</td>
-                                            <td>Rakoto Andry</td>
-                                            <td>cf.</td>
-                                            <td>Oui</td>
+                                        <tr v-if="identifications.length === 0">
+                                            <td colspan="5" class="text-center text-body-secondary">Aucune identification trouvée</td>
                                         </tr>
-                                        <tr>
-                                            <td>Propithecus verreauxi</td>
-                                            <td>03/09/2026</td>
-                                            <td>Rasoa Voahangy</td>
-                                            <td>aff.</td>
-                                            <td>Non</td>
-                                        </tr>
+                                        <template v-else>
+                                            <tr v-for="i in identifications" :key="i.identificationID">
+                                                <td> {{i.taxon.scientificName}} </td>
+                                                <td> {{formatDate(i.dateIdentified)}} </td>
+                                                <td> {{i.agent.utilisateurId}} </td>
+                                                <td> {{i.identificationQualifier}} </td>
+                                                <td> {{isAccepted(i) ? 'Oui' : 'Non'}} </td>
+                                                <td> <router-link
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    :to="`/partage/fiche-taxon/${i.taxon.taxonID}`"
+                                                    >Fiche Taxon</router-link> 
+                                                </td>
+                                            </tr>
+                                        </template>
                                     </tbody>
                                 </table>
                             </div>

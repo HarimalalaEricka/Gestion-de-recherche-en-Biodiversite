@@ -83,7 +83,7 @@ export default [
     meta: { page: 29, active: 29, layout: 'app', title: "Explorer" } },
   { path: "/partage/liste-des-taxons", component: () => import('../views/partage/ListeDesTaxons.vue'),
     meta: { page: 30, active: 30, layout: 'app', title: "Liste des taxons" } },
-  { path: "/partage/fiche-taxon", component: () => import('../views/partage/FicheTaxon.vue'),
+  { path: "/partage/fiche-taxon/:idTaxon", component: () => import('../views/partage/FicheTaxon.vue'),
     meta: { page: 31, active: 30, layout: 'app', title: "Fiche taxon" } },
   { path: "/partage/detail-d-une-observation/:idOccurrence", component: () => import('../views/partage/DetailDUneObservation.vue'),
     meta: { page: 32, active: 29, layout: 'app', title: "Détail d'une observation" } },

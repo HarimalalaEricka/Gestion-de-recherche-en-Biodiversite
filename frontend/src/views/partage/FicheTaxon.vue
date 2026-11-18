@@ -1,6 +1,51 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getItems, getItemById } from '../../services/api'
+
 usePage()
+
+
+const route = useRoute()
+
+const idTaxon = Number(route.params.idTaxon)
+const taxon = ref(null)
+const identifications = ref([])
+
+const page = ref(1);
+const perPage = ref(10);
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+
+const formatDate = (d) => (d ? new Date(d).toLocaleDateString("fr-FR") : "-");
+async function fetchTaxon() {
+    try {
+        taxon.value = await getItemById("taxons", idTaxon);
+    } catch(e) {
+        console.error("Erreur lors du chargement du taxon: ", e);
+    }
+}
+
+const total = ref(0)
+
+async function fetchIdentifications() {
+    try {
+        const { items, total: totalCount } = await getItems(
+            "identifications",
+            { 'taxon.taxonID': idTaxon },
+            { page: page.value, perPage: perPage.value, sort: "dateIdentified,desc" }
+        )
+        identifications.value = items
+        total.value = totalCount
+    } catch (e) {
+        console.error("Erreur lors du chargement des identifications: ", e)
+    }
+}
+
+onMounted(() => {
+    fetchTaxon()
+    fetchIdentifications()
+})
 </script>
 
 <template>
@@ -11,12 +56,36 @@ usePage()
             <li class="breadcrumb-item active" aria-current="page"><router-link to="/partage/fiche-taxon">Fiche taxon</router-link></li>
         </ol>
         </nav>
-        <h1 class="h3 mb-0">Propithecus verreauxi</h1>
+        <h1 class="h3 mb-0"> {{taxon?.scientificName}} </h1>
         <ul class="list-unstyled mb-0 d-grid gap-1">
-            <li><span class="text-body-secondary">Règne :</span> Animalia</li>
-            <li><span class="text-body-secondary">Classe :</span> Mammalia</li>
-            <li><span class="text-body-secondary">Ordre :</span> Primates</li>
-            <li><span class="text-body-secondary">Famille :</span> Lemuridae</li>
+            <li>
+                <span class="text-body-secondary">Règne :</span>
+                {{ taxon?.kingdom || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Embranchement :</span>
+                {{ taxon?.phylum || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Classe :</span>
+                {{ taxon?.taxonomicClass || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Ordre :</span>
+                {{ taxon?.order || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Famille :</span>
+                {{ taxon?.family || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Genre :</span>
+                {{ taxon?.genus || '-' }}
+            </li>
+            <li>
+                <span class="text-body-secondary">Nom scientifique :</span>
+                {{ taxon?.scientificName || '-' }}
+            </li>
         </ul>
         <div class="row row-cols-2 row-cols-lg-4 g-3">
             <div class="col">

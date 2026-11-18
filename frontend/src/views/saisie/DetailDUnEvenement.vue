@@ -327,6 +327,7 @@ onBeforeUnmount(() => {
                                 <th scope="col">Nombre d'individus</th>
                                 <th scope="col">Date de l'événement</th>
                                 <th scope="col">Lieu</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
 
@@ -395,6 +396,18 @@ onBeforeUnmount(() => {
                                             '—'
                                         }}
                                     </td>
+                                    <router-link
+                                        class="btn btn-sm btn-outline-secondary"
+                                        :to="`/partage/detail-d-une-observation/${o.occurrenceID}`"
+                                    >
+                                        Détails
+                                    </router-link>
+                                    <router-link
+                                        class="btn btn-sm btn-outline-primary"
+                                        :to="`/saisie/saisie-identification/${o.occurrenceID}`"
+                                        >
+                                        Identification
+                                    </router-link>
 
                                 </tr>
 
