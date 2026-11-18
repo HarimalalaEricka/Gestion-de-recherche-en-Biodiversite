@@ -57,7 +57,7 @@ export default [
     meta: { page: 18, active: 17, layout: 'app', title: "Saisie : observations" } },
   { path: "/saisie/saisie-identification/:idOccurrence", component: () => import('../views/saisie/SaisieIdentification.vue'),
     meta: { page: 19, active: 17, layout: 'app', title: "Saisie : identification" } },
-  { path: "/saisie/saisie-complements/:idEvent", component: () => import('../views/saisie/SaisieComplements.vue'),
+  { path: "/saisie/saisie-complements/:idOccurrence", component: () => import('../views/saisie/SaisieComplements.vue'),
     meta: { page: 20, active: 17, layout: 'app', title: "Saisie : compléments" } },
   { path: "/saisie/saisie-modules-avances", component: () => import('../views/saisie/SaisieModulesAvances.vue'),
     meta: { page: 21, active: 17, layout: 'app', title: "Saisie : modules avancés" } },

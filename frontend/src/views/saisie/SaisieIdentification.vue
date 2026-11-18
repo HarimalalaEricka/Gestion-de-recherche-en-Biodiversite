@@ -556,7 +556,7 @@ onMounted(() => {
                   <td class="text-end">
                     <router-link
                       class="btn btn-sm btn-outline-secondary"
-                      :to="`/partage/fiche-d-un-taxon/${i.taxon?.taxonID}`"
+                      :to="`/partage/fiche-taxon/${i.taxon?.taxonID}`"
                     >
                       Fiche du taxon
                     </router-link>

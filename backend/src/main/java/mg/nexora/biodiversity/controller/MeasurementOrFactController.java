@@ -4,6 +4,13 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import mg.nexora.biodiversity.service.UtilisateurService;
+import mg.nexora.biodiversity.model.MeasurementOrFact;
+import mg.nexora.biodiversity.service.MeasurementOrFactService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import mg.nexora.biodiversity.model.MeasurementOrFact;
 import mg.nexora.biodiversity.service.MeasurementOrFactService;
 
@@ -11,9 +18,11 @@ import mg.nexora.biodiversity.service.MeasurementOrFactService;
 @RequestMapping("/api/measurement-or-facts")
 public class MeasurementOrFactController {
     private final MeasurementOrFactService service;
+    private final UtilisateurService utilisateurService;
 
-    public MeasurementOrFactController(MeasurementOrFactService service) {
+    public MeasurementOrFactController(MeasurementOrFactService service, UtilisateurService utilisateurService) {
         this.service = service;
+        this.utilisateurService = utilisateurService;
     }
 
     @GetMapping
@@ -29,9 +38,20 @@ public class MeasurementOrFactController {
     }
 
     @PostMapping
-    public ResponseEntity<MeasurementOrFact> create(@RequestBody MeasurementOrFact entity) {
-        MeasurementOrFact saved = service.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    public ResponseEntity<MeasurementOrFact> create(
+            @Valid @RequestBody MeasurementOrFact body,
+            Authentication authentication) {
+
+        Integer utilisateurId = utilisateurService.findIdByEmail(authentication.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(body, utilisateurId));
+    }
+
+    @GetMapping("/list")
+    public Page<MeasurementOrFact> list(
+            @RequestParam("occurrence.occurrenceID") Integer occurrenceID,
+            Pageable pageable) {
+
+        return service.listByOccurrence(occurrenceID, pageable);
     }
 
     @PutMapping("/{id}")

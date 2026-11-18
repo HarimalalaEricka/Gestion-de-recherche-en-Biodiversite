@@ -164,6 +164,11 @@ onMounted(() => {
                             </li>
 
                             <li>
+                                <span class="text-body-secondary">Recherche :</span>
+                                {{ occurrence?.event?.dataset?.recherche?.sujet || '-' }}
+                            </li>
+
+                            <li>
                                 <span class="text-body-secondary">Dataset :</span>
                                 {{ occurrence?.event?.dataset?.datasetName || '-' }}
                             </li>
@@ -239,7 +244,40 @@ onMounted(() => {
                         </ul>
                     </div>
                 </div>
+                <!-- RÉFÉRENCES -->
+                <div class="card">
+                    <div class="card-header fw-semibold">
+                        Références
+                    </div>
 
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li>
+                                Auteur, 2019. Titre de la référence.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- MATÉRIEL ET ADN -->
+                <div class="card">
+                    <div class="card-header fw-semibold">
+                        Matériel et ADN
+                    </div>
+
+                    <div class="card-body d-grid gap-3">
+                        <ul class="list-unstyled mb-0 d-grid gap-1">
+                            <li>
+                                <span class="text-body-secondary">Échantillon :</span>
+                                MNHN, collection MAM, n° 2024-118
+                            </li>
+
+                            <li>
+                                <span class="text-body-secondary">Analyse ADN :</span>
+                                COI, 658 pb, 1 240 lectures
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <!-- COLONNE DROITE -->
@@ -536,43 +574,6 @@ onMounted(() => {
 
                     </div>
                 </div>
-
-                <!-- MATÉRIEL ET ADN -->
-                <div class="card">
-                    <div class="card-header fw-semibold">
-                        Matériel et ADN
-                    </div>
-
-                    <div class="card-body d-grid gap-3">
-                        <ul class="list-unstyled mb-0 d-grid gap-1">
-                            <li>
-                                <span class="text-body-secondary">Échantillon :</span>
-                                MNHN, collection MAM, n° 2024-118
-                            </li>
-
-                            <li>
-                                <span class="text-body-secondary">Analyse ADN :</span>
-                                COI, 658 pb, 1 240 lectures
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- RÉFÉRENCES -->
-                <div class="card">
-                    <div class="card-header fw-semibold">
-                        Références
-                    </div>
-
-                    <div class="card-body d-grid gap-3">
-                        <ul class="list-unstyled mb-0 d-grid gap-1">
-                            <li>
-                                Auteur, 2019. Titre de la référence.
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
             </div>
         </div>
 
