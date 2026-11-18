@@ -1,6 +1,7 @@
 package mg.nexora.biodiversity.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +17,10 @@ import mg.nexora.biodiversity.repository.UtilisateurRepository;
 import mg.nexora.biodiversity.model.*;
 import mg.nexora.biodiversity.model.MeasurementOrFact;
 import mg.nexora.biodiversity.repository.MeasurementOrFactRepository;
+import mg.nexora.biodiversity.util.FilterSpec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -37,8 +40,8 @@ public class MeasurementOrFactService {
     }
 
     @Transactional(readOnly = true)
-    public List<MeasurementOrFact> findAll() {
-        return repository.findAll();
+    public Page<MeasurementOrFact> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<MeasurementOrFact>from(params), pageable);
     }
 
     @Transactional(readOnly = true)

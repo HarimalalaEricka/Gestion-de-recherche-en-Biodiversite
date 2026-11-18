@@ -14,6 +14,7 @@ const idOccurrence = Number(route.params.idOccurrence)
 const occurrence = ref(null)
 const identifications = ref([])
 const medias = ref([])
+const mesures = ref([])
 
 const page = ref(1)
 const perPage = ref(10)
@@ -44,7 +45,6 @@ const formatDate = (d) =>
 const isAccepted = (identification) =>
     identification?.isAcceptedIdentification === true
 
-// Chargement de l'occurrence
 async function fetchOccurrence() {
     try {
         occurrence.value = await getItemById(
@@ -59,7 +59,6 @@ async function fetchOccurrence() {
     }
 }
 
-// Chargement des identifications
 async function fetchIdentifications() {
     try {
         const { items, total: totalCount } = await getItems(
@@ -83,7 +82,6 @@ async function fetchIdentifications() {
     }
 }
 
-// Chargement des médias
 async function fetchMedias() {
     try {
         const { items } = await getItems(
@@ -106,11 +104,35 @@ async function fetchMedias() {
         )
     }
 }
+async function fetchMesures() {
+    try {
+        const { items } = await getItems(
+            'measurement-or-facts',
+            { 'occurrence.occurrenceID': idOccurrence },
+            {
+                page: 1,
+                perPage: 100,
+                sort: 'measurementDeterminedDate,asc'
+            }
+        )
+
+        mesures.value = items
+        console.log('mesures =', mesures.value)
+        
+
+    } catch (e) {
+        console.error(
+            'Erreur lors du chargement des médias : ',
+            e
+        )
+    }
+}
 
 onMounted(() => {
     fetchOccurrence()
     fetchIdentifications()
     fetchMedias()
+    fetchMesures()
 })
 </script>
 
@@ -388,7 +410,7 @@ onMounted(() => {
                             </div>
 
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
+                                <table class="table table-hover align-middle mb-0" data-table>
 
                                     <thead>
                                         <tr>
@@ -396,23 +418,73 @@ onMounted(() => {
                                             <th scope="col">Valeur</th>
                                             <th scope="col">Unité</th>
                                             <th scope="col">Méthode</th>
+                                            <th scope="col">Précision</th>
+                                            <th scope="col">Date</th>
                                         </tr>
                                     </thead>
 
-                                    <tbody>
-                                        <tr>
-                                            <td>Poids</td>
-                                            <td>2,4</td>
-                                            <td>kg</td>
-                                            <td>Transect linéaire</td>
+                                    <!-- <tbody>
+                                        <tr v-if="mesures.length === 0">
+                                            <td colspan="6"
+                                                class="text-center text-body-secondary">
+                                                Aucune mesure trouvée
+                                            </td>
                                         </tr>
 
-                                        <tr>
-                                            <td>Longueur du corps</td>
-                                            <td>15,8</td>
-                                            <td>cm</td>
-                                            <td>Pesée</td>
+                                        <template v-else>
+                                            <tr
+                                                v-for="mesure in mesures"
+                                                :key="mesure?.measurementType?.measurementType"
+                                            >
+                                                <td>
+                                                    {{ mesure.taxon?.scientificName || '-' }}
+                                                </td>
+
+                                                <td>
+                                                    {{ formatDate(mesure.dateIdentified) }}
+                                                </td>
+
+                                                <td>
+                                                    {{ mesure.agent?.utilisateurId || '-' }}
+                                                </td>
+
+                                                <td>
+                                                    {{ mesure.identificationQualifier || '-' }}
+                                                </td>
+
+                                                <td>
+                                                    {{ isAccepted(i) ? 'Oui' : 'Non' }}
+                                                </td>
+
+                                                <td>
+                                                    <router-link
+                                                        v-if="i.taxon?.taxonID"
+                                                        class="btn btn-sm btn-outline-primary"
+                                                        :to="`/partage/fiche-taxon/${i.taxon.taxonID}`"
+                                                    >
+                                                        Fiche Taxon
+                                                    </router-link>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody> -->
+                                    <tbody>
+                                        <tr v-if="mesures.length === 0">
+                                            <td colspan="6"
+                                                class="text-center text-body-secondary">
+                                                Aucune mesure trouvée
+                                            </td>
                                         </tr>
+                                        <template v-else>
+                                            <tr v-for="m in mesures" :key="m.measurementOrFactID">
+                                                <td>{{ m.measurementType?.measurementType ?? '-' }}</td>
+                                                <td>{{ m.measurementValue ?? '-' }}</td>
+                                                <td>{{ m.measurementUnit?.measurementUnit ?? '-' }}</td>
+                                                <td>{{ m.measurementMethod ?? '—' }}</td>
+                                                <td>{{ m.measurementAccuracy ?? '—' }}</td>
+                                                <td>{{ formatDate(m.measurementDeterminedDate) }}</td>
+                                            </tr>
+                                        </template>
                                     </tbody>
 
                                 </table>
