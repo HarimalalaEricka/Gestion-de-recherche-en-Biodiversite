@@ -4,6 +4,7 @@ import { useAccessError } from '../../composables/useAccessError'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getItemById, getItems, insertItem } from '../../services/api'
+import MediaUpload from '../../components/MediaUpload.vue'
 
 usePage()
 
@@ -146,6 +147,21 @@ watch(occPerPage, () => {
 })
 
 watch(occPage, fetchOccurrences)
+
+/* ------------------------------------------------------------------ */
+/* Photos d'une occurrence                                             */
+/* ------------------------------------------------------------------ */
+
+// ID de l'occurrence dont on importe les photos (null = panneau fermé)
+const mediaOccurrenceId = ref(null)
+
+function ouvrirPhotos(id) {
+    mediaOccurrenceId.value = id
+}
+
+function fermerPhotos() {
+    mediaOccurrenceId.value = null
+}
 
 /* ------------------------------------------------------------------ */
 /* Formulaire d'ajout d'une occurrence                                 */
@@ -298,7 +314,7 @@ async function enregistrer() {
         }
 
         // 2) L'occurrence, rattachée à l'organisme et à l'événement
-        const occurrenceinsert = await insertItem('occurrences', {
+        await insertItem('occurrences', {
             individualCount:
                 occurrenceStatus.value === STATUT_ABSENT || individualCount.value === ''
                     ? null
@@ -333,6 +349,7 @@ onMounted(() => {
     fetchOccurrences()
 })
 </script>
+
 <template>
   <main id="content" class="p-4 d-grid gap-4 align-content-start">
 
@@ -349,18 +366,18 @@ onMounted(() => {
     <h1 class="h3 mb-0">Nouvelle observation</h1>
 
     <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <span class="nav-link disabled">1 Contexte</span>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link active" :to="versOnglet('/saisie/saisie-observations')">2 Observations</router-link>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
-        </li>
+      <li class="nav-item">
+        <span class="nav-link disabled">1 Contexte</span>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link active" :to="versOnglet('/saisie/saisie-observations')">2 Observations</router-link>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
+      </li>
     </ul>
 
     <!-- ID d'événement absent ou invalide -->
@@ -413,11 +430,11 @@ onMounted(() => {
               <tbody>
 
                 <tr v-if="occLoading">
-                  <td colspan="6" class="text-center text-body-secondary">Chargement...</td>
+                  <td colspan="7" class="text-center text-body-secondary">Chargement...</td>
                 </tr>
 
                 <tr v-else-if="occurrences.length === 0">
-                  <td colspan="6" class="text-center text-body-secondary">
+                  <td colspan="7" class="text-center text-body-secondary">
                     Aucune occurrence pour cet événement.
                   </td>
                 </tr>
@@ -428,7 +445,7 @@ onMounted(() => {
                     <td>
                       <span
                         class="badge"
-                        :class="o.occurrenceStatus === 'ABSENT' ? 'text-bg-secondary' : 'text-bg-success'"
+                        :class="o.occurrenceStatus === STATUT_ABSENT ? 'text-bg-secondary' : 'text-bg-success'"
                       >
                         {{ labelDe(STATUTS, o.occurrenceStatus) }}
                       </span>
@@ -437,19 +454,34 @@ onMounted(() => {
                     <td>{{ o.individualCount ?? '—' }}</td>
                     <td>{{ formatDate(o.event?.eventDate ?? evenement?.eventDate) }}</td>
                     <td>{{ o.event?.location?.municipality ?? evenement?.location?.municipality ?? '-' }}</td>
-                    <td>
-                      <router-link
-                        class="btn btn-sm btn-outline-secondary"
-                        :to="`/partage/detail-d-une-observation/${o.occurrenceID}`"
-                      >
-                        Détails
-                      </router-link>
-                      <router-link
-                        class="btn btn-sm btn-outline-primary"
-                        :to="`/saisie/saisie-identification/${o.occurrenceID}`"
+                    <td class="text-nowrap">
+                      <div class="d-flex flex-wrap gap-1">
+                        <router-link
+                          class="btn btn-sm btn-outline-secondary"
+                          :to="`/partage/detail-d-une-observation/${o.occurrenceID}`"
                         >
-                        Identification
-                      </router-link>
+                          Détails
+                        </router-link>
+                        <router-link
+                          class="btn btn-sm btn-outline-primary"
+                          :to="`/saisie/saisie-identification/${o.occurrenceID}`"
+                        >
+                          Identification
+                        </router-link>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                          :class="{ active: mediaOccurrenceId === o.occurrenceID }"
+                          @click="mediaOccurrenceId === o.occurrenceID
+                            ? fermerPhotos()
+                            : ouvrirPhotos(o.occurrenceID)"
+                          :aria-label="`Ajouter des photos à l'occurrence ${o.occurrenceID}`"
+                          title="Ajouter des photos"
+                        >
+                          <i class="bi bi-camera"></i>
+                          <span>Ajouter des photos</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -503,6 +535,23 @@ onMounted(() => {
             </button>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Import de photos pour l'occurrence choisie -->
+      <div v-if="mediaOccurrenceId" class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">Photos de l'occurrence n° {{ mediaOccurrenceId }}</span>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Fermer"
+            @click="fermerPhotos"
+          ></button>
+        </div>
+        <div class="card-body">
+          <!-- :key remet le composant à zéro quand on change d'occurrence -->
+          <MediaUpload :key="mediaOccurrenceId" :occurrence-id="mediaOccurrenceId" />
         </div>
       </div>
 
@@ -644,7 +693,7 @@ onMounted(() => {
                 min="0"
                 step="1"
                 v-model="individualCount"
-                :disabled="occurrenceStatus === 'ABSENT'"
+                :disabled="occurrenceStatus === STATUT_ABSENT"
               />
             </div>
           </div>

@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 import { ref, watch, computed, onMounted, onUnmounted } from "vue";
-import { getItems, getItemById, uploadMedia, deleteItem } from "../../services/api";
+import { getItems, getItemById, uploadMediaRecherche, deleteItem } from "../../services/api";
 
 usePage()
 
@@ -274,7 +274,7 @@ async function uploadAll() {
     if (item.status === "done") continue;
     item.status = "uploading";
     try {
-      await uploadMedia(props.idRecherche, item.file, item.caption, item.comments, 'MEDIA');
+      await uploadMediaRecherche(props.idRecherche, item.file, item.caption, item.comments, 'MEDIA');
       item.status = "done";
     } catch (e) {
       console.error("Erreur d'envoi :", e);

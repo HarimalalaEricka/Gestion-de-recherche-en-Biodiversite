@@ -151,7 +151,7 @@ export async function deleteItem(itemType, itemId) {
   return data
 }
 
-export async function uploadMedia(rechercheId, file, caption, comments, type) {
+export async function uploadMediaRecherche(rechercheId, file, caption, comments, type) {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('rechercheID', rechercheId)
@@ -160,6 +160,27 @@ export async function uploadMedia(rechercheId, file, caption, comments, type) {
   formData.append('type', type)  
 
   const { data } = await request('medias-recherche/upload', {
+    method: 'POST',
+    body: formData
+  })
+  return data
+}
+
+export async function uploadMedia(occurrenceId, file, {
+  caption,
+  comments,
+  captureDevice,
+  associatedObservationReference
+} = {}) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('occurrenceID', occurrenceId)
+  formData.append('caption', caption || '')
+  formData.append('comments', comments || '')
+  formData.append('captureDevice', captureDevice || '')
+  formData.append('associatedObservationReference', associatedObservationReference || '')
+
+  const { data } = await request('medias/upload', {
     method: 'POST',
     body: formData
   })

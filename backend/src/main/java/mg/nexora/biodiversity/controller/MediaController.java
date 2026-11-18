@@ -4,16 +4,24 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import mg.nexora.biodiversity.model.Media;
+import mg.nexora.biodiversity.model.*;
+import mg.nexora.biodiversity.service.*;
+import mg.nexora.biodiversity.model.enums.*;
 import mg.nexora.biodiversity.service.MediaService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/medias")
 public class MediaController {
     private final MediaService service;
+    private final UtilisateurService utilisateurService;
 
-    public MediaController(MediaService service) {
+    public MediaController(MediaService service, UtilisateurService utilisateurService) {
         this.service = service;
+        this.utilisateurService = utilisateurService;
     }
 
     @GetMapping
@@ -58,5 +66,21 @@ public class MediaController {
         }
         service.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Media> upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("occurrenceID") Integer occurrenceID,
+            @RequestParam(required = false) String caption,
+            @RequestParam(required = false) String comments,
+            @RequestParam(required = false) String captureDevice,
+            @RequestParam(required = false) String associatedObservationReference,
+            Authentication authentication) {
+
+        Integer utilisateurId = utilisateurService.findIdByEmail(authentication.getName());
+        Media saved = service.upload(file, occurrenceID, caption, comments,
+                captureDevice, associatedObservationReference, utilisateurId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 }

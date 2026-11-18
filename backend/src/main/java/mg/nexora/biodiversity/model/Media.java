@@ -40,6 +40,11 @@ public class Media {
     @JoinColumn(name = "occurrenceid", nullable = false)
     private Occurrence occurrence;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_media", nullable = false)
+
+    private TypeMedia typeMedia;
+
     public Integer getMediaID() { return mediaID; }
 
     public void setMediaID(Integer mediaID) { this.mediaID = mediaID; }
@@ -67,5 +72,9 @@ public class Media {
     public Occurrence getOccurrence() { return occurrence; }
 
     public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
+
+    public TypeMedia getTypeMedia() { return typeMedia; }
+
+    public void setTypeMedia(TypeMedia typeMedia) { this.typeMedia = typeMedia; }
 
 }
