@@ -3,6 +3,7 @@ import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getItems, getItemById } from '../../services/api'
+import { listerMediasTaxon, importerMediasTaxon } from '../../services/gbifMedia'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -53,14 +54,6 @@ const nomOrganisme = (o) =>
   o?.organismName || (o?.organismID ? `Organisme #${o.organismID}` : '-')
 
 const taxon = ref(null)
-
-async function fetchTaxon() {
-  try {
-    taxon.value = await getItemById('taxons', idTaxon)
-  } catch (e) {
-    console.error('Erreur lors du chargement du taxon :', e)
-  }
-}
 
 /* ---------- Identifications → une ligne par occurrence ---------- */
 
@@ -200,10 +193,49 @@ async function fetchPhotos() {
 }
 
 // Quelques photos du taxon pour le bloc « Médias »
-const photosTaxon = computed(() =>
+const photosTaxonOccurrence = computed(() =>
   [...photos.value.values()].flat().slice(0, 6)
 )
 
+const photosTaxon = computed(() =>
+  [
+    ...mediasTaxon.value.map((m) => ({
+      url: mediaUrl(m),
+      legende: m.comments || m.caption || ''
+    }))
+  ]
+    .filter((p) => p.url)
+    .slice(0, 6)
+)
+/* ---------- Médias du taxon (GBIF) ---------- */
+
+const mediasTaxon = ref([])
+
+async function chargerMediasTaxon() {
+  const t = taxon.value
+  if (!t?.taxonID) return
+
+  try {
+    let medias = await listerMediasTaxon(t.taxonID)
+
+    if (medias.length === 0 && t.gbifKey) {
+      medias = await importerMediasTaxon(t.taxonID, t.gbifKey)
+    }
+
+    mediasTaxon.value = medias
+  } catch (e) {
+    console.error('Médias du taxon :', e)
+  }
+}
+
+async function fetchTaxon() {
+  try {
+    taxon.value = await getItemById('taxons', idTaxon)
+    chargerMediasTaxon()
+  } catch (e) {
+    console.error('Erreur lors du chargement du taxon :', e)
+  }
+}
 /* ---------- Mesures ---------- */
 
 const mesures = ref([])
@@ -630,11 +662,11 @@ onBeforeUnmount(() => {
 
         <!-- Médias : vraies photos, sinon vignettes vides -->
         <div class="card">
-          <div class="card-header fw-semibold">Médias</div>
+          <div class="card-header fw-semibold">Médias des occurrences</div>
           <div class="card-body">
             <div class="row g-2">
-              <template v-if="photosTaxon.length">
-                <div v-for="(url, n) in photosTaxon" :key="url + n" class="col-4">
+              <template v-if="photosTaxonOccurrence.length">
+                <div v-for="(url, n) in photosTaxonOccurrence" :key="url + n" class="col-4">
                   <a :href="url" target="_blank" rel="noopener">
                     <div class="ratio ratio-1x1 rounded overflow-hidden">
                       <img
@@ -647,6 +679,37 @@ onBeforeUnmount(() => {
                   </a>
                 </div>
               </template>
+              <template v-else>
+                <div v-for="n in 3" :key="n" class="col-4">
+                  <div class="ratio ratio-1x1 bg-body-secondary rounded">
+                    <div class="d-flex align-items-center justify-content-center text-body-secondary">
+                      <i class="bi bi-image fs-3"></i>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+         <div class="card">
+          <div class="card-header fw-semibold">Médias du taxon</div>
+          <div class="card-body">
+            <div class="row g-2">
+              <template v-if="photosTaxon.length">
+                <div v-for="(p, n) in photosTaxon" :key="p.url + n" class="col-4">
+                    <a :href="p.url" target="_blank" rel="noopener" :title="p.legende">
+                    <div class="ratio ratio-1x1 rounded overflow-hidden">
+                        <img
+                        :src="p.url"
+                        :alt="`Photo ${n + 1} de ${taxon?.scientificName ?? 'ce taxon'}`"
+                        :title="p.legende"
+                        loading="lazy"
+                        style="object-fit: cover"
+                        />
+                    </div>
+                    </a>
+                </div>
+                </template>
 
               <template v-else>
                 <div v-for="n in 3" :key="n" class="col-4">

@@ -4,6 +4,7 @@ import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getItemById, getItems, insertItem } from '../../services/api'
+import { assurerMediasTaxon } from '../../services/gbifMedia'
 
 usePage()
 
@@ -302,7 +303,6 @@ function chooseGbifTaxon(g) {
     taxonOpen.value = false
 }
 
-// Données d'un taxon GBIF envoyées au backend
 function taxonDepuisGbif(g) {
     return {
         gbifKey: g.key,
@@ -310,7 +310,7 @@ function taxonDepuisGbif(g) {
         taxonRank: { taxonRank: g.rank },
         kingdom: g.kingdom,
         phylum: g.phylum,
-        class: g.class,
+        taxonomicClass: g.class,      // était "class"
         order: g.order,
         family: g.family,
         genus: g.genus,
@@ -391,7 +391,7 @@ async function enregistrer() {
                 ? taxonDepuisGbif(taxonSelected.value.gbif)
                 : { taxonID: taxonSelected.value.taxonID }
 
-        await insertItem('identifications', {
+        const identification = await insertItem('identifications', {
             dateIdentified: `${dateIdentified.value}:00`,
             identificationQualifier: identificationQualifier.value.trim() || null,
             isAcceptedIdentification: isAcceptedIdentification.value,
@@ -400,6 +400,18 @@ async function enregistrer() {
                 occurrenceID: Number(idOccurrence.value)
             }
         })
+
+        // Taxon venu de GBIF : on enregistre ses photos, sans bloquer la suite
+        if (taxonSelected.value.source === 'gbif') {
+            const taxonID = identification?.taxon?.taxonID
+            const gbifKey = taxonSelected.value.gbif.key
+
+            if (taxonID) {
+                assurerMediasTaxon(taxonID, gbifKey).catch((e) =>
+                    console.warn('Import des photos GBIF :', e)
+                )
+            }
+        }
 
         success.value = 'Identification enregistrée.'
 

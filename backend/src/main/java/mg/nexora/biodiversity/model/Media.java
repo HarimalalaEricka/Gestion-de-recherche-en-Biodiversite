@@ -37,8 +37,12 @@ public class Media {
     private String comments;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "occurrenceid", nullable = false)
+    @JoinColumn(name = "occurrenceid")          
     private Occurrence occurrence;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taxonid")
+    private Taxon taxon;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_media", nullable = false)
@@ -73,8 +77,20 @@ public class Media {
 
     public void setOccurrence(Occurrence occurrence) { this.occurrence = occurrence; }
 
+    public Taxon getTaxon() { return taxon; }
+
+    public void setTaxon(Taxon taxon) { this.taxon = taxon; }
+
     public TypeMedia getTypeMedia() { return typeMedia; }
 
     public void setTypeMedia(TypeMedia typeMedia) { this.typeMedia = typeMedia; }
 
+    @PrePersist
+    @PreUpdate
+    private void verifierRattachement() {
+        if ((occurrence == null) == (taxon == null)) {
+            throw new IllegalStateException(
+                "Un média doit être rattaché à une occurrence ou à un taxon, pas aux deux");
+        }
+    }
 }
