@@ -1,31 +1,19 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { insertItem, getItems } from '../../services/api'
 
 usePage()
 
 const route = useRoute()
-const router = useRouter()
 const idDataset = Number(route.params.idDataset)
-
-const pays = ref([])
-const provinces = ref([])
-
-const dateEvenement = ref('')
-const paysSelected = ref(null)
-const provinceSelected = ref(null)
-const commune = ref('')
-const localite = ref('')
-const latitude = ref('')
-const longitude = ref('')
-
-const formRef = ref(null)
-const error = ref('')
-const loading = ref(false)
+const datasetValide = Number.isInteger(idDataset) && idDataset > 0
 
 /* ---------- Utilitaires ---------- */
+
+const formatDate = (d) =>
+  d ? new Date(d).toLocaleDateString('fr-FR') : '-'
 
 function debounce(fn, delay = 300) {
   let timer
@@ -39,6 +27,84 @@ function parseCoord(v) {
   const s = String(v ?? '').trim().replace(',', '.')
   return s === '' ? null : Number(s)
 }
+
+/* ------------------------------------------------------------------ */
+/* Liste des événements (pagination côté backend)                      */
+/* ------------------------------------------------------------------ */
+
+const evenements = ref([])
+const evTotal = ref(0)
+const evLoading = ref(false)
+const evPage = ref(1)
+const evPerPage = ref(10)
+
+const evTotalPages = computed(() =>
+  Math.max(1, Math.ceil(evTotal.value / evPerPage.value))
+)
+
+let evRequestId = 0
+
+async function fetchEvenements() {
+  const requestId = ++evRequestId
+  evLoading.value = true
+
+  try {
+    const { items, total } = await getItems(
+      'events',
+      { 'dataset.datasetID': idDataset },
+      { page: evPage.value, perPage: evPerPage.value, sort: 'eventID,desc' }
+    )
+
+    if (requestId !== evRequestId) return
+
+    // Page devenue vide : reculer d'une page
+    if (items.length === 0 && evPage.value > 1) {
+      evPage.value--
+      return
+    }
+
+    evenements.value = items
+    evTotal.value = total ?? 0
+  } catch (e) {
+    if (requestId !== evRequestId) return
+    console.error('Erreur chargement des événements :', e)
+    evenements.value = []
+    evTotal.value = 0
+  } finally {
+    if (requestId === evRequestId) evLoading.value = false
+  }
+}
+
+watch(evPerPage, () => {
+  if (evPage.value !== 1) {
+    evPage.value = 1
+  } else {
+    fetchEvenements()
+  }
+})
+
+watch(evPage, fetchEvenements)
+
+/* ------------------------------------------------------------------ */
+/* Formulaire d'ajout d'un événement                                   */
+/* ------------------------------------------------------------------ */
+
+const showForm = ref(false)
+const formRef = ref(null)
+const saving = ref(false)
+const error = ref('')
+const success = ref('')
+
+const pays = ref([])
+const provinces = ref([])
+
+const dateEvenement = ref('')
+const paysSelected = ref(null)
+const provinceSelected = ref(null)
+const commune = ref('')
+const localite = ref('')
+const latitude = ref('')
+const longitude = ref('')
 
 /* ---------- Protocole (recherche avec suggestions) ---------- */
 
@@ -295,15 +361,13 @@ function useMyPosition() {
   geoLoading.value = true
 
   const onSuccess = ({ coords }) => {
-    clearTimeout(geoErrorTimer) // annule une erreur encore en attente
+    clearTimeout(geoErrorTimer)
     geoError.value = ''
     latitude.value = coords.latitude.toFixed(6)
     longitude.value = coords.longitude.toFixed(6)
     geoLoading.value = false
   }
 
-  // L'erreur n'est affichée qu'après un court délai : si une position
-  // arrive entre-temps, onSuccess annule l'affichage.
   const onFail = (e) => {
     console.warn('Géolocalisation :', e.code, e.message)
     clearTimeout(geoErrorTimer)
@@ -319,10 +383,8 @@ function useMyPosition() {
   navigator.geolocation.getCurrentPosition(
     onSuccess,
     (e) => {
-      // Autorisation refusée : inutile de réessayer
       if (e.code === 1) return onFail(e)
 
-      // Le 1er essai (GPS précis) a échoué : on retente en précision normale
       navigator.geolocation.getCurrentPosition(onSuccess, onFail, {
         enableHighAccuracy: false,
         timeout: 10000,
@@ -335,10 +397,38 @@ function useMyPosition() {
 
 onBeforeUnmount(() => clearTimeout(geoErrorTimer))
 
+/* ---------- Ouverture / fermeture / reset ---------- */
+
+function ouvrirFormulaire() {
+  error.value = ''
+  success.value = ''
+  showForm.value = true
+}
+
+function resetForm() {
+  dateEvenement.value = ''
+  commune.value = ''
+  localite.value = ''
+  latitude.value = ''
+  longitude.value = ''
+  geoError.value = ''
+  clearProtocol()
+  detachLocation()
+  cancelLocationSearch()
+  formRef.value?.classList.remove('was-validated')
+  // pays et province conservés : on saisit souvent plusieurs lignes de suite
+}
+
+function fermerFormulaire() {
+  showForm.value = false
+  resetForm()
+}
+
 /* ---------- Soumission ---------- */
 
-async function submit() {
+async function enregistrer() {
   error.value = ''
+  success.value = ''
 
   if (!formRef.value.checkValidity()) {
     formRef.value.classList.add('was-validated')
@@ -358,7 +448,7 @@ async function submit() {
     return
   }
 
-  loading.value = true
+  saving.value = true
   try {
     // Lieu choisi et inchangé : on réutilise son ID. Sinon, nouveau lieu.
     const reuse = locationSelected.value && !locationModified.value
@@ -386,12 +476,20 @@ async function submit() {
         : null
     })
 
-    router.push(`/saisie/saisie-observations/${idDataset}`)
+    success.value = 'Événement enregistré.'
+    resetForm()
+
+    // La nouvelle ligne apparaît en tête de liste
+    if (evPage.value !== 1) {
+      evPage.value = 1
+    } else {
+      fetchEvenements()
+    }
   } catch (e) {
     console.error('Erreur enregistrement du contexte :', e)
-    error.value = "Erreur lors de l'enregistrement du contexte"
+    error.value = "Erreur lors de l'enregistrement de l'événement"
   } finally {
-    loading.value = false
+    saving.value = false
   }
 }
 
@@ -412,7 +510,10 @@ async function loadLocation() {
   }
 }
 
-onMounted(loadLocation)
+onMounted(() => {
+  loadLocation()
+  if (datasetValide) fetchEvenements()
+})
 </script>
 
 <template>
@@ -426,346 +527,459 @@ onMounted(loadLocation)
       </ol>
     </nav>
 
-    <form
-      ref="formRef"
-      class="needs-validation d-grid gap-4"
-      novalidate
-      @submit.prevent="submit"
-    >
-      <small class="text-body-secondary text-end" data-autosave></small>
+    <h1 class="h3 mb-0">Nouvelle observation</h1>
 
-      <h1 class="h3 mb-0">Nouvelle observation</h1>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <router-link class="nav-link active" :to="`/saisie/saisie-contexte/${idDataset}`">
+          1 Contexte
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" aria-disabled="true">2 Observations</span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
+      </li>
+    </ul>
 
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <router-link class="nav-link active" :to="`/saisie/saisie-contexte/${idDataset}`">
-            1 Contexte
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link disabled" aria-disabled="true">2 Observations</span>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link disabled" aria-disabled="true">3 Identification</span>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link disabled" aria-disabled="true">4 Compléments</span>
-        </li>
-      </ul>
+    <!-- Dataset absent ou invalide -->
+    <div v-if="!datasetValide" class="alert alert-warning mb-0" role="alert">
+      Aucun dataset sélectionné. Choisissez d'abord un dataset pour saisir des événements.
+    </div>
 
-      <!-- Événement -->
+    <template v-else>
+
+      <!-- Liste des événements -->
       <div class="card">
-        <div class="card-header fw-semibold">Événement</div>
+        <div class="card-header fw-semibold">
+          Une ligne = un événement enregistré
+        </div>
+
         <div class="card-body d-grid gap-3">
-          <div class="row g-3">
-            <div class="col-md">
-              <label class="form-label" for="f2">
-                Date de l'événement<span class="text-danger"> *</span>
-              </label>
-              <input
-                class="form-control"
-                type="date"
-                id="f2"
-                name="date-de-l-evenement"
-                v-model="dateEvenement"
-                required
-              />
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Commune</th>
+                  <th scope="col">Localité</th>
+                  <th scope="col">Protocole</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr v-if="evLoading">
+                  <td colspan="5" class="text-center text-body-secondary">Chargement...</td>
+                </tr>
+
+                <tr v-else-if="evenements.length === 0">
+                  <td colspan="5" class="text-center text-body-secondary">
+                    Aucun événement pour ce dataset.
+                  </td>
+                </tr>
+
+                <template v-else>
+                  <tr v-for="ev in evenements" :key="ev.eventID">
+                    <td>{{ formatDate(ev.eventDate) }}</td>
+                    <td>{{ ev.location?.municipality || '-' }}</td>
+                    <td>{{ ev.location?.locality || '-' }}</td>
+                    <td>{{ ev.protocol?.protocolName || '-' }}</td>
+                    <td class="text-nowrap">
+                      <router-link
+                        class="btn btn-sm btn-outline-primary"
+                        :to="`/saisie/saisie-observations/${ev.eventID}`"
+                      >
+                        Observations
+                      </router-link>
+                    </td>
+                  </tr>
+                </template>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <small class="text-body-secondary">{{ evTotal }} événement(s)</small>
+
+            <div class="d-flex align-items-center gap-2">
+              <select
+                class="form-select form-select-sm w-auto"
+                v-model.number="evPerPage"
+                aria-label="Événements par page"
+              >
+                <option :value="5">5</option>
+                <option :value="10">10</option>
+                <option :value="20">20</option>
+              </select>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="evPage <= 1 || evLoading"
+                @click="evPage--"
+              >
+                Précédent
+              </button>
+
+              <span class="small">Page {{ evPage }} / {{ evTotalPages }}</span>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                :disabled="evPage >= evTotalPages || evLoading"
+                @click="evPage++"
+              >
+                Suivant
+              </button>
             </div>
+          </div>
 
-            <!-- Protocole -->
-            <div class="col-md">
-              <label class="form-label" for="f3">Protocole</label>
+          <div v-if="success" class="alert alert-success mb-0" role="status">{{ success }}</div>
 
-              <div class="position-relative">
-                <div class="input-group">
-                  <input
-                    id="f3"
-                    name="protocole"
-                    type="text"
-                    class="form-control"
-                    :class="{ 'is-valid': protocolSelected }"
-                    placeholder="Rechercher un protocole..."
-                    autocomplete="off"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-controls="protocol-list"
-                    :aria-expanded="protocolOpen"
-                    v-model="protocolInput"
-                    @input="onProtocolInput"
-                    @focus="onProtocolFocus"
-                    @blur="closeProtocols"
-                    @keydown="onProtocolKeydown"
-                  />
-                  <button
-                    v-if="protocolInput"
-                    type="button"
-                    class="btn btn-outline-secondary"
-                    aria-label="Effacer le protocole"
-                    @mousedown.prevent
-                    @click="clearProtocol"
+          <div v-if="!showForm" class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-secondary" @click="ouvrirFormulaire">
+              + Ajouter un événement
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Formulaire d'ajout -->
+      <div v-if="showForm" class="card">
+        <div class="card-header fw-semibold">Nouvel événement</div>
+
+        <form
+          ref="formRef"
+          class="card-body d-grid gap-4 needs-validation"
+          novalidate
+          @submit.prevent="enregistrer"
+        >
+
+          <!-- Événement -->
+          <div class="d-grid gap-3">
+            <div class="fw-semibold">Événement</div>
+
+            <div class="row g-3">
+              <div class="col-md">
+                <label class="form-label" for="f2">
+                  Date de l'événement<span class="text-danger"> *</span>
+                </label>
+                <input
+                  class="form-control"
+                  type="date"
+                  id="f2"
+                  name="date-de-l-evenement"
+                  v-model="dateEvenement"
+                  required
+                />
+              </div>
+
+              <!-- Protocole -->
+              <div class="col-md">
+                <label class="form-label" for="f3">Protocole</label>
+
+                <div class="position-relative">
+                  <div class="input-group">
+                    <input
+                      id="f3"
+                      name="protocole"
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-valid': protocolSelected }"
+                      placeholder="Rechercher un protocole..."
+                      autocomplete="off"
+                      role="combobox"
+                      aria-autocomplete="list"
+                      aria-controls="protocol-list"
+                      :aria-expanded="protocolOpen"
+                      v-model="protocolInput"
+                      @input="onProtocolInput"
+                      @focus="onProtocolFocus"
+                      @blur="closeProtocols"
+                      @keydown="onProtocolKeydown"
+                    />
+                    <button
+                      v-if="protocolInput"
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      aria-label="Effacer le protocole"
+                      @mousedown.prevent
+                      @click="clearProtocol"
+                    >
+                      &times;
+                    </button>
+                  </div>
+
+                  <ul
+                    v-if="protocolOpen"
+                    id="protocol-list"
+                    class="list-group position-absolute w-100 shadow"
+                    style="z-index: 1050; max-height: 240px; overflow-y: auto"
+                    role="listbox"
                   >
-                    &times;
-                  </button>
+                    <li v-if="protocolLoading" class="list-group-item text-body-secondary">
+                      Recherche...
+                    </li>
+
+                    <li
+                      v-else-if="protocolResults.length === 0"
+                      class="list-group-item text-body-secondary"
+                    >
+                      Aucun protocole trouvé
+                    </li>
+
+                    <template v-else>
+                      <li
+                        v-for="(p, i) in protocolResults"
+                        :key="p.protocolID"
+                        class="list-group-item list-group-item-action"
+                        :class="{ active: i === protocolActive }"
+                        role="option"
+                        :aria-selected="i === protocolActive"
+                        style="cursor: pointer"
+                        @mousedown.prevent
+                        @click="chooseProtocol(p)"
+                        @mouseenter="protocolActive = i"
+                      >
+                        {{ p.protocolName }}
+                      </li>
+                    </template>
+                  </ul>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-0" />
+
+          <!-- Lieu -->
+          <div class="d-grid gap-3">
+            <div class="fw-semibold">Lieu</div>
+
+            <div class="d-grid gap-2">
+              <div class="d-flex flex-wrap gap-2">
+                <button
+                  v-if="!showLocationSearch"
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  @click="openLocationSearch"
+                >
+                  {{ locationSelected ? 'Choisir un autre lieu' : 'Choisir un lieu existant' }}
+                </button>
+
+                <button
+                  v-else
+                  type="button"
+                  class="btn btn-outline-danger"
+                  @click="cancelLocationSearch"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  v-if="locationSelected && !showLocationSearch && !locationModified"
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  @click="detachLocation"
+                >
+                  Ne plus réutiliser ce lieu
+                </button>
+              </div>
+
+              <div v-if="showLocationSearch" class="position-relative">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Rechercher par localité ou commune..."
+                  autocomplete="off"
+                  v-model="locationInput"
+                  @input="onLocationInput"
+                  @keydown.esc="cancelLocationSearch"
+                  @keydown.enter.prevent
+                />
 
                 <ul
-                  v-if="protocolOpen"
-                  id="protocol-list"
+                  v-if="locationOpen"
                   class="list-group position-absolute w-100 shadow"
-                  style="z-index: 1050; max-height: 240px; overflow-y: auto"
-                  role="listbox"
+                  style="z-index: 1050; max-height: 300px; overflow-y: auto"
                 >
-                  <li v-if="protocolLoading" class="list-group-item text-body-secondary">
+                  <li v-if="locationLoading" class="list-group-item text-body-secondary">
                     Recherche...
                   </li>
 
                   <li
-                    v-else-if="protocolResults.length === 0"
+                    v-else-if="!locationResults.length"
                     class="list-group-item text-body-secondary"
                   >
-                    Aucun protocole trouvé
+                    Aucun lieu trouvé
                   </li>
 
                   <template v-else>
                     <li
-                      v-for="(p, i) in protocolResults"
-                      :key="p.protocolID"
+                      v-for="l in locationResults"
+                      :key="l.locationID"
                       class="list-group-item list-group-item-action"
-                      :class="{ active: i === protocolActive }"
-                      role="option"
-                      :aria-selected="i === protocolActive"
                       style="cursor: pointer"
-                      @mousedown.prevent
-                      @click="chooseProtocol(p)"
-                      @mouseenter="protocolActive = i"
+                      @click="chooseLocation(l)"
                     >
-                      {{ p.protocolName }}
+                      <div class="fw-semibold">
+                        {{ [l.locality, l.municipality].filter(Boolean).join(', ') || 'Lieu #' + l.locationID }}
+                      </div>
+                      <small class="text-body-secondary d-block">
+                        {{ locationPlace(l) || 'Province inconnue' }}
+                      </small>
+                      <small class="text-body-secondary d-block">
+                        {{ locationCoords(l) }}
+                      </small>
                     </li>
                   </template>
                 </ul>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Lieu -->
-      <div class="card">
-        <div class="card-header fw-semibold">Lieu</div>
-        <div class="card-body d-grid gap-3">
-
-          <div class="d-grid gap-2">
-            <div class="d-flex flex-wrap gap-2">
-              <button
-                v-if="!showLocationSearch"
-                type="button"
-                class="btn btn-outline-secondary"
-                @click="openLocationSearch"
+              <div
+                v-if="locationSelected"
+                class="alert py-2 mb-0"
+                :class="locationModified ? 'alert-warning' : 'alert-info'"
               >
-                {{ locationSelected ? 'Choisir un autre lieu' : 'Choisir un lieu existant' }}
-              </button>
-
-              <button
-                v-else
-                type="button"
-                class="btn btn-outline-danger"
-                @click="cancelLocationSearch"
-              >
-                Annuler
-              </button>
-
-              <button
-                v-if="locationSelected && !showLocationSearch && !locationModified"
-                type="button"
-                class="btn btn-outline-secondary"
-                @click="detachLocation"
-              >
-                Ne plus réutiliser ce lieu
-              </button>
-            </div>
-
-            <div v-if="showLocationSearch" class="position-relative">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Rechercher par localité ou commune..."
-                autocomplete="off"
-                v-model="locationInput"
-                @input="onLocationInput"
-                @keydown.esc="cancelLocationSearch"
-              />
-
-              <ul
-                v-if="locationOpen"
-                class="list-group position-absolute w-100 shadow"
-                style="z-index: 1050; max-height: 300px; overflow-y: auto"
-              >
-                <li v-if="locationLoading" class="list-group-item text-body-secondary">
-                  Recherche...
-                </li>
-
-                <li
-                  v-else-if="!locationResults.length"
-                  class="list-group-item text-body-secondary"
-                >
-                  Aucun lieu trouvé
-                </li>
-
-                <template v-else>
-                  <li
-                    v-for="l in locationResults"
-                    :key="l.locationID"
-                    class="list-group-item list-group-item-action"
-                    style="cursor: pointer"
-                    @click="chooseLocation(l)"
-                  >
-                    <div class="fw-semibold">
-                      {{ [l.locality, l.municipality].filter(Boolean).join(', ') || 'Lieu #' + l.locationID }}
-                    </div>
-                    <small class="text-body-secondary d-block">
-                      {{ locationPlace(l) || 'Province inconnue' }}
-                    </small>
-                    <small class="text-body-secondary d-block">
-                      {{ locationCoords(l) }}
-                    </small>
-                  </li>
+                <template v-if="locationModified">
+                  Vous avez modifié le lieu choisi : un nouveau lieu sera créé à l'enregistrement.
                 </template>
-              </ul>
+                <template v-else>
+                  Lieu existant sélectionné : il sera réutilisé tel quel. Modifiez un champ pour créer un nouveau lieu.
+                </template>
+              </div>
             </div>
 
-            <div
-              v-if="locationSelected"
-              class="alert py-2 mb-0"
-              :class="locationModified ? 'alert-warning' : 'alert-info'"
-            >
-              <template v-if="locationModified">
-                Vous avez modifié le lieu choisi : un nouveau lieu sera créé à l'enregistrement.
-              </template>
-              <template v-else>
-                Lieu existant sélectionné : il sera réutilisé tel quel. Modifiez un champ pour créer un nouveau lieu.
-              </template>
-            </div>
-          </div>
+            <div class="row g-3">
+              <div class="col-md">
+                <label class="form-label" for="f5">Pays</label>
+                <select class="form-select" id="f5" name="pays" v-model="paysSelected">
+                  <option :value="null">-- Choisir --</option>
+                  <option v-for="p in pays" :key="p.paysID" :value="p.paysID">
+                    {{ p.pays }}
+                  </option>
+                </select>
+              </div>
 
-          <div class="row g-3">
-            <div class="col-md">
-              <label class="form-label" for="f5">Pays</label>
-              <select class="form-select" id="f5" name="pays" v-model="paysSelected">
-                <option :value="null">-- Choisir --</option>
-                <option v-for="p in pays" :key="p.paysID" :value="p.paysID">
-                  {{ p.pays }}
-                </option>
-              </select>
-            </div>
-
-            <div class="col-md">
-              <label class="form-label" for="f6">
-                Province<span class="text-danger"> *</span>
-              </label>
-              <select
-                class="form-select"
-                id="f6"
-                name="province"
-                v-model="provinceSelected"
-                required
-              >
-                <option :value="null" disabled>-- Choisir --</option>
-                <option
-                  v-for="pr in provincesFiltrees"
-                  :key="pr.provinceID"
-                  :value="pr.provinceID"
+              <div class="col-md">
+                <label class="form-label" for="f6">
+                  Province<span class="text-danger"> *</span>
+                </label>
+                <select
+                  class="form-select"
+                  id="f6"
+                  name="province"
+                  v-model="provinceSelected"
+                  required
                 >
-                  {{ pr.province }}
-                </option>
-              </select>
+                  <option :value="null" disabled>-- Choisir --</option>
+                  <option
+                    v-for="pr in provincesFiltrees"
+                    :key="pr.provinceID"
+                    :value="pr.provinceID"
+                  >
+                    {{ pr.province }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md">
+                <label class="form-label" for="f7">
+                  Commune<span class="text-danger"> *</span>
+                </label>
+                <input
+                  class="form-control"
+                  type="text"
+                  id="f7"
+                  name="commune"
+                  v-model="commune"
+                  required
+                />
+              </div>
             </div>
 
-            <div class="col-md">
-              <label class="form-label" for="f7">
-                Commune<span class="text-danger"> *</span>
-              </label>
-              <input
-                class="form-control"
-                type="text"
-                id="f7"
-                name="commune"
-                v-model="commune"
-                required
-              />
+            <div class="row g-3">
+              <div class="col-md">
+                <label class="form-label" for="f8">Localité</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  id="f8"
+                  name="localite"
+                  v-model="localite"
+                />
+              </div>
+
+              <div class="col-md">
+                <label class="form-label" for="f9">Latitude</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  inputmode="decimal"
+                  id="f9"
+                  name="latitude"
+                  v-model="latitude"
+                  placeholder="-18.9"
+                />
+              </div>
+
+              <div class="col-md">
+                <label class="form-label" for="f10">Longitude</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  inputmode="decimal"
+                  id="f10"
+                  name="longitude"
+                  v-model="longitude"
+                  placeholder="48.4"
+                />
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                :disabled="geoLoading"
+                @click="useMyPosition"
+              >
+                {{ geoLoading ? 'Localisation...' : 'Ma position' }}
+              </button>
+              <small v-if="geoError" class="text-danger">{{ geoError }}</small>
             </div>
           </div>
 
-          <div class="row g-3">
-            <div class="col-md">
-              <label class="form-label" for="f8">Localité</label>
-              <input
-                class="form-control"
-                type="text"
-                id="f8"
-                name="localite"
-                v-model="localite"
-              />
-            </div>
+          <div v-if="error" class="alert alert-danger mb-0" role="alert">{{ error }}</div>
 
-            <div class="col-md">
-              <label class="form-label" for="f9">Latitude</label>
-              <input
-                class="form-control"
-                type="text"
-                inputmode="decimal"
-                id="f9"
-                name="latitude"
-                v-model="latitude"
-                placeholder="-18.9"
-              />
-            </div>
-
-            <div class="col-md">
-              <label class="form-label" for="f10">Longitude</label>
-              <input
-                class="form-control"
-                type="text"
-                inputmode="decimal"
-                id="f10"
-                name="longitude"
-                v-model="longitude"
-                placeholder="48.4"
-              />
-            </div>
-          </div>
-
-          <div class="d-flex flex-wrap align-items-center gap-2">
+          <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary" :disabled="saving">
+              {{ saving ? 'Enregistrement...' : 'Enregistrer la ligne' }}
+            </button>
             <button
               type="button"
               class="btn btn-outline-secondary"
-              :disabled="geoLoading"
-              @click="useMyPosition"
+              :disabled="saving"
+              @click="fermerFormulaire"
             >
-              {{ geoLoading ? 'Localisation...' : 'Ma position' }}
+              Fermer
             </button>
-            <small v-if="geoError" class="text-danger">{{ geoError }}</small>
           </div>
-        </div>
+
+        </form>
       </div>
 
-      <div v-if="error" class="alert alert-danger mb-0" role="alert">
-        {{ error }}
-      </div>
-
-      <div class="d-flex flex-wrap gap-2">
-        <router-link
-          class="btn btn-outline-secondary"
-          to="/saisie/brouillons-hors-ligne"
-          data-toast="Brouillon enregistré"
-        >
-          Enregistrer le brouillon
-        </router-link>
-
-        <button type="submit" class="btn btn-primary" :disabled="loading">
-          {{ loading ? 'Enregistrement...' : 'Suivant' }}
-        </button>
-      </div>
-    </form>
+    </template>
 
   </main>
 </template>

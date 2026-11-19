@@ -3,13 +3,15 @@ import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import SearchSelect from '../../components/SearchSelect.vue'
-import { getItems, insertItem } from '../../services/api'
+import { getItems, insertItem, getItemById } from '../../services/api'
 
 usePage()
 
 const route = useRoute()
 
 const idOccurrence = Number(route.params.idOccurrence)
+const idEvent = ref(0)
+const idDataset = ref(0)
 const occurrenceValide = Number.isInteger(idOccurrence) && idOccurrence > 0
 
 const formatDate = (d) =>
@@ -39,6 +41,16 @@ const perPage = ref(5)
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)))
 
 let mesuresRequestId = 0
+const occurrence = ref(null)
+async function fetchOccurrence() {
+    try {
+        occurrence.value = await getItemById('occurrences', idOccurrence)
+        idEvent.value = occurrence.value.event?.eventID || 0
+        idDataset.value = occurrence.value.event?.dataset?.datasetID || 0
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'occurrence :", error)
+    }
+}
 
 async function fetchMesures() {
     const requestId = ++mesuresRequestId
@@ -49,7 +61,7 @@ async function fetchMesures() {
         const { items, total: totalCount } = await getItems(
             'measurement-or-facts',
             { 'occurrence.occurrenceID': idOccurrence },
-            { page: page.value, perPage: perPage.value, sort: 'measurementID,desc' }
+            { page: page.value, perPage: perPage.value, sort: 'measurementDeterminedDate,desc' }
         )
 
         if (requestId !== mesuresRequestId) return
@@ -270,6 +282,7 @@ async function enregistrer() {
 onMounted(() => {
     if (!occurrenceValide) return
     fetchMesures()
+    fetchOccurrence()
 })
 </script>
 
@@ -287,8 +300,12 @@ onMounted(() => {
     <h1 class="h3 mb-0">Nouvelle observation</h1>
 
     <ul class="nav nav-tabs">
-      <li class="nav-item"><router-link class="nav-link" to="/saisie/saisie-contexte">1 Contexte</router-link></li>
-      <li class="nav-item"><router-link class="nav-link" to="/saisie/saisie-observations">2 Observations</router-link></li>
+      <li class="nav-item">
+        <router-link class="nav-link" :to="`/saisie/saisie-contexte/${idDataset}`">
+          1 Contexte
+        </router-link>
+      </li>
+      <li class="nav-item"><router-link class="nav-link" :to="`/saisie/saisie-observations/${idEvent}`">2 Observations</router-link></li>
       <li class="nav-item">
         <router-link class="nav-link" :to="`/saisie/saisie-identification/${idOccurrence}`">3 Identification</router-link>
       </li>
@@ -336,7 +353,7 @@ onMounted(() => {
                 </tr>
 
                 <template v-else>
-                  <tr v-for="m in mesures" :key="m.measurementID" :title="m.measurementRemarks || undefined">
+                  <tr v-for="m in mesures" :key="m.measurementOrFactID" :title="m.measurementRemarks || undefined">
                     <td>{{ m.measurementType?.measurementType ?? '-' }}</td>
                     <td>{{ afficherValeur(m.measurementValue) }}</td>
                     <td>{{ m.measurementUnit?.measurementUnit ?? '-' }}</td>
@@ -550,12 +567,6 @@ onMounted(() => {
       <div class="d-flex flex-wrap gap-2">
         <router-link class="btn btn-outline-secondary" :to="`/saisie/saisie-identification/${idOccurrence}`">
           Précédent
-        </router-link>
-        <router-link class="btn btn-outline-secondary" to="/saisie/brouillons-hors-ligne">
-          Enregistrer le brouillon
-        </router-link>
-        <router-link class="btn btn-primary" to="/saisie/saisie-recapitulatif">
-          Terminer et soumettre
         </router-link>
       </div>
 

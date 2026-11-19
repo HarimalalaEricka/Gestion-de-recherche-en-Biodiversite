@@ -12,6 +12,8 @@ const GBIF_API = (import.meta.env.VITE_GBIF_API_URL || '').replace(/\/$/, '')
 
 const route = useRoute()
 const idOccurrence = ref(route.params.idOccurrence)
+const idEvent = ref(0)
+const idDataset = ref(0)
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -62,6 +64,8 @@ const occurrence = ref(null)
 async function fetchOccurrence() {
     try {
         occurrence.value = await getItemById('occurrences', idOccurrence.value)
+        idEvent.value = occurrence.value.event?.eventID || 0
+        idDataset.value = occurrence.value.event?.dataset?.datasetID || 0
     } catch (error) {
         console.error("Erreur lors de la récupération de l'occurrence :", error)
     }
@@ -448,24 +452,31 @@ onMounted(() => {
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-        <router-link class="nav-link" to="/saisie/saisie-contexte">
+        <router-link class="nav-link" :to="`/saisie/saisie-contexte/${idDataset}`">
           1 Contexte
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link class="nav-link" to="/saisie/saisie-observations">
+        <router-link class="nav-link" :to="`/saisie/saisie-observations/${idEvent}`">
           2 Observations
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link class="nav-link active" to="/saisie/saisie-identification">
+        <router-link class="nav-link active" :to="`/saisie/saisie-identification/${idOccurrence}`">
           3 Identification
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link class="nav-link" to="/saisie/saisie-complements">
-          4 Compléments
-        </router-link>
+        <div v-if="identifications.length > 0">
+           <router-link class="nav-link" :to="`/saisie/saisie-complements/${idOccurrence}`">
+            4 Compléments
+          </router-link>
+        </div>
+        <div v-else>
+          <span class="nav-link disabled" aria-disabled="true">
+            4 Compléments
+          </span>
+        </div>
       </li>
     </ul>
 
@@ -876,25 +887,18 @@ onMounted(() => {
     <div class="d-flex flex-wrap gap-2">
       <router-link
         class="btn btn-outline-secondary"
-        to="/saisie/saisie-observations"
+        :to="`/saisie/saisie-observations/${idEvent}`"
       >
         Précédent
       </router-link>
-
-      <a
-        class="btn btn-outline-secondary"
-        href="/saisie/brouillons-hors-ligne"
-        data-toast="Brouillon enregistré"
-      >
-        Enregistrer le brouillon
-      </a>
-
-      <router-link
-        class="btn btn-primary"
-        to="/saisie/saisie-complements"
-      >
-        Suivant : compléments
-      </router-link>
+      <div v-if="identifications.length > 0">
+        <router-link
+          class="btn btn-primary"
+          :to="`/saisie/saisie-complements/${idOccurrence}`"
+        >
+          Suivant : compléments
+        </router-link>
+      </div>
     </div>
 
   </main>

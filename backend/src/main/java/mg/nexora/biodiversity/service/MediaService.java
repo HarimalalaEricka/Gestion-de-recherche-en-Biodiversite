@@ -11,7 +11,10 @@ import mg.nexora.biodiversity.repository.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
-
+import mg.nexora.biodiversity.util.FilterSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -54,8 +57,8 @@ public class MediaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Media> findAll() {
-        return repository.findAll();
+    public Page<Media> findAll(Map<String, String> params, Pageable pageable) {
+        return repository.findAll(FilterSpec.<Media>from(params), pageable);
     }
 
     @Transactional(readOnly = true)

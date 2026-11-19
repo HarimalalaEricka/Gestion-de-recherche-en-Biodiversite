@@ -367,7 +367,7 @@ onMounted(() => {
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-        <span class="nav-link disabled">1 Contexte</span>
+        <router-link class="nav-link" :to="versContexte">1 Contexte</router-link>
       </li>
       <li class="nav-item">
         <router-link class="nav-link active" :to="versOnglet('/saisie/saisie-observations')">2 Observations</router-link>
@@ -726,12 +726,6 @@ onMounted(() => {
 
       <div class="d-flex flex-wrap gap-2">
         <router-link class="btn btn-outline-secondary" :to="versContexte">Précédent</router-link>
-        <router-link class="btn btn-outline-secondary" to="/saisie/brouillons-hors-ligne">
-          Enregistrer le brouillon
-        </router-link>
-        <!-- <router-link class="btn btn-primary" :to="versOnglet('/saisie/saisie-identification')">
-          Suivant : identification
-        </router-link> -->
       </div>
 
     </template>
