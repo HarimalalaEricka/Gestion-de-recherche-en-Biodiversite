@@ -4,9 +4,10 @@ import { usePage } from '../../composables/usePage'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { getItemById, getItems } from '../../services/api'
+import { useAccessError } from '../../composables/useAccessError'
 
 usePage()
-
+const { gererAcces } = useAccessError()
 const route = useRoute()
 
 const idOccurrence = Number(route.params.idOccurrence)
@@ -52,6 +53,7 @@ async function fetchOccurrence() {
             idOccurrence
         )
     } catch (e) {
+        if (gererAcces(e)) return
         console.error(
             "Erreur lors du chargement de l'occurrence : ",
             e
@@ -75,6 +77,7 @@ async function fetchIdentifications() {
         total.value = totalCount
 
     } catch (e) {
+        // if (gererAcces(error)) return
         console.error(
             'Erreur lors du chargement des identifications : ',
             e
@@ -98,6 +101,7 @@ async function fetchMedias() {
         mediaPosition.value = 0
 
     } catch (e) {
+        // if (gererAcces(error)) return
         console.error(
             'Erreur lors du chargement des médias : ',
             e

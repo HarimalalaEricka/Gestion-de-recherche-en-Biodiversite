@@ -15,25 +15,16 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
-public class OccurrenceService {
+public class OccurrenceService extends SecuredService<Occurrence> {
     private final OccurrenceRepository repository;
     private final AgentRepository agentRepository;
     private final OccurrenceAgentRepository occurrenceAgentRepository;
 
-    public OccurrenceService(OccurrenceRepository repository, AgentRepository agentRepository, OccurrenceAgentRepository occurrenceAgentRepository) {
+    public OccurrenceService(OccurrenceRepository repository, AgentRepository agentRepository, OccurrenceAgentRepository occurrenceAgentRepository, AccessGuard guard) {
+        super(repository, guard, "event.dataset.recherche", "occurrenceID");
         this.repository = repository;
         this.agentRepository = agentRepository;
         this.occurrenceAgentRepository = occurrenceAgentRepository;
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Occurrence> findAll(Map<String, String> params, Pageable pageable) {
-        return repository.findAll(FilterSpec.<Occurrence>from(params), pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Occurrence> findById(Integer id) {
-        return repository.findById(id);
     }
 
     @Transactional
@@ -55,7 +46,6 @@ public class OccurrenceService {
         return savedOccurrence;
     }
 
-    // Modification simple, sans recréer l'association avec l'agent
     @Transactional
     public Occurrence update(Occurrence entity) {
         return repository.save(entity);

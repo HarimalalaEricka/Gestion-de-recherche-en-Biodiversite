@@ -4,9 +4,10 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import SearchSelect from '../../components/SearchSelect.vue'
 import { getItems, insertItem, getItemById } from '../../services/api'
+import { useAccessError } from '../../composables/useAccessError'
 
 usePage()
-
+const { gererAcces } = useAccessError()
 const route = useRoute()
 
 const idOccurrence = Number(route.params.idOccurrence)
@@ -48,6 +49,7 @@ async function fetchOccurrence() {
         idEvent.value = occurrence.value.event?.eventID || 0
         idDataset.value = occurrence.value.event?.dataset?.datasetID || 0
     } catch (error) {
+        if (gererAcces(error)) return
         console.error("Erreur lors de la récupération de l'occurrence :", error)
     }
 }
@@ -562,6 +564,18 @@ onMounted(() => {
           </div>
 
         </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header fw-semibold">Options avancées</div>
+        <div class="card-body d-grid gap-3">
+          <ul class="list-unstyled mb-0 d-grid gap-1">
+            <li>▸ Contexte géologique (fossiles)</li>
+            <li>▸ Interactions entre organismes</li>
+            <li>▸ Matériel / collection</li>
+            <li>▸ Analyse ADN</li>
+          </ul>
+        </div>
       </div>
 
       <div class="d-flex flex-wrap gap-2">

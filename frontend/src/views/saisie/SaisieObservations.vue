@@ -711,19 +711,6 @@ onMounted(() => {
 
         </form>
       </div>
-
-      <div class="card">
-        <div class="card-header fw-semibold">Options avancées</div>
-        <div class="card-body d-grid gap-3">
-          <ul class="list-unstyled mb-0 d-grid gap-1">
-            <li>▸ Contexte géologique (fossiles)</li>
-            <li>▸ Interactions entre organismes</li>
-            <li>▸ Matériel / collection</li>
-            <li>▸ Analyse ADN</li>
-          </ul>
-        </div>
-      </div>
-
       <div class="d-flex flex-wrap gap-2">
         <router-link class="btn btn-outline-secondary" :to="versContexte">Précédent</router-link>
       </div>
