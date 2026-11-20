@@ -1,11 +1,14 @@
 package mg.nexora.biodiversity.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mg.nexora.biodiversity.model.MeasurementType;
 import mg.nexora.biodiversity.service.MeasurementTypeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/measurement-types")
@@ -17,8 +20,8 @@ public class MeasurementTypeController {
     }
 
     @GetMapping
-    public List<MeasurementType> findAll() {
-        return service.findAll();
+    public Page<MeasurementType> findAll(@RequestParam Map<String, String> params, Pageable pageable) {
+        return service.findAll(params, pageable);
     }
 
     @GetMapping("/{id}")

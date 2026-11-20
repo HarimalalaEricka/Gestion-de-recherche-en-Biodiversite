@@ -51,6 +51,12 @@ public class Taxon {
     @JoinColumn(name = "taxonrankid", nullable = false)
     private TaxonRank taxonRank;
 
+    @Column(name = "gbifkey", unique = true)
+    private Long gbifKey;
+
+    public Long getGbifKey() { return gbifKey; }
+    public void setGbifKey(Long gbifKey) { this.gbifKey = gbifKey; }
+
     public Integer getTaxonID() { return taxonID; }
 
     public void setTaxonID(Integer taxonID) { this.taxonID = taxonID; }

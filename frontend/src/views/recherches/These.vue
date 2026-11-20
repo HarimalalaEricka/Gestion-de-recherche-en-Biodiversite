@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '../../composables/usePage'
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { getItems, getItemById, uploadMedia, deleteItem } from "../../services/api";
+import { getItems, getItemById, uploadMediaRecherche, deleteItem } from "../../services/api";
 
 usePage();
 
@@ -258,7 +258,7 @@ async function uploadAll() {
     item.status = "uploading";
 
     try {
-      await uploadMedia(
+      await uploadMediaRecherche(
         props.idRecherche,
         item.file,
         item.caption,
